@@ -12,7 +12,7 @@ public class AwsConfig {
     public BedrockRuntimeClient bedrockRuntimeClient() {
         return BedrockRuntimeClient.builder()
                 .credentialsProvider(DefaultCredentialsProvider.create())
-                .region(Region.AP_NORTHEAST_2)
+                .region(Region.US_EAST_1)
                 .build();
     }
 }
