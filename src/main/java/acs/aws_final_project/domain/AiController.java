@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/v1/text")
+@RequestMapping("/v1/ai")
 public class AiController {
 
     private final GptService gptService;

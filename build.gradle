@@ -39,11 +39,17 @@ dependencies {
 	implementation platform('software.amazon.awssdk:bom:2.26.3')
 	implementation 'software.amazon.awssdk:bedrockruntime'
 
+	// aws s3
+	//implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.6.6.RELEASE'
+	implementation 'io.awspring.cloud:spring-cloud-starter-aws:2.4.4'
+
 	//dall-e
 	implementation 'org.apache.httpcomponents.client5:httpclient5:5.4'
 
 	//jackson
 	implementation 'com.fasterxml.jackson.core:jackson-databind:2.15.2'
+
+	implementation 'com.googlecode.json-simple:json-simple:1.1'
 
 }
 

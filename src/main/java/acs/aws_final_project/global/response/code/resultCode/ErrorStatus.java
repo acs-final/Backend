@@ -11,7 +11,9 @@ import org.springframework.http.HttpStatus;
 public enum ErrorStatus implements BaseErrorCode {
 
     // Global
-    INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "GLOBAL401", "서버 오류");
+    INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "GLOBAL401", "서버 오류"),
+
+    FILE_UPLOAD_FAILED(HttpStatus.BAD_REQUEST, "GLOBAL404", "파일 업로드 실패");
 
 
     private final HttpStatus httpStatus;

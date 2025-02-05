@@ -32,15 +32,17 @@ public class DalleService {
     @Value("${gpt.api.key}")
     private String apiKey;
 
-    @Value("${gpt.api.dalle.url")
+    @Value("${gpt.dalle.url}")
     private String DALL_E_URL;
 
 
     private final String downloadPath = "D:/Intellij-workspace"; // 이미지를 저장할 로컬 경로
 
 
-    public String generateImage(String prompt) throws Exception {
+    public String generateImage(String message) throws Exception {
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+            String prompt = "Create a cartoon-style illustration based on " + message;
+
             HttpPost request = new HttpPost(DALL_E_URL);
 
             // 설정: 헤더
@@ -50,10 +52,11 @@ public class DalleService {
             // JSON Body 생성 (안전한 방식 사용)
             ObjectMapper objectMapper = new ObjectMapper();
             Map<String, Object> requestBody = new HashMap<>();
-            //requestBody.put("model", "dall-e-3");
+            requestBody.put("model", "dall-e-3");
             requestBody.put("prompt", prompt);
             requestBody.put("n", 1);
             requestBody.put("size", "1024x1024");
+
 
             String jsonBody = objectMapper.writeValueAsString(requestBody);
             request.setEntity(new StringEntity(jsonBody, ContentType.APPLICATION_JSON));
@@ -85,7 +88,6 @@ public class DalleService {
 
     //로컬 경로에 다운로드.
     public void downloadImage(String imageUrl, String fileName) throws Exception {
-        RestTemplate restTemplate = new RestTemplate();
 
         fileName = fileName + ".png";
 
