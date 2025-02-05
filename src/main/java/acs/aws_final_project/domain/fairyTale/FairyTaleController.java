@@ -23,13 +23,16 @@ public class FairyTaleController {
     private final NovaService novaService;
 
     @PostMapping("/sonnet")
-    public ApiResponse<FairyTaleResponseDto.FairyTaleResultDto> createFairyTale(@RequestBody FairyTaleRequestDto.FairyTaleCreateDto requestDto){
+    public ApiResponse<Object> createFairyTale(@RequestBody FairyTaleRequestDto.FairyTaleCreateDto requestDto){
 
         String genre = requestDto.getGenre();
         String gender = requestDto.getGender();
         String challenge = requestDto.getChallenge();
 
         FairyTaleResponseDto.FairyTaleResultDto result = sonnetService.createFairyTale(genre, gender, challenge);
+        //String result = sonnetService.createFairyTale(genre, gender, challenge);
+
+        //Object result = sonnetService.createFairyTaleByInvoke(genre, gender, challenge);
 
         return ApiResponse.onSuccess(result);
     }
