@@ -8,6 +8,7 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Builder;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import software.amazon.awssdk.auth.credentials.*;
@@ -21,8 +22,14 @@ import java.time.Duration;
 @Configuration
 public class AwsConfig {
 
-    private final String accessKey = System.getenv("aws_access_key_id");
-    private final String secretKey = System.getenv("aws_secret_access_key");
+    @Value("${aws.config.accessKey}")
+    private String accessKey;
+
+    @Value("${aws.config.secretKey}")
+    private String secretKey;
+
+//    private final String accessKey = System.getenv("aws_access_key_id");
+//    private final String secretKey = System.getenv("aws_secret_access_key");
 
     @Bean
     public BedrockRuntimeClient bedrockRuntimeClient() {
