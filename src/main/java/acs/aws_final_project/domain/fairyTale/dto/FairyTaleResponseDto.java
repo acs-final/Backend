@@ -18,8 +18,8 @@ public class FairyTaleResponseDto {
 
         private String title;
         private TreeMap<String, String> body;
+        private TreeMap<String, String> prompt;
         private List<String> keywords;
-
     }
 
     @AllArgsConstructor
@@ -29,4 +29,14 @@ public class FairyTaleResponseDto {
     public static class Pages{
         private String page;
     }
+
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Getter
+    @Builder
+    public static class Prompt{
+        private String prompt;
+    }
+
+
 }
