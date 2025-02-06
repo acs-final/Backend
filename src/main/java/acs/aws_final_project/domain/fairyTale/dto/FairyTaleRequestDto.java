@@ -18,4 +18,15 @@ public class FairyTaleRequestDto {
         private String challenge;
 
     }
+
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Getter
+    @Builder
+    public static class PollyRequestDto{
+
+        private String text;
+        private String fileName;
+
+    }
 }

@@ -144,16 +144,16 @@ public class NovaService {
 
 
 
-//    @Transactional
-//    public String uploadImage(MultipartFile imageFile) {
-//        String imageUrl;
-//
-//        try {
-//            imageUrl = amazonS3UploadService.uploadFile(imageFile, "nova-image");
-//        } catch (Exception e) {
-//            throw new NovaHandler(ErrorStatus.FILE_UPLOAD_FAILED);
-//        }
-//
-//        return imageUrl;
-//    }
+    @Transactional
+    public String uploadImage(MultipartFile imageFile, String fileName) {
+        String imageUrl;
+
+        try {
+            imageUrl = amazonS3UploadService.uploadFile(imageFile, fileName,"nova-image");
+        } catch (Exception e) {
+            throw new NovaHandler(ErrorStatus.FILE_UPLOAD_FAILED);
+        }
+
+        return imageUrl;
+    }
 }

@@ -31,5 +31,13 @@ public class FairyTaleResponseDto {
         private String page;
     }
 
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Getter
+    @Builder
+    public static class PollyResultDto{
+        private String mp3Url;
+    }
+
 
 }

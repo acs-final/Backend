@@ -1,0 +1,84 @@
+package acs.aws_final_project.domain.fairyTale.service;
+
+import acs.aws_final_project.global.response.code.resultCode.ErrorStatus;
+import acs.aws_final_project.global.response.exception.handler.NovaHandler;
+import acs.aws_final_project.global.util.AmazonS3UploadService;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+import software.amazon.awssdk.core.ResponseInputStream;
+import software.amazon.awssdk.services.polly.PollyClient;
+import software.amazon.awssdk.services.polly.model.*;
+
+import java.io.FileOutputStream;
+import java.io.InputStream;
+
+@Slf4j
+@Service
+@RequiredArgsConstructor
+@Transactional(readOnly = true)
+public class PollyService {
+
+
+    private final AmazonS3UploadService amazonS3UploadService;
+    private final PollyClient pollyClient;
+
+
+    public String createMP3(String text, String fileDir, String fileName){
+
+        log.info("text: {}", text);
+
+        SynthesizeSpeechRequest request = SynthesizeSpeechRequest.builder()
+                .text(text)
+                .voiceId(VoiceId.SEOYEON)  // 영어 여성 목소리
+                .outputFormat(OutputFormat.MP3)
+                .languageCode(LanguageCode.KO_KR)
+                .textType(TextType.SSML)
+                .build();
+
+        String mp3Name = fileDir + "/" + fileName;
+
+        try (ResponseInputStream<SynthesizeSpeechResponse> response = pollyClient.synthesizeSpeech(request);
+             InputStream audioStream = response) {
+
+//            try (FileOutputStream outputStream = new FileOutputStream(mp3Name)) {
+//                byte[] buffer = new byte[1024];
+//                int bytesRead;
+//                while ((bytesRead = audioStream.read(buffer)) != -1) {
+//                    outputStream.write(buffer, 0, bytesRead);
+//                }
+//                System.out.println("MP3 파일 생성 완료: " + mp3Name);
+//            }
+
+            return uploadMP3(audioStream, fileName);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+
+        return mp3Name;
+
+    }
+
+
+    @Transactional
+    public String uploadMP3(InputStream audioStream, String fileName) {
+
+        String mp3Url;
+
+        try {
+            mp3Url = amazonS3UploadService.uploadMP3(audioStream, fileName, "polly-mp3");
+
+            log.info("mp3Url: {}", mp3Url);
+
+        } catch (Exception e) {
+            throw new NovaHandler(ErrorStatus.FILE_UPLOAD_FAILED);
+        }
+
+        return mp3Url;
+    }
+
+}
