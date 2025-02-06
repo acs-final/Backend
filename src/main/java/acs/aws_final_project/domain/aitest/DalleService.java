@@ -1,4 +1,4 @@
-package acs.aws_final_project.domain;
+package acs.aws_final_project.domain.aitest;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;

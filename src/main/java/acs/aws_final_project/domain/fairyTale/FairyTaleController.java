@@ -11,10 +11,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDateTime;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import software.amazon.awssdk.services.bedrockruntime.endpoints.internal.Value;
 
 @Slf4j
 @RestController
@@ -26,10 +24,21 @@ public class FairyTaleController {
     private final SonnetService sonnetService;
     private final NovaService novaService;
 
+
+    @GetMapping("/{fairytaleId}")
+    public ApiResponse<FairyTaleResponseDto.FairyTaleResultDto> getFairyTale(@PathVariable Long fairytaleId){
+
+        log.info("getFairyTale API Request time: {}", LocalDateTime.now());
+
+        FairyTaleResponseDto.FairyTaleResultDto findFairyTale = sonnetService.getFairyTale(fairytaleId);
+
+        return ApiResponse.onSuccess(findFairyTale);
+    }
+
     @PostMapping("/sonnet")
     public ApiResponse<Object> createFairyTale(@RequestBody FairyTaleRequestDto.FairyTaleCreateDto requestDto){
 
-        log.info("API Request time: {}", LocalDateTime.now());
+        log.info("createFairyTale API Request time: {}", LocalDateTime.now());
 
         String genre = requestDto.getGenre();
         String gender = requestDto.getGender();

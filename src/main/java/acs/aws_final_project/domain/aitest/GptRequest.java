@@ -1,4 +1,4 @@
-package acs.aws_final_project.domain;
+package acs.aws_final_project.domain.aitest;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

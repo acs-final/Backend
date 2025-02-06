@@ -16,6 +16,7 @@ public class FairyTaleResponseDto {
     @Builder
     public static class FairyTaleResultDto{
 
+        private Long fairytaleId;
         private String title;
         private TreeMap<String, String> body;
         //private List<Pages> body;

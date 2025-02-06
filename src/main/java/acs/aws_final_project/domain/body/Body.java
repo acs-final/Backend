@@ -25,7 +25,6 @@ public class Body extends BaseEntity {
 
     private Integer pageNumber;
 
-    private Float score;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "fairytale_id")

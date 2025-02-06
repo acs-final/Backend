@@ -31,6 +31,8 @@ public class FairyTale extends BaseEntity {
 
     private String title;
 
+    private Float score;
+
     @OneToMany(mappedBy = "fairyTale", cascade = CascadeType.ALL)
     private List<Body> body;
 
