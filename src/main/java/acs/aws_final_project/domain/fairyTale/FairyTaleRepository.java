@@ -6,5 +6,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface FairyTaleRepository extends JpaRepository<FairyTale, Long> {
 
+    FairyTale findByTitle(String title);
 
 }

@@ -1,4 +1,4 @@
-package acs.aws_final_project.domain;
+package acs.aws_final_project.domain.aitest;
 
 import acs.aws_final_project.global.response.ApiResponse;
 import lombok.RequiredArgsConstructor;
