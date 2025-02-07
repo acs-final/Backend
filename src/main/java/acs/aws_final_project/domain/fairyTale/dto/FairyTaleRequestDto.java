@@ -23,6 +23,18 @@ public class FairyTaleRequestDto {
     @NoArgsConstructor
     @Getter
     @Builder
+    public static class StablediffusionRequestDto{
+
+        private String title;
+        private String fileName;
+        private String prompt;
+
+    }
+
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Getter
+    @Builder
     public static class PollyRequestDto{
 
         private String text;

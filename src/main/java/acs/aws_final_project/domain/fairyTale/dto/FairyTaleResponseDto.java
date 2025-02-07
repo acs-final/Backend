@@ -20,7 +20,7 @@ public class FairyTaleResponseDto {
         private String title;
         private TreeMap<String, String> body;
         //private List<Pages> body;
-        private List<String> keywords;
+
     }
 
     @AllArgsConstructor
@@ -29,6 +29,15 @@ public class FairyTaleResponseDto {
     @Builder
     public static class Pages{
         private String page;
+    }
+
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Getter
+    @Builder
+    public static class StablediffusionResultDto{
+        //private Integer pageNumber;
+        private String imageUrl;
     }
 
     @AllArgsConstructor

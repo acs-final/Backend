@@ -1,6 +1,5 @@
 package acs.aws_final_project.domain.fairyTale.service;
 
-import acs.aws_final_project.domain.fairyTale.dto.FairyTaleResponseDto;
 import acs.aws_final_project.global.response.code.resultCode.ErrorStatus;
 import acs.aws_final_project.global.response.exception.handler.NovaHandler;
 import acs.aws_final_project.global.util.AmazonS3UploadService;
@@ -29,11 +28,11 @@ import java.util.Map;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class NovaService {
+public class StableDiffusionService {
 
 
-    @Value("${aws.bedrock.nova.model}")
-    private String NOVA_MODEL_ID;
+    @Value("${aws.bedrock.stablediffusion.model}")
+    private String STABLEDIFFUSION_MODEL_ID;
 
 
     private final BedrockRuntimeClient bedrockRuntimeClient;
@@ -44,47 +43,32 @@ public class NovaService {
 
     private final String SYSTEM_PROMPT_NOVA = "Create a cartoon-style illustration based on ";
 
-    public Object createImage(String promptText) throws JsonProcessingException {
-        String message = promptText;
+    public String createImage(String title, String fileName, String promptText) throws JsonProcessingException {
+        String message = SYSTEM_PROMPT_NOVA + "\"" + promptText + "\"";
+        String fileDirName = title + "/" + fileName + ".png";
 
         log.info("message: {}", message);
 
         Map<String, Object> payload = new HashMap<>();
-        payload.put("taskType", "TEXT_IMAGE");
+        payload.put("mode", "text-to-image");
 
-        Map<String, Object> textToImageParams = new HashMap<>();
-        textToImageParams.put("text", message);
 
-        payload.put("textToImageParams", textToImageParams);
+        payload.put("prompt", message);
 
-        Map<String, Object> imageConfig = new HashMap<>();
-        imageConfig.put("numberOfImages", 1);
-//        imageConfig.put("width", 1024);
-//        imageConfig.put("height", 1024);
-//        imageConfig.put("cfgScale", 7.5); // 이미지 품질 조정
-//        imageConfig.put("seed", 42); // 랜덤성 고정
+        payload.put("aspect_ratio", "1:1");
+        payload.put("output_format", "png");
 
-        payload.put("imageGenerationConfig", imageConfig);
 
         log.info("payload: {}", payload);
 
         String requestBody = objectMapper.writeValueAsString(payload);
 
-        // "content"의 올바른 형식 적용
-//        Map<String, String> contentObject = new HashMap<>();
-//        contentObject.put("text", message);
-//
-//        Map<String, Object> userMessage = new HashMap<>();
-//        userMessage.put("role", "user");
-//        userMessage.put("content", List.of(contentObject));
-//
-//        Map<String, Object> payload = new HashMap<>();
-//        payload.put("messages", List.of(userMessage));
-//
-//        String requestBody = objectMapper.writeValueAsString(payload);
+
 
         InvokeModelRequest request = InvokeModelRequest.builder()
-                .modelId("amazon.nova-canvas-v1:0") // ✅ Nova Canvas 모델 사용
+                //.modelId("stability.sd3-5-large-v1:0")
+                .modelId(STABLEDIFFUSION_MODEL_ID)
+                //.modelId("stability.sd3-large-v1:0")
                 .contentType("application/json")
                 .body(SdkBytes.fromByteArray(requestBody.getBytes(StandardCharsets.UTF_8)))
                 .build();
@@ -98,7 +82,8 @@ public class NovaService {
         //log.info("ResponseBody: {}", responseBody);
 
         // 이미지 파일을 저장할 경로 지정
-        String filePath = "D:/novaImage/image3.png";  // 예시 경로, 저장할 실제 경로로 변경
+        //String filePath = "D:/novaImage/image5.png";  // 예시 경로, 저장할 실제 경로로 변경
+        String filePath = "";
 
         // 이미지를 파일로 저장하는 메소드 호출
         //saveImageFromBase64(responseBody, filePath);
@@ -117,15 +102,17 @@ public class NovaService {
                 // Base64 디코딩
                 byte[] decodedBytes = Base64.getDecoder().decode(base64Image);
 
-                // 이미지 파일로 저장 (예: generated_image.png)
-                try (FileOutputStream fos = new FileOutputStream(filePath)) {
-                    fos.write(decodedBytes);
-                    log.info("Image saved as generated_image.png");
-                } catch (IOException e) {
-                    log.error("Error saving the image: ", e);
-                }
 
-                //log.info("Decoded Data: {}", decodedBytes);
+                filePath = uploadImage(decodedBytes, fileDirName);
+
+                // 이미지 파일로 저장 (예: generated_image.png)
+//                try (FileOutputStream fos = new FileOutputStream(filePath)) {
+//                    fos.write(decodedBytes);
+//                    log.info("Image saved as generated_image.png");
+//                } catch (IOException e) {
+//                    log.error("Error saving the image: ", e);
+//                }
+
             }
 
             //return parseResponse(responseBody);
@@ -137,19 +124,12 @@ public class NovaService {
     }
 
 
-    private String parseResponse(String responseBody) throws Exception {
-        Map<String, Object> responseMap = objectMapper.readValue(responseBody, Map.class);
-        return responseMap.get("image_url").toString(); // 이미지 URL 반환
-    }
-
-
-
     @Transactional
-    public String uploadImage(MultipartFile imageFile, String fileName) {
+    public String uploadImage(byte[] imageBytes, String fileName) {
         String imageUrl;
 
         try {
-            imageUrl = amazonS3UploadService.uploadFile(imageFile, fileName,"nova-image");
+            imageUrl = amazonS3UploadService.uploadImage(imageBytes, fileName,"stablediffusion-image");
         } catch (Exception e) {
             throw new NovaHandler(ErrorStatus.FILE_UPLOAD_FAILED);
         }
