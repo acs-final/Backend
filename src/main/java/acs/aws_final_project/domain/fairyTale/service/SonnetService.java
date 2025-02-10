@@ -3,14 +3,11 @@ package acs.aws_final_project.domain.fairyTale.service;
 import acs.aws_final_project.domain.body.Body;
 import acs.aws_final_project.domain.body.BodyConverter;
 import acs.aws_final_project.domain.body.BodyRepository;
-import acs.aws_final_project.domain.fairyTale.FairyTale;
+import acs.aws_final_project.domain.fairyTale.Fairytale;
 import acs.aws_final_project.domain.fairyTale.FairyTaleConverter;
 import acs.aws_final_project.domain.fairyTale.FairyTaleRepository;
 import acs.aws_final_project.domain.fairyTale.dto.FairyTaleRequestDto;
 import acs.aws_final_project.domain.fairyTale.dto.FairyTaleResponseDto;
-import acs.aws_final_project.domain.keyword.Keyword;
-import acs.aws_final_project.domain.keyword.KeywordConverter;
-import acs.aws_final_project.domain.keyword.KeywordRepository;
 import acs.aws_final_project.global.response.code.resultCode.ErrorStatus;
 import acs.aws_final_project.global.response.exception.handler.SonnetHandler;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -25,7 +22,6 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 import org.jsoup.Jsoup;
-import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,7 +31,6 @@ import software.amazon.awssdk.services.bedrockruntime.BedrockRuntimeClient;
 import software.amazon.awssdk.services.bedrockruntime.model.*;
 
 import java.nio.charset.StandardCharsets;
-import java.security.Key;
 import java.util.*;
 
 @Slf4j
@@ -241,9 +236,9 @@ public class SonnetService {
             log.info("image urls: {}", imageUrls);
 
 
-            FairyTale myFairyTale = FairyTaleConverter.toFairyTale(title);
+            Fairytale myFairytale = FairyTaleConverter.toFairyTale(title);
 
-            fairyTaleRepository.save(myFairyTale);
+            fairyTaleRepository.save(myFairytale);
 
             sortedBody.forEach((key, value) -> {
                 String page = key.substring(4);
@@ -251,12 +246,12 @@ public class SonnetService {
                 log.info("page: {}", page);
                 log.info("pageNumber: {}", pageNumber);
 
-                Body body = FairyTaleConverter.toBody(value, pageNumber, myFairyTale);
+                Body body = FairyTaleConverter.toBody(value, pageNumber, myFairytale);
                 bodyRepository.save(body);
             });
 
             return myresult.builder()
-                    .fairytaleId(myFairyTale.getFairytaleId())
+                    .fairytaleId(myFairytale.getFairytaleId())
                     .title(title)
                     .body(resultBody)
                     .imageUrl(imageUrls)
@@ -284,13 +279,13 @@ public class SonnetService {
 
     public FairyTaleResponseDto.FairyTaleResultDto getFairyTale(Long fairytaleId){
 
-        FairyTale findFairyTale = fairyTaleRepository.findById(fairytaleId).orElseThrow(() -> new SonnetHandler(ErrorStatus.FAIRYTALE_NOT_FOUND));
+        Fairytale findFairytale = fairyTaleRepository.findById(fairytaleId).orElseThrow(() -> new SonnetHandler(ErrorStatus.FAIRYTALE_NOT_FOUND));
 
-        List<Body> findBody = bodyRepository.findAllByFairyTale(findFairyTale);
+        List<Body> findBody = bodyRepository.findAllByFairytale(findFairytale);
 
         return FairyTaleResponseDto.FairyTaleResultDto.builder()
                 .fairytaleId(fairytaleId)
-                .title(findFairyTale.getTitle())
+                .title(findFairytale.getTitle())
                 .body(BodyConverter.toBodies(findBody))
                 .build();
 

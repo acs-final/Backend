@@ -1,12 +1,11 @@
 package acs.aws_final_project.domain.bookstore;
 
 import acs.aws_final_project.domain.comment.Comment;
-import acs.aws_final_project.domain.fairyTale.FairyTale;
+import acs.aws_final_project.domain.fairyTale.Fairytale;
 import acs.aws_final_project.domain.member.Member;
 import acs.aws_final_project.global.baseEntity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.stereotype.Service;
 
 import java.util.List;
 
@@ -31,8 +30,10 @@ public class Bookstore extends BaseEntity {
 
     private Float score;
 
+    private Integer commentCount;
+
     @OneToOne
-    private FairyTale fairyTale;
+    private Fairytale fairytale;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")

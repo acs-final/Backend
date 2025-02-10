@@ -29,4 +29,18 @@ public class BookstoreResponseDto {
 
     }
 
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Getter
+    @Builder
+    public static class BookstoreListResultDto{
+
+        private Long bookstoreId;
+        private String title;
+        private String body;
+        private Float score;
+        private Long fairytaleId;
+
+    }
+
 }

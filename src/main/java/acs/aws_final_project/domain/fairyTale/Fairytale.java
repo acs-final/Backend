@@ -9,7 +9,6 @@ import acs.aws_final_project.domain.prompt.Prompt;
 import acs.aws_final_project.global.baseEntity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.data.annotation.TypeAlias;
 
 import java.util.List;
 
@@ -19,7 +18,7 @@ import java.util.List;
 @Table(name = "fairytale")
 @AllArgsConstructor
 @NoArgsConstructor
-public class FairyTale extends BaseEntity {
+public class Fairytale extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,10 +29,10 @@ public class FairyTale extends BaseEntity {
 
     private Float score;
 
-    @OneToMany(mappedBy = "fairyTale", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "fairytale", cascade = CascadeType.ALL)
     private List<Body> body;
 
-    @OneToMany(mappedBy = "fairyTale", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "fairytale", cascade = CascadeType.ALL)
     private List<Keyword> keywords;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -46,7 +45,7 @@ public class FairyTale extends BaseEntity {
     @OneToOne
     private Bookstore bookstore;
 
-    @OneToMany(mappedBy = "fairyTale", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "fairytale", cascade = CascadeType.ALL)
     private List<Prompt> prompts;
 
 }

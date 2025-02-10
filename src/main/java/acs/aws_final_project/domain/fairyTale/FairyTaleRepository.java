@@ -4,8 +4,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface FairyTaleRepository extends JpaRepository<FairyTale, Long> {
+public interface FairyTaleRepository extends JpaRepository<Fairytale, Long> {
 
-    FairyTale findByTitle(String title);
+    Fairytale findByTitle(String title);
 
 }

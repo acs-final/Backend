@@ -1,6 +1,6 @@
 package acs.aws_final_project.domain.prompt;
 
-import acs.aws_final_project.domain.fairyTale.FairyTale;
+import acs.aws_final_project.domain.fairyTale.Fairytale;
 import acs.aws_final_project.global.baseEntity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -29,7 +29,7 @@ public class Prompt extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "fairytale_id")
-    private FairyTale fairyTale;
+    private Fairytale fairytale;
 
 
 
