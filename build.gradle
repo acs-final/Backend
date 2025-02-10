@@ -52,6 +52,9 @@ dependencies {
 	//jackson
 	implementation 'com.fasterxml.jackson.core:jackson-databind:2.15.2'
 
+	//jsoup
+	implementation 'org.jsoup:jsoup:1.14.3'
+
 	implementation 'com.googlecode.json-simple:json-simple:1.1'
 
 }

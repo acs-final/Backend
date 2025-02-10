@@ -65,7 +65,7 @@ public class FairyTaleController {
         log.info("API Request time: {}", LocalDateTime.now());
 
 
-        List<FairyTaleResponseDto.StablediffusionResultDto> result = fairyTaleService.acyncImage(requestDto);
+        List<FairyTaleResponseDto.StablediffusionResultDto> result = fairyTaleService.asyncImage(requestDto);
 
 
         return ApiResponse.onSuccess(result);

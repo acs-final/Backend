@@ -55,7 +55,7 @@ public class FairyTaleService {
     }
 
 
-    public List<FairyTaleResponseDto.StablediffusionResultDto> acyncImage(List<FairyTaleRequestDto.StablediffusionRequestDto> requestDtos) throws JsonProcessingException{
+    public List<FairyTaleResponseDto.StablediffusionResultDto> asyncImage(List<FairyTaleRequestDto.StablediffusionRequestDto> requestDtos) throws JsonProcessingException{
 
         List<FairyTaleRequestDto.StablediffusionRequestDto> requestIds = requestDtos;
 

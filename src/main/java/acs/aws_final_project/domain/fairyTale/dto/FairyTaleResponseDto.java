@@ -20,6 +20,8 @@ public class FairyTaleResponseDto {
         private String title;
         private TreeMap<String, String> body;
         //private List<Pages> body;
+        private List<StablediffusionResultDto> imageUrl;
+        private List<PollyResultDto> mp3Url;
 
     }
 

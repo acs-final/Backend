@@ -37,6 +37,7 @@ public class FairyTaleRequestDto {
     @Builder
     public static class PollyRequestDto{
 
+        private String title;
         private String text;
         private String fileName;
 
