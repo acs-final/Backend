@@ -5,16 +5,15 @@ import acs.aws_final_project.domain.fairyTale.FairyTale;
 import acs.aws_final_project.domain.member.Member;
 import acs.aws_final_project.global.baseEntity.BaseEntity;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Entity
 @Builder
-@Data
+@Getter
+@Setter
 @Table(name = "bookstore")
 @AllArgsConstructor
 @NoArgsConstructor
