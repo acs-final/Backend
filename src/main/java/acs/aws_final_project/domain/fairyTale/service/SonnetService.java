@@ -183,6 +183,7 @@ public class SonnetService {
 
             int j = 0;
 
+            // 2page 씩 합침.
             for (int i=0; i< pages.size(); i++){
 
                 resultPage.append(pages.get(i));
@@ -219,20 +220,24 @@ public class SonnetService {
             List<FairyTaleRequestDto.StablediffusionRequestDto> imageRequestDtos = new ArrayList<>();
             List<FairyTaleRequestDto.PollyRequestDto> mp3RequestDtos = new ArrayList<>();
 
-            sortedPrompt.forEach((key,value) -> {
-                        int i = 0;
-                        String file = title + i;
-                        imageRequestDtos.add(FairyTaleConverter.toImageRequestDto(title, file, value));
-                    }
-            );
+            for (int i=1; i<=sortedPrompt.size(); i++){
+                String file = title + "-" + i;
+                log.info("image file name: {}", file);
+                String prompt = "prompt"+i;
+                imageRequestDtos.add(FairyTaleConverter.toImageRequestDto(title, file, sortedPrompt.get(prompt)));
+            }
 
-            resultBody.forEach((key, value) -> {
-                int i = 0;
-                String file = title + i;
-                mp3RequestDtos.add(FairyTaleConverter.toMp3RequestDto(title,file, value));
-            });
+            for (int i=1; i<=resultBody.size(); i++){
+                String file = title + "-" + i;
+                log.info("mp3 file name: {}", file);
+                String key = "page"+i;
+                mp3RequestDtos.add(FairyTaleConverter.toMp3RequestDto(title, file, resultBody.get(key)));
+            }
+
+
 
             log.info("Async image request: {}", imageRequestDtos);
+            log.info("Async mp3 request: {}", mp3RequestDtos);
 
             List<FairyTaleResponseDto.StablediffusionResultDto> imageUrls = fairyTaleService.asyncImage(imageRequestDtos);
             List<FairyTaleResponseDto.PollyResultDto> mp3Urls = fairyTaleService.asyncPolly(mp3RequestDtos);
