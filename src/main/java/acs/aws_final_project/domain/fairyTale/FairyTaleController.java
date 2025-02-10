@@ -3,7 +3,8 @@ package acs.aws_final_project.domain.fairyTale;
 import acs.aws_final_project.domain.fairyTale.dto.FairyTaleRequestDto;
 import acs.aws_final_project.domain.fairyTale.dto.FairyTaleResponseDto;
 import acs.aws_final_project.domain.fairyTale.service.FairyTaleService;
-import acs.aws_final_project.domain.fairyTale.service.NovaService;
+import acs.aws_final_project.domain.fairyTale.service.StableDiffusionService;
+import acs.aws_final_project.domain.fairyTale.service.PollyService;
 import acs.aws_final_project.domain.fairyTale.service.SonnetService;
 import acs.aws_final_project.global.response.ApiResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -12,7 +13,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDateTime;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.services.bedrockruntime.endpoints.internal.Value;
+
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -22,7 +26,8 @@ public class FairyTaleController {
 
     private final FairyTaleService fairyTaleService;
     private final SonnetService sonnetService;
-    private final NovaService novaService;
+    private final StableDiffusionService stableDiffusionService;
+    private final PollyService pollyService;
 
 
     @GetMapping("/{fairytaleId}")
@@ -53,19 +58,46 @@ public class FairyTaleController {
     }
 
 
-    @PostMapping("/nova")
-    public ApiResponse<Object> createImage(@RequestBody String prompt){
+    // 이미지 여러개 생성 요청
+    @PostMapping("/sdasync")
+    public ApiResponse<List<FairyTaleResponseDto.StablediffusionResultDto>> createImage(@RequestBody List<FairyTaleRequestDto.StablediffusionRequestDto> requestDto) throws JsonProcessingException {
+
+        log.info("API Request time: {}", LocalDateTime.now());
+
+
+        List<FairyTaleResponseDto.StablediffusionResultDto> result = fairyTaleService.asyncImage(requestDto);
+
+
+        return ApiResponse.onSuccess(result);
+    }
+
+    // 이미지 하나만 생성 요청
+    @PostMapping("/sd")
+//    public ApiResponse<Object> createImage(@RequestParam("imageFile") MultipartFile imageFile){
+    public ApiResponse<Object> createImageByAsync(@RequestBody FairyTaleRequestDto.StablediffusionRequestDto requestDto){
 
         log.info("API Request time: {}", LocalDateTime.now());
 
         Object result = null;
         try {
-            result = novaService.createImage(prompt);
+            result = stableDiffusionService.createImage(requestDto.getTitle(), requestDto.getFileName(), requestDto.getPrompt());
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
 
         return ApiResponse.onSuccess(result);
+    }
+
+    @PostMapping("/polly")
+    public ApiResponse<List<FairyTaleResponseDto.PollyResultDto>> createMP3(@RequestBody List<FairyTaleRequestDto.PollyRequestDto> requestDto){
+
+
+        //String mp3Dir = pollyService.createMP3(requestDto.getText(), fileDir, requestDto.getFileName());
+
+        List<FairyTaleResponseDto.PollyResultDto> mp3Dir = fairyTaleService.asyncPolly(requestDto);
+
+        //return ApiResponse.onSuccess(new FairyTaleResponseDto.PollyResultDto(mp3Dir));
+        return ApiResponse.onSuccess(mp3Dir);
     }
 
 

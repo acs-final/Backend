@@ -15,6 +15,7 @@ import software.amazon.awssdk.auth.credentials.*;
 import software.amazon.awssdk.core.client.config.ClientOverrideConfiguration;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.bedrockruntime.BedrockRuntimeClient;
+import software.amazon.awssdk.services.polly.PollyClient;
 
 import java.time.Duration;
 
@@ -40,7 +41,7 @@ public class AwsConfig {
 
         return BedrockRuntimeClient.builder()
                 .credentialsProvider(DefaultCredentialsProvider.create())
-                .region(Region.US_EAST_1)
+                .region(Region.US_WEST_2)
                 .overrideConfiguration(ClientOverrideConfiguration.builder()
                         .apiCallTimeout(Duration.ofSeconds(240))
                         .apiCallAttemptTimeout(Duration.ofSeconds(240))
@@ -48,16 +49,27 @@ public class AwsConfig {
                 .build();
     }
 
-//    @Bean(name = "s3Client")
-//    public AmazonS3 amazonS3Client() {
-//
-//
-//        BasicAWSCredentials credentials = new BasicAWSCredentials(accessKey, secretKey);
-//
-//        return AmazonS3ClientBuilder
-//                .standard()
-//                .withRegion(Regions.AP_NORTHEAST_2)
-//                .withCredentials(new AWSStaticCredentialsProvider(credentials))
-//                .build();
-//    }
+    @Bean(name = "s3Client")
+    public AmazonS3Client amazonS3Client() {
+
+
+        BasicAWSCredentials credentials = new BasicAWSCredentials(accessKey, secretKey);
+
+        return (AmazonS3Client) AmazonS3ClientBuilder
+                .standard()
+                .withRegion(Regions.AP_NORTHEAST_2)
+                .withCredentials(new AWSStaticCredentialsProvider(credentials))
+                .build();
+    }
+
+    @Bean
+    public PollyClient pollyClient(){
+
+        return PollyClient.builder()
+                .region(Region.AP_NORTHEAST_2)
+                .credentialsProvider(StaticCredentialsProvider.create(
+                        AwsBasicCredentials.create(accessKey, secretKey)))
+                .build();
+
+    }
 }
