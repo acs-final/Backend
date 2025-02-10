@@ -4,15 +4,12 @@ import acs.aws_final_project.domain.bookstore.Bookstore;
 import acs.aws_final_project.domain.member.Member;
 import acs.aws_final_project.global.baseEntity.BaseEntity;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.engine.spi.ManagedEntity;
 
 @Entity
 @Builder
-@Data
+@Getter
 @Table(name = "comment")
 @AllArgsConstructor
 @NoArgsConstructor
