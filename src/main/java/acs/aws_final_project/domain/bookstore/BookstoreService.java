@@ -5,8 +5,11 @@ import acs.aws_final_project.domain.bookstore.dto.BookstoreResponseDto;
 import acs.aws_final_project.domain.comment.CommentRepository;
 import acs.aws_final_project.domain.fairyTale.Fairytale;
 import acs.aws_final_project.domain.fairyTale.FairyTaleRepository;
+import acs.aws_final_project.domain.member.Member;
+import acs.aws_final_project.domain.member.MemberRepository;
 import acs.aws_final_project.global.response.code.resultCode.ErrorStatus;
 import acs.aws_final_project.global.response.exception.handler.BookstoreHandler;
+import acs.aws_final_project.global.response.exception.handler.MemberHandler;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -26,6 +29,7 @@ public class BookstoreService {
     private final BookstoreRepository bookstoreRepository;
     private final FairyTaleRepository fairyTaleRepository;
     private final CommentRepository commentRepository;
+    private final MemberRepository memberRepository;
 
     public BookstoreResponseDto.BookstoreResultDto getBookstore(Long bookstoreId){
 
@@ -40,11 +44,13 @@ public class BookstoreService {
     }
 
     @Transactional
-    public BookstoreResponseDto.BookstoreCreateDto createBookstore(BookstoreRequestDto.BookstoreCreateDto createDto){
+    public BookstoreResponseDto.BookstoreCreateDto createBookstore(Long memberId, BookstoreRequestDto.BookstoreCreateDto createDto){
+
+        Member findMember = memberRepository.findById(memberId).orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
 
         Fairytale findFairytale = fairyTaleRepository.findByTitle(createDto.getFairytaleTitle());
 
-        Bookstore newBookstore = BookstoreConverter.toBookstore(createDto.getTitle(), createDto.getBody(), createDto.getScore(), findFairytale, createDto.getImageUrl());
+        Bookstore newBookstore = BookstoreConverter.toBookstore(findMember, createDto.getTitle(), createDto.getBody(), createDto.getScore(), 0, findFairytale, createDto.getImageUrl());
 
         Bookstore saveBookstore = bookstoreRepository.save(newBookstore);
 
@@ -54,9 +60,15 @@ public class BookstoreService {
     }
 
     @Transactional
-    public BookstoreResponseDto.BookstoreCreateDto updateBookstore(Long bookstoreId, BookstoreRequestDto.BookstoreUpdateDto updateDto){
+    public BookstoreResponseDto.BookstoreCreateDto updateBookstore(Long memberId, Long bookstoreId, BookstoreRequestDto.BookstoreUpdateDto updateDto){
+
+        Member findMember = memberRepository.findById(memberId).orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
 
         Bookstore findBookstore = bookstoreRepository.findById(bookstoreId).orElseThrow(()->new BookstoreHandler(ErrorStatus.BOOKSTORE_NOT_FOUND));
+
+        if (findMember != findBookstore.getMember()){
+            throw new MemberHandler(ErrorStatus.FAIRYTALE_BAD_REQUEST);
+        }
 
         if (updateDto.getTitle() != null){
             findBookstore.setTitle(updateDto.getTitle());
@@ -80,10 +92,15 @@ public class BookstoreService {
     }
 
     @Transactional
-    public Long deleteBookstore(Long bookstoreId){
+    public Long deleteBookstore(Long memberId, Long bookstoreId){
+
+        Member findMember = memberRepository.findById(memberId).orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
 
         Bookstore findBookstore = bookstoreRepository.findById(bookstoreId).orElseThrow(() -> new BookstoreHandler(ErrorStatus.BOOKSTORE_NOT_FOUND));
 
+        if (findMember != findBookstore.getMember()){
+            throw new MemberHandler(ErrorStatus.FAIRYTALE_BAD_REQUEST);
+        }
 
         bookstoreRepository.delete(findBookstore);
 
@@ -111,11 +128,8 @@ public class BookstoreService {
 
         List<Bookstore> findBookstores = bookstoreRepository.findAll();
 
-        findBookstores = findBookstores.stream()
-                .sorted(Comparator.comparing(Bookstore::getCreatedAt).reversed())
-                .collect(Collectors.toList());
-
         List<BookstoreResponseDto.BookstoreListResultDto> resultDtos = findBookstores.stream()
+                .sorted(Comparator.comparing(Bookstore::getCreatedAt).reversed())
                 .map(bs -> new BookstoreResponseDto.BookstoreListResultDto(bs.getBookstoreId(), bs.getTitle(), bs.getBody(), bs.getScore(), bs.getFairytale().getFairytaleId()))
                 .collect(Collectors.toList());
 

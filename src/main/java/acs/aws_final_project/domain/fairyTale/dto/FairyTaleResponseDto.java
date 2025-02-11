@@ -29,6 +29,8 @@ public class FairyTaleResponseDto {
 
         private Long fairytaleId;
         private String title;
+        private Float score;
+        private String genre;
         private TreeMap<String, String> body;
         //private List<Pages> body;
         private List<StablediffusionResultDto> imageUrl;

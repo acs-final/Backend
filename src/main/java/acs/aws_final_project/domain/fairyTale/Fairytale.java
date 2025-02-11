@@ -17,6 +17,7 @@ import java.util.List;
 @Entity
 @Builder
 @Getter
+@Setter
 @Table(name = "fairytale")
 @AllArgsConstructor
 @NoArgsConstructor
@@ -30,6 +31,8 @@ public class Fairytale extends BaseEntity {
     private String title;
 
     private Float score;
+
+    private String genre;
 
     @OneToMany(mappedBy = "fairytale", cascade = CascadeType.ALL)
     private List<Body> body;

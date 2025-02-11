@@ -18,7 +18,7 @@ import acs.aws_final_project.domain.fairyTale.dto.FairyTaleResponseDto;
 import acs.aws_final_project.domain.image.Image;
 import acs.aws_final_project.domain.image.ImageRepository;
 import acs.aws_final_project.global.response.code.resultCode.ErrorStatus;
-import acs.aws_final_project.global.response.exception.handler.SonnetHandler;
+import acs.aws_final_project.global.response.exception.handler.FairytaleHandler;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -58,7 +58,7 @@ public class FairyTaleService {
 
     public FairyTaleResponseDto.FairyTaleResultDto getFairyTale(Long fairytaleId){
 
-        Fairytale findFairytale = fairyTaleRepository.findById(fairytaleId).orElseThrow(() -> new SonnetHandler(ErrorStatus.FAIRYTALE_NOT_FOUND));
+        Fairytale findFairytale = fairyTaleRepository.findById(fairytaleId).orElseThrow(() -> new FairytaleHandler(ErrorStatus.FAIRYTALE_NOT_FOUND));
 
         List<Body> findBody = bodyRepository.findAllByFairytale(findFairytale);
 
@@ -73,6 +73,8 @@ public class FairyTaleService {
         return FairyTaleResponseDto.FairyTaleResultDto.builder()
                 .fairytaleId(fairytaleId)
                 .title(findFairytale.getTitle())
+                .score(findFairytale.getScore())
+                .genre(findFairytale.getGenre())
                 .body(BodyConverter.toBodies(findBody))
                 .imageUrl(myImages)
                 .mp3Url(myMp3s)
@@ -175,5 +177,18 @@ public class FairyTaleService {
     }
 
 
+    @Transactional
+    public FairyTaleResponseDto.FairyTaleListDto grantScore(Long fairytaleId, Float score){
+
+        Fairytale findFairytale = fairyTaleRepository.findById(fairytaleId).orElseThrow(() -> new FairytaleHandler(ErrorStatus.FAIRYTALE_NOT_FOUND));
+
+        Float totalScore = (findFairytale.getScore() + score)/2;
+
+        findFairytale.setScore(totalScore);
+
+        FairyTaleResponseDto.FairyTaleListDto result = new FairyTaleResponseDto.FairyTaleListDto(findFairytale.getFairytaleId(), findFairytale.getTitle());
+
+        return result;
+    }
 
 }

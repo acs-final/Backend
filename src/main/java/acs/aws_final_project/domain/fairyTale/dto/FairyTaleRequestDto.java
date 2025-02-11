@@ -42,4 +42,14 @@ public class FairyTaleRequestDto {
         private String fileName;
 
     }
+
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Getter
+    @Builder
+    public static class ScoreRequestDto{
+
+        private Float score;
+
+    }
 }
