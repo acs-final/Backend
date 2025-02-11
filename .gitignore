@@ -40,4 +40,4 @@ out/
 resources/application.yaml
 src/main/resources/application.yaml
 src/main/java/acs/aws_final_project/domain/aitest
-
+bookstore

@@ -9,6 +9,7 @@ import java.util.List;
 @Repository
 public interface FairyTaleRepository extends JpaRepository<Fairytale, Long> {
 
+    Fairytale findByFairytaleId(Long fairytaleId);
     Fairytale findByTitle(String title);
 
     @Query("SELECT f FROM Fairytale f ORDER BY f.score DESC LIMIT 5")

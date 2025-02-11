@@ -5,6 +5,9 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
 public class BookstoreResponseDto {
 
     @AllArgsConstructor
@@ -26,6 +29,7 @@ public class BookstoreResponseDto {
         private String body;
         private Float score;
         private Long fairytaleId;
+        private String imageUrl;
 
     }
 
@@ -36,9 +40,12 @@ public class BookstoreResponseDto {
     public static class BookstoreListResultDto{
 
         private Long bookstoreId;
+        private String writer;
         private String title;
-        private String body;
+        private String genre;
+        private Integer commentCount;
         private Float score;
+        private LocalDate createdAt;
         private Long fairytaleId;
 
     }

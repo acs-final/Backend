@@ -9,6 +9,7 @@ import acs.aws_final_project.domain.member.Member;
 import acs.aws_final_project.domain.member.MemberRepository;
 import acs.aws_final_project.global.response.code.resultCode.ErrorStatus;
 import acs.aws_final_project.global.response.exception.handler.BookstoreHandler;
+import acs.aws_final_project.global.response.exception.handler.FairytaleHandler;
 import acs.aws_final_project.global.response.exception.handler.MemberHandler;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -39,7 +40,8 @@ public class BookstoreService {
                 .title(findBookstore.getTitle())
                 .body(findBookstore.getBody())
                 .score(findBookstore.getScore())
-                .fairytaleId(findBookstore.getBookstoreId())
+                .fairytaleId(findBookstore.getFairytale().getFairytaleId())
+                .imageUrl(findBookstore.getImageUrl())
                 .build();
     }
 
@@ -48,7 +50,11 @@ public class BookstoreService {
 
         Member findMember = memberRepository.findById(memberId).orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
 
-        Fairytale findFairytale = fairyTaleRepository.findByTitle(createDto.getFairytaleTitle());
+        Fairytale findFairytale = fairyTaleRepository.findByFairytaleId(createDto.getFairytaleId());
+
+        if (findFairytale == null){
+            throw new FairytaleHandler(ErrorStatus.FAIRYTALE_NOT_FOUND);
+        }
 
         Bookstore newBookstore = BookstoreConverter.toBookstore(findMember, createDto.getTitle(), createDto.getBody(), createDto.getScore(), 0, findFairytale, createDto.getImageUrl());
 
@@ -116,7 +122,10 @@ public class BookstoreService {
         List<BookstoreResponseDto.BookstoreListResultDto> resultDtos = new ArrayList<>();
 
         findBookstores.forEach(bs -> {
-            resultDtos.add(new BookstoreResponseDto.BookstoreListResultDto(bs.getBookstoreId(), bs.getTitle(), bs.getBody(), bs.getScore(), bs.getFairytale().getFairytaleId()));
+            resultDtos.add(new BookstoreResponseDto.BookstoreListResultDto(
+                    bs.getBookstoreId(), bs.getMember().getName(),
+                    bs.getTitle(), bs.getFairytale().getGenre(), bs.getCommentCount(),
+                    bs.getScore(), bs.getCreatedAt().toLocalDate(), bs.getFairytale().getFairytaleId()));
         });
 
 
@@ -130,7 +139,11 @@ public class BookstoreService {
 
         List<BookstoreResponseDto.BookstoreListResultDto> resultDtos = findBookstores.stream()
                 .sorted(Comparator.comparing(Bookstore::getCreatedAt).reversed())
-                .map(bs -> new BookstoreResponseDto.BookstoreListResultDto(bs.getBookstoreId(), bs.getTitle(), bs.getBody(), bs.getScore(), bs.getFairytale().getFairytaleId()))
+                .map(bs -> new BookstoreResponseDto.BookstoreListResultDto(
+                        bs.getBookstoreId(), bs.getMember().getName(),
+                        bs.getTitle(), bs.getFairytale().getGenre(), bs.getCommentCount(),
+                        bs.getScore(), bs.getCreatedAt().toLocalDate(), bs.getFairytale().getFairytaleId()
+                ))
                 .collect(Collectors.toList());
 
         return resultDtos;
@@ -146,7 +159,11 @@ public class BookstoreService {
         List<BookstoreResponseDto.BookstoreListResultDto> resultDtos = new ArrayList<>();
 
         findBookstores.forEach(bs -> {
-            resultDtos.add(new BookstoreResponseDto.BookstoreListResultDto(bs.getBookstoreId(), bs.getTitle(), bs.getBody(), bs.getScore(), bs.getFairytale().getFairytaleId()));
+            resultDtos.add(new BookstoreResponseDto.BookstoreListResultDto(
+                    bs.getBookstoreId(), bs.getMember().getName(),
+                    bs.getTitle(), bs.getFairytale().getGenre(), bs.getCommentCount(),
+                    bs.getScore(), bs.getCreatedAt().toLocalDate(), bs.getFairytale().getFairytaleId()
+            ));
         });
 
         return resultDtos;
