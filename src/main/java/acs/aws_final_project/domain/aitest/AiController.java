@@ -14,33 +14,33 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/v1/ai")
 public class AiController {
 
-    private final GptService gptService;
-    private final BedrockService bedrockService;
-    private final DalleService dalleService;
-
-    @PostMapping("/dalle")
-    public ApiResponse<Object> imageGen(@RequestBody String question) throws Exception {
-
-        Object result = dalleService.generateImage(question);
-
-        return ApiResponse.onSuccess(result);
-    }
-
-    @PostMapping("/gpt")
-    public ApiResponse<Object> gptSummarize(@RequestBody String question){
-
-        Object content = gptService.summarize(question);
-
-
-        return ApiResponse.onSuccess(content);
-    }
-
-    @PostMapping("/bedrock")
-    public ApiResponse<Object> bedrock(@RequestBody String question){
-
-        Object content = bedrockService.send(question);
-
-
-        return ApiResponse.onSuccess(content);
-    }
+//    private final GptService gptService;
+//    private final BedrockService bedrockService;
+//    private final DalleService dalleService;
+//
+//    @PostMapping("/dalle")
+//    public ApiResponse<Object> imageGen(@RequestBody String question) throws Exception {
+//
+//        Object result = dalleService.generateImage(question);
+//
+//        return ApiResponse.onSuccess(result);
+//    }
+//
+//    @PostMapping("/gpt")
+//    public ApiResponse<Object> gptSummarize(@RequestBody String question){
+//
+//        Object content = gptService.summarize(question);
+//
+//
+//        return ApiResponse.onSuccess(content);
+//    }
+//
+//    @PostMapping("/bedrock")
+//    public ApiResponse<Object> bedrock(@RequestBody String question){
+//
+//        Object content = bedrockService.send(question);
+//
+//
+//        return ApiResponse.onSuccess(content);
+//    }
 }

@@ -32,6 +32,9 @@ public class Bookstore extends BaseEntity {
 
     private Integer commentCount;
 
+    @Column(length = 500)
+    private String imageUrl;
+
     @OneToOne
     private Fairytale fairytale;
 

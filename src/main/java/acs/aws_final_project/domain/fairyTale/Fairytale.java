@@ -1,8 +1,10 @@
 package acs.aws_final_project.domain.fairyTale;
 
 import acs.aws_final_project.domain.Report.Report;
+import acs.aws_final_project.domain.audio.Audio;
 import acs.aws_final_project.domain.body.Body;
 import acs.aws_final_project.domain.bookstore.Bookstore;
+import acs.aws_final_project.domain.image.Image;
 import acs.aws_final_project.domain.keyword.Keyword;
 import acs.aws_final_project.domain.member.Member;
 import acs.aws_final_project.domain.prompt.Prompt;
@@ -47,5 +49,11 @@ public class Fairytale extends BaseEntity {
 
     @OneToMany(mappedBy = "fairytale", cascade = CascadeType.ALL)
     private List<Prompt> prompts;
+
+    @OneToMany(mappedBy = "fairytale", cascade = CascadeType.ALL)
+    private List<Image> images;
+
+    @OneToMany(mappedBy = "fairytale", cascade = CascadeType.ALL)
+    private List<Audio> audio;
 
 }

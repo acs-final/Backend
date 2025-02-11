@@ -24,11 +24,11 @@ public class BooksController {
     private final BooksService booksService;
 
     @GetMapping("/")
-    public ApiResponse<List<BooksResponseDto.TopBook>> getTop5Books(@RequestParam BooksGenre genre){
+    public ApiResponse<List<BooksResponseDto.RecommendedBook>> getRecommendedBooks(@RequestParam BooksGenre genre){
 
-        log.info("getTop5Books API Request time: {}", LocalDateTime.now());
+        log.info("getRecommendedBooks API Request time: {}", LocalDateTime.now());
 
-        List<BooksResponseDto.TopBook> result = booksService.getTop5(genre);
+        List<BooksResponseDto.RecommendedBook> result = booksService.getRecommendedBooks(genre);
 
         return ApiResponse.onSuccess(result);
     }

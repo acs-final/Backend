@@ -11,7 +11,7 @@ public class BooksResponseDto {
     @NoArgsConstructor
     @Getter
     @Builder
-    public static class TopBook {
+    public static class RecommendedBook {
         private String title;
         private String author;
         //private String genre;

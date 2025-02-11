@@ -14,6 +14,17 @@ public class FairyTaleResponseDto {
     @NoArgsConstructor
     @Getter
     @Builder
+    public static class FairyTaleListDto{
+
+        private Long fairytaleId;
+        private String title;
+
+    }
+
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Getter
+    @Builder
     public static class FairyTaleResultDto{
 
         private Long fairytaleId;
@@ -50,5 +61,16 @@ public class FairyTaleResponseDto {
         private String mp3Url;
     }
 
+
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Getter
+    @Builder
+    public static class Top5{
+        private Long fairytaleId;
+        private String title;
+        private String imageUrl;
+
+    }
 
 }

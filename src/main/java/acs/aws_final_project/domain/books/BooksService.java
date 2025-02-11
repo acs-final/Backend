@@ -18,17 +18,17 @@ public class BooksService {
 
     private final BooksRepository booksRepository;
 
-    public List<BooksResponseDto.TopBook> getTop5(BooksGenre genre){
+    public List<BooksResponseDto.RecommendedBook> getRecommendedBooks(BooksGenre genre){
 
         List<Books> findBooks = booksRepository.findAllByGenre(genre);
 
         findBooks = findBooks.stream().sorted(Comparator.comparing(Books::getScore).reversed()).toList();
 
-        List<BooksResponseDto.TopBook> topBooks = findBooks.stream()
+        List<BooksResponseDto.RecommendedBook> topBooks = findBooks.stream()
                 .map(b ->
-                        new BooksResponseDto.TopBook(b.getTitle(), b.getAuthor(),b.getPrice(), b.getScore(), b.getImageUrl())
+                        new BooksResponseDto.RecommendedBook(b.getTitle(), b.getAuthor(),b.getPrice(), b.getScore(), b.getImageUrl())
                 )
-                .limit(5)
+                .limit(3)
                 .toList();
 
 

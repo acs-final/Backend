@@ -44,7 +44,7 @@ public class BookstoreService {
 
         Fairytale findFairytale = fairyTaleRepository.findByTitle(createDto.getFairytaleTitle());
 
-        Bookstore newBookstore = BookstoreConverter.toBookstore(createDto.getTitle(), createDto.getBody(), createDto.getScore(), findFairytale);
+        Bookstore newBookstore = BookstoreConverter.toBookstore(createDto.getTitle(), createDto.getBody(), createDto.getScore(), findFairytale, createDto.getImageUrl());
 
         Bookstore saveBookstore = bookstoreRepository.save(newBookstore);
 
@@ -66,6 +66,9 @@ public class BookstoreService {
         }
         if (updateDto.getScore() != null){
             findBookstore.setScore(updateDto.getScore());
+        }
+        if (updateDto.getImageUrl() != null){
+            findBookstore.setImageUrl(updateDto.getImageUrl());
         }
 
         Bookstore saveBookstore = bookstoreRepository.save(findBookstore);
