@@ -42,7 +42,7 @@ public class BookstoreController {
     }
 
     @PatchMapping("/{bookstoreId}")
-    public ApiResponse<BookstoreResponseDto.BookstoreCreateDto> updateBookstre(@PathVariable Long bookstoreId, @RequestBody BookstoreRequestDto.BookstoreUpdateDto updateDto){
+    public ApiResponse<BookstoreResponseDto.BookstoreCreateDto> updateBookstore(@PathVariable Long bookstoreId, @RequestBody BookstoreRequestDto.BookstoreUpdateDto updateDto){
 
         log.info("getBookstore API Request time: {}", LocalDateTime.now());
 
@@ -76,7 +76,7 @@ public class BookstoreController {
     }
 
     @GetMapping("/latest")
-    public ApiResponse<List<BookstoreResponseDto.BookstoreListResultDto>> getBoostoresByDate(){
+    public ApiResponse<List<BookstoreResponseDto.BookstoreListResultDto>> getBookstoresByDate(){
 
         log.info("getBoostoresByDate API Request time: {}", LocalDateTime.now());
 

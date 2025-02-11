@@ -33,7 +33,7 @@ public class FairyTaleController {
     private final PollyService pollyService;
 
 
-
+    // 동화책 목록 가져오기. pagenation 추가 해야함.
     @GetMapping("/")
     public ApiResponse<List<FairyTaleResponseDto.FairyTaleListDto>> getFairyTaleList(){
 
@@ -56,7 +56,7 @@ public class FairyTaleController {
     }
 
     @PostMapping("/sonnet")
-    public ApiResponse<Object> createFairyTale(@RequestBody FairyTaleRequestDto.FairyTaleCreateDto requestDto){
+    public ApiResponse<FairyTaleResponseDto.FairyTaleResultDto> createFairyTale(@RequestBody FairyTaleRequestDto.FairyTaleCreateDto requestDto){
 
         log.info("createFairyTale API Request time: {}", LocalDateTime.now());
 
@@ -126,5 +126,14 @@ public class FairyTaleController {
         return ApiResponse.onSuccess(result);
     }
 
+    @PostMapping("/{fairytaleId}/score")
+    public ApiResponse<FairyTaleResponseDto.FairyTaleListDto> grantScore(@PathVariable Long fairytaleId, @RequestBody FairyTaleRequestDto.ScoreRequestDto requestDto){
+
+        log.info("grantScore API Request time: {}", LocalDateTime.now());
+
+        FairyTaleResponseDto.FairyTaleListDto result = fairyTaleService.grantScore(fairytaleId, requestDto.getScore());
+
+        return ApiResponse.onSuccess(result);
+    }
 
 }

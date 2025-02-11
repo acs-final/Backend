@@ -9,7 +9,7 @@ import acs.aws_final_project.domain.fairyTale.FairyTaleRepository;
 import acs.aws_final_project.domain.fairyTale.dto.FairyTaleRequestDto;
 import acs.aws_final_project.domain.fairyTale.dto.FairyTaleResponseDto;
 import acs.aws_final_project.global.response.code.resultCode.ErrorStatus;
-import acs.aws_final_project.global.response.exception.handler.SonnetHandler;
+import acs.aws_final_project.global.response.exception.handler.FairytaleHandler;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -117,7 +117,7 @@ public class SonnetService {
             log.info("Response: {}", response.output().message().content().get(0).text());
 
             //return response.output().message().content().get(0).text();
-            return getSonnetResult(response.output().message().content().get(0).text());
+            return getSonnetResult(response.output().message().content().get(0).text(), genre);
 
 
         } catch (SdkClientException e) {
@@ -129,7 +129,7 @@ public class SonnetService {
 
 
 
-    public FairyTaleResponseDto.FairyTaleResultDto getSonnetResult(String sonnetResponse) {
+    public FairyTaleResponseDto.FairyTaleResultDto getSonnetResult(String sonnetResponse, String genre) {
 
         FairyTaleResponseDto.FairyTaleResultDto myresult = new FairyTaleResponseDto.FairyTaleResultDto();
 
@@ -228,7 +228,8 @@ public class SonnetService {
 
             log.info("Async image request: {}", imageRequestDtos);
 
-            Fairytale myFairytale = FairyTaleConverter.toFairyTale(title);
+            /* 동화 저장 시 평점 입력하는 부분 수정 필요 */
+            Fairytale myFairytale = FairyTaleConverter.toFairyTale(title, 4.5F, genre);
 
             fairyTaleRepository.save(myFairytale);
 
@@ -259,7 +260,7 @@ public class SonnetService {
 
         } catch (Exception e) {
             e.printStackTrace();
-            throw new SonnetHandler(ErrorStatus.FAIRYTALE_BADREQUEST);
+            throw new FairytaleHandler(ErrorStatus.FAIRYTALE_BAD_REQUEST);
         }
 
     }

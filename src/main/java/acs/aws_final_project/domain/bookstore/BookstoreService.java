@@ -111,11 +111,8 @@ public class BookstoreService {
 
         List<Bookstore> findBookstores = bookstoreRepository.findAll();
 
-        findBookstores = findBookstores.stream()
-                .sorted(Comparator.comparing(Bookstore::getCreatedAt).reversed())
-                .collect(Collectors.toList());
-
         List<BookstoreResponseDto.BookstoreListResultDto> resultDtos = findBookstores.stream()
+                .sorted(Comparator.comparing(Bookstore::getCreatedAt).reversed())
                 .map(bs -> new BookstoreResponseDto.BookstoreListResultDto(bs.getBookstoreId(), bs.getTitle(), bs.getBody(), bs.getScore(), bs.getFairytale().getFairytaleId()))
                 .collect(Collectors.toList());
 

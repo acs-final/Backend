@@ -10,6 +10,7 @@ import org.hibernate.engine.spi.ManagedEntity;
 @Entity
 @Builder
 @Getter
+@Setter
 @Table(name = "comment")
 @AllArgsConstructor
 @NoArgsConstructor

@@ -6,12 +6,14 @@ import acs.aws_final_project.domain.fairyTale.dto.FairyTaleRequestDto;
 public class FairyTaleConverter {
 
 
-    public static Fairytale toFairyTale(String title){
+    public static Fairytale toFairyTale(String title, Float score, String genre){
 
 
 
         return Fairytale.builder()
                 .title(title)
+                .score(score)
+                .genre(genre)
                 .build();
 
     }
