@@ -2,15 +2,17 @@ package acs.aws_final_project.domain.fairyTale;
 
 import acs.aws_final_project.domain.body.Body;
 import acs.aws_final_project.domain.fairyTale.dto.FairyTaleRequestDto;
+import acs.aws_final_project.domain.member.Member;
 
 public class FairyTaleConverter {
 
 
-    public static Fairytale toFairyTale(String title, Float score, String genre){
+    public static Fairytale toFairyTale(Member member, String title, Float score, String genre){
 
 
 
         return Fairytale.builder()
+                .member(member)
                 .title(title)
                 .score(score)
                 .genre(genre)

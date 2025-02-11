@@ -8,8 +8,11 @@ import acs.aws_final_project.domain.fairyTale.FairyTaleConverter;
 import acs.aws_final_project.domain.fairyTale.FairyTaleRepository;
 import acs.aws_final_project.domain.fairyTale.dto.FairyTaleRequestDto;
 import acs.aws_final_project.domain.fairyTale.dto.FairyTaleResponseDto;
+import acs.aws_final_project.domain.member.Member;
+import acs.aws_final_project.domain.member.MemberRepository;
 import acs.aws_final_project.global.response.code.resultCode.ErrorStatus;
 import acs.aws_final_project.global.response.exception.handler.FairytaleHandler;
+import acs.aws_final_project.global.response.exception.handler.MemberHandler;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -49,6 +52,7 @@ public class SonnetService {
 
     private final FairyTaleRepository fairyTaleRepository;
     private final BodyRepository bodyRepository;
+    private final MemberRepository memberRepository;
 
     private final FairyTaleService fairyTaleService;
 
@@ -81,7 +85,7 @@ public class SonnetService {
 
 
     @Transactional
-    public FairyTaleResponseDto.FairyTaleResultDto createFairyTale(String genre, String gender, String challenge) {
+    public FairyTaleResponseDto.FairyTaleResultDto createFairyTale(Long memberid, String genre, String gender, String challenge) {
         String message = String.format(
                 "genre = %s\n" +
                         "gender = %s\n" +
@@ -117,7 +121,8 @@ public class SonnetService {
             log.info("Response: {}", response.output().message().content().get(0).text());
 
             //return response.output().message().content().get(0).text();
-            return getSonnetResult(response.output().message().content().get(0).text(), genre);
+            String sonnetResponse = response.output().message().content().get(0).text();
+            return getSonnetResult(memberid, sonnetResponse, genre);
 
 
         } catch (SdkClientException e) {
@@ -129,7 +134,7 @@ public class SonnetService {
 
 
 
-    public FairyTaleResponseDto.FairyTaleResultDto getSonnetResult(String sonnetResponse, String genre) {
+    public FairyTaleResponseDto.FairyTaleResultDto getSonnetResult(Long memberId, String sonnetResponse, String genre) {
 
         FairyTaleResponseDto.FairyTaleResultDto myresult = new FairyTaleResponseDto.FairyTaleResultDto();
 
@@ -229,7 +234,9 @@ public class SonnetService {
             log.info("Async image request: {}", imageRequestDtos);
 
             /* 동화 저장 시 평점 입력하는 부분 수정 필요 */
-            Fairytale myFairytale = FairyTaleConverter.toFairyTale(title, 4.5F, genre);
+            Member findMember = memberRepository.findById(memberId).orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
+
+            Fairytale myFairytale = FairyTaleConverter.toFairyTale(findMember, title, 4.5F, genre);
 
             fairyTaleRepository.save(myFairytale);
 
@@ -252,6 +259,8 @@ public class SonnetService {
             return myresult.builder()
                     .fairytaleId(myFairytale.getFairytaleId())
                     .title(title)
+                    .score(myFairytale.getScore())
+                    .genre(myFairytale.getGenre())
                     .body(resultBody)
                     .imageUrl(imageUrls)
                     .mp3Url(mp3Urls)

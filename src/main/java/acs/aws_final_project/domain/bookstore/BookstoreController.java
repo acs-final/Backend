@@ -25,7 +25,7 @@ public class BookstoreController {
 
         log.info("createBookstore API Request time: {}", LocalDateTime.now());
 
-        BookstoreResponseDto.BookstoreCreateDto result = bookstoreService.createBookstore(createDto);
+        BookstoreResponseDto.BookstoreCreateDto result = bookstoreService.createBookstore(1L, createDto);
 
 
         return ApiResponse.onSuccess(result);
@@ -46,7 +46,7 @@ public class BookstoreController {
 
         log.info("getBookstore API Request time: {}", LocalDateTime.now());
 
-        BookstoreResponseDto.BookstoreCreateDto result = bookstoreService.updateBookstore(bookstoreId, updateDto);
+        BookstoreResponseDto.BookstoreCreateDto result = bookstoreService.updateBookstore(1L, bookstoreId, updateDto);
 
         return ApiResponse.onSuccess(result);
     }
@@ -56,7 +56,7 @@ public class BookstoreController {
 
         log.info("getBookstore API Request time: {}", LocalDateTime.now());
 
-        Long id = bookstoreService.deleteBookstore(bookstoreId);
+        Long id = bookstoreService.deleteBookstore(1L, bookstoreId);
 
         BookstoreResponseDto.BookstoreCreateDto result = BookstoreResponseDto.BookstoreCreateDto.builder()
                 .bookstoreId(id)

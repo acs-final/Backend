@@ -64,7 +64,7 @@ public class FairyTaleController {
         String gender = requestDto.getGender();
         String challenge = requestDto.getChallenge();
 
-        FairyTaleResponseDto.FairyTaleResultDto result = sonnetService.createFairyTale(genre, gender, challenge);
+        FairyTaleResponseDto.FairyTaleResultDto result = sonnetService.createFairyTale(1L, genre, gender, challenge);
         //String result = sonnetService.createFairyTale(genre, gender, challenge);
 
         //Object result = sonnetService.createFairyTaleByInvoke(genre, gender, challenge);
