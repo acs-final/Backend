@@ -28,6 +28,8 @@ public class Books extends BaseEntity {
 
     private String imageUrl;
 
+    @Enumerated(EnumType.STRING)
+    private BooksGenre genre;
 
 
 }

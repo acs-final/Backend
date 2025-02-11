@@ -47,7 +47,7 @@ dependencies {
 	implementation 'io.awspring.cloud:spring-cloud-starter-aws:2.4.4'
 
 	//dall-e
-	implementation 'org.apache.httpcomponents.client5:httpclient5:5.4'
+//	implementation 'org.apache.httpcomponents.client5:httpclient5:5.4'
 
 	//jackson
 	implementation 'com.fasterxml.jackson.core:jackson-databind:2.15.2'
@@ -55,7 +55,7 @@ dependencies {
 	//jsoup
 	implementation 'org.jsoup:jsoup:1.14.3'
 
-	implementation 'com.googlecode.json-simple:json-simple:1.1'
+	//implementation 'com.googlecode.json-simple:json-simple:1.1'
 
 }
 

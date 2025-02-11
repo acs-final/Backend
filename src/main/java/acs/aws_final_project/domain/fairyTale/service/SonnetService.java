@@ -3,14 +3,11 @@ package acs.aws_final_project.domain.fairyTale.service;
 import acs.aws_final_project.domain.body.Body;
 import acs.aws_final_project.domain.body.BodyConverter;
 import acs.aws_final_project.domain.body.BodyRepository;
-import acs.aws_final_project.domain.fairyTale.FairyTale;
+import acs.aws_final_project.domain.fairyTale.Fairytale;
 import acs.aws_final_project.domain.fairyTale.FairyTaleConverter;
 import acs.aws_final_project.domain.fairyTale.FairyTaleRepository;
 import acs.aws_final_project.domain.fairyTale.dto.FairyTaleRequestDto;
 import acs.aws_final_project.domain.fairyTale.dto.FairyTaleResponseDto;
-import acs.aws_final_project.domain.keyword.Keyword;
-import acs.aws_final_project.domain.keyword.KeywordConverter;
-import acs.aws_final_project.domain.keyword.KeywordRepository;
 import acs.aws_final_project.global.response.code.resultCode.ErrorStatus;
 import acs.aws_final_project.global.response.exception.handler.SonnetHandler;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -19,13 +16,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
+//import org.json.simple.JSONArray;
+//import org.json.simple.JSONObject;
+//import org.json.simple.parser.JSONParser;
+//import org.json.simple.parser.ParseException;
 
 import org.jsoup.Jsoup;
-import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,7 +31,6 @@ import software.amazon.awssdk.services.bedrockruntime.BedrockRuntimeClient;
 import software.amazon.awssdk.services.bedrockruntime.model.*;
 
 import java.nio.charset.StandardCharsets;
-import java.security.Key;
 import java.util.*;
 
 @Slf4j
@@ -80,7 +75,9 @@ public class SonnetService {
             "\", which body is list type and each value of list should be in one line.\n" +
 //            "The body texts have SSML tags for polly service." +
             "All responses are under 2048 tokens." +
-            "All responses in Korean except prompt.";
+            "All responses in Korean except prompt." +
+            "Do not use double quotes in any dialogues or direct quotes of pages";
+//            "Please make sure that any dialogues or direct quotes in the story are enclosed in **single quotes** (') instead of double quotes (\"), while regular sentences should continue using double quotes.";
 
 
     @Transactional
@@ -121,15 +118,12 @@ public class SonnetService {
 
             //return response.output().message().content().get(0).text();
             return getSonnetResult(response.output().message().content().get(0).text());
-            //return getSonnetResultJO(response.output().message().content().get(0).text());
 
 
         } catch (SdkClientException e) {
             log.error(e.toString(), e);
             throw new RuntimeException(e);
-        } //catch (ParseException e) {
-           // throw new RuntimeException(e);
-       // }
+        }
 
     }
 
@@ -234,16 +228,15 @@ public class SonnetService {
 
             log.info("Async image request: {}", imageRequestDtos);
 
-            List<FairyTaleResponseDto.StablediffusionResultDto> imageUrls = fairyTaleService.asyncImage(imageRequestDtos);
-            List<FairyTaleResponseDto.PollyResultDto> mp3Urls = fairyTaleService.asyncPolly(mp3RequestDtos);
+            Fairytale myFairytale = FairyTaleConverter.toFairyTale(title);
+
+            fairyTaleRepository.save(myFairytale);
+
+            List<FairyTaleResponseDto.StablediffusionResultDto> imageUrls = fairyTaleService.asyncImage(imageRequestDtos, myFairytale);
+            List<FairyTaleResponseDto.PollyResultDto> mp3Urls = fairyTaleService.asyncPolly(mp3RequestDtos, myFairytale);
 
 
             log.info("image urls: {}", imageUrls);
-
-
-            FairyTale myFairyTale = FairyTaleConverter.toFairyTale(title);
-
-            fairyTaleRepository.save(myFairyTale);
 
             sortedBody.forEach((key, value) -> {
                 String page = key.substring(4);
@@ -251,12 +244,12 @@ public class SonnetService {
                 log.info("page: {}", page);
                 log.info("pageNumber: {}", pageNumber);
 
-                Body body = FairyTaleConverter.toBody(value, pageNumber, myFairyTale);
+                Body body = FairyTaleConverter.toBody(value, pageNumber, myFairytale);
                 bodyRepository.save(body);
             });
 
             return myresult.builder()
-                    .fairytaleId(myFairyTale.getFairytaleId())
+                    .fairytaleId(myFairytale.getFairytaleId())
                     .title(title)
                     .body(resultBody)
                     .imageUrl(imageUrls)
@@ -282,19 +275,7 @@ public class SonnetService {
     }
 
 
-    public FairyTaleResponseDto.FairyTaleResultDto getFairyTale(Long fairytaleId){
 
-        FairyTale findFairyTale = fairyTaleRepository.findById(fairytaleId).orElseThrow(() -> new SonnetHandler(ErrorStatus.FAIRYTALE_NOT_FOUND));
-
-        List<Body> findBody = bodyRepository.findAllByFairyTale(findFairyTale);
-
-        return FairyTaleResponseDto.FairyTaleResultDto.builder()
-                .fairytaleId(fairytaleId)
-                .title(findFairyTale.getTitle())
-                .body(BodyConverter.toBodies(findBody))
-                .build();
-
-    }
 
 
 
@@ -394,51 +375,51 @@ public class SonnetService {
 
     }
 
-    public FairyTaleResponseDto.FairyTaleResultDto getSonnetResultJO(String sonnetResponse) throws ParseException {
-
-        JSONParser jsonParser = new JSONParser();
-        JSONObject jsonObject = (JSONObject) jsonParser.parse(sonnetResponse);
-
-
-
-        log.info("JsonObject: {}", jsonObject);
-
-        JSONObject title = (JSONObject) jsonObject.get("title");
-        log.info("title: {}", title);
-        String titleResult = title.toString();
-
-        JSONObject body = (JSONObject) jsonObject.get("body");
-        JSONArray bodys = (JSONArray) jsonObject.get("body");
-        log.info("body: {}", body);
-        log.info("bodys: {}", bodys);
-        //ArrayList<String> bodies = body.
-
-        List<FairyTaleResponseDto.Pages> pages = new ArrayList<>();
-
-        for (int i=1; i<8; i++) {
-            String key = "page" + i;
-
-            String content = body.get("key").toString();
-            FairyTaleResponseDto.Pages page = FairyTaleResponseDto.Pages.builder().page(content).build();
-            pages.add(page);
-        }
-
-
-        JSONObject keywords = (JSONObject) jsonObject.get("keywords");
-        JSONArray keywordlist = (JSONArray) jsonObject.get("keywords");
-        log.info("keywords: {}", keywords);
-        log.info("keywordlist: {}", keywordlist);
-
-        for (int i=1; i<6; i++){
-
-        }
-
-
-        return FairyTaleResponseDto.FairyTaleResultDto.builder()
-                .title(titleResult)
-                //.body(pages)
-                .build();
-
-    }
+//    public FairyTaleResponseDto.FairyTaleResultDto getSonnetResultJO(String sonnetResponse) throws ParseException {
+//
+//        JSONParser jsonParser = new JSONParser();
+//        JSONObject jsonObject = (JSONObject) jsonParser.parse(sonnetResponse);
+//
+//
+//
+//        log.info("JsonObject: {}", jsonObject);
+//
+//        JSONObject title = (JSONObject) jsonObject.get("title");
+//        log.info("title: {}", title);
+//        String titleResult = title.toString();
+//
+//        JSONObject body = (JSONObject) jsonObject.get("body");
+//        JSONArray bodys = (JSONArray) jsonObject.get("body");
+//        log.info("body: {}", body);
+//        log.info("bodys: {}", bodys);
+//        //ArrayList<String> bodies = body.
+//
+//        List<FairyTaleResponseDto.Pages> pages = new ArrayList<>();
+//
+//        for (int i=1; i<8; i++) {
+//            String key = "page" + i;
+//
+//            String content = body.get("key").toString();
+//            FairyTaleResponseDto.Pages page = FairyTaleResponseDto.Pages.builder().page(content).build();
+//            pages.add(page);
+//        }
+//
+//
+//        JSONObject keywords = (JSONObject) jsonObject.get("keywords");
+//        JSONArray keywordlist = (JSONArray) jsonObject.get("keywords");
+//        log.info("keywords: {}", keywords);
+//        log.info("keywordlist: {}", keywordlist);
+//
+//        for (int i=1; i<6; i++){
+//
+//        }
+//
+//
+//        return FairyTaleResponseDto.FairyTaleResultDto.builder()
+//                .title(titleResult)
+//                //.body(pages)
+//                .build();
+//
+//    }
 
 }

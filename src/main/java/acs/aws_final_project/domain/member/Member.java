@@ -3,7 +3,7 @@ package acs.aws_final_project.domain.member;
 import acs.aws_final_project.domain.Report.Report;
 import acs.aws_final_project.domain.bookstore.Bookstore;
 import acs.aws_final_project.domain.comment.Comment;
-import acs.aws_final_project.domain.fairyTale.FairyTale;
+import acs.aws_final_project.domain.fairyTale.Fairytale;
 import acs.aws_final_project.domain.preference.Preference;
 import acs.aws_final_project.global.baseEntity.BaseEntity;
 import jakarta.persistence.*;
@@ -45,7 +45,7 @@ public class Member extends BaseEntity {
     private List<Comment> comments;
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
-    private List<FairyTale> fairyTales;
+    private List<Fairytale> fairytales;
 
 
 

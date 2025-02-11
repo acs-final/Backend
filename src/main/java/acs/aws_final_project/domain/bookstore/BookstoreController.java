@@ -10,6 +10,7 @@ import org.joda.time.LocalDateTime;
 import org.springframework.web.bind.annotation.*;
 
 import java.awt.print.Book;
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -63,4 +64,36 @@ public class BookstoreController {
 
         return ApiResponse.onSuccess(result);
     }
+
+    @GetMapping("/")
+    public ApiResponse<List<BookstoreResponseDto.BookstoreListResultDto>> getBookstores(){
+
+        log.info("getBookstores API Request time: {}", LocalDateTime.now());
+
+        List<BookstoreResponseDto.BookstoreListResultDto> result = bookstoreService.getBookstores();
+
+        return ApiResponse.onSuccess(result);
+    }
+
+    @GetMapping("/latest")
+    public ApiResponse<List<BookstoreResponseDto.BookstoreListResultDto>> getBoostoresByDate(){
+
+        log.info("getBoostoresByDate API Request time: {}", LocalDateTime.now());
+
+        List<BookstoreResponseDto.BookstoreListResultDto> result = bookstoreService.getBookstoresByDate();
+
+        return ApiResponse.onSuccess(result);
+    }
+
+    @GetMapping("/comments")
+    public ApiResponse<List<BookstoreResponseDto.BookstoreListResultDto>> getBookstoresByComments(){
+
+        log.info("getBookstoresByComments API Request time: {}", LocalDateTime.now());
+
+        List<BookstoreResponseDto.BookstoreListResultDto> result = bookstoreService.getBookstoresByComments();
+
+        return ApiResponse.onSuccess(result);
+    }
+
+
 }

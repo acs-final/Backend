@@ -1,12 +1,10 @@
 package acs.aws_final_project.domain.Report;
 
-import acs.aws_final_project.domain.fairyTale.FairyTale;
+import acs.aws_final_project.domain.fairyTale.Fairytale;
 import acs.aws_final_project.domain.member.Member;
 import acs.aws_final_project.global.baseEntity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
-
-import java.util.Base64;
 
 @Entity
 @Builder
@@ -33,7 +31,7 @@ public class Report extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "fairytale_id")
-    private FairyTale fairyTale;
+    private Fairytale fairyTale;
 
 
 

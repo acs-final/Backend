@@ -18,6 +18,7 @@ public class BookstoreRequestDto {
         private String body;
         private Float score;
         private String fairytaleTitle;
+        private String imageUrl;
 
     }
 
@@ -30,7 +31,7 @@ public class BookstoreRequestDto {
         private String title;
         private String body;
         private Float score;
-
+        private String imageUrl;
     }
 
 }

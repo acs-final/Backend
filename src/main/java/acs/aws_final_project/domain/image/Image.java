@@ -1,36 +1,30 @@
-package acs.aws_final_project.domain.prompt;
+package acs.aws_final_project.domain.image;
 
 import acs.aws_final_project.domain.fairyTale.Fairytale;
-import acs.aws_final_project.global.baseEntity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Builder
-@Data
-@Table(name = "prompt")
+@Getter
+@Table(name = "image")
 @AllArgsConstructor
 @NoArgsConstructor
-public class Prompt extends BaseEntity {
-
+public class Image {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="prompt_id")
-    private Long promptId;
+    @Column(name="image_id")
+    private Long imageId;
 
-
-    private String text;
-
-    private Integer pageNumber;
+    @Column(length = 500)
+    private String imageUrl;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "fairytale_id")
     private Fairytale fairytale;
-
-
 
 }

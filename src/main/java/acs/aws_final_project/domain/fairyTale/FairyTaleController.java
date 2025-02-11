@@ -1,5 +1,8 @@
 package acs.aws_final_project.domain.fairyTale;
 
+import acs.aws_final_project.domain.books.BooksGenre;
+import acs.aws_final_project.domain.books.dto.BooksResponseDto;
+import acs.aws_final_project.domain.bookstore.dto.BookstoreResponseDto;
 import acs.aws_final_project.domain.fairyTale.dto.FairyTaleRequestDto;
 import acs.aws_final_project.domain.fairyTale.dto.FairyTaleResponseDto;
 import acs.aws_final_project.domain.fairyTale.service.FairyTaleService;
@@ -30,12 +33,24 @@ public class FairyTaleController {
     private final PollyService pollyService;
 
 
+
+    @GetMapping("/")
+    public ApiResponse<List<FairyTaleResponseDto.FairyTaleListDto>> getFairyTaleList(){
+
+        log.info("getFairyTaleList API Request time: {}", LocalDateTime.now());
+
+        List<FairyTaleResponseDto.FairyTaleListDto> findFairyTaleList = fairyTaleService.getFairyTaleList();
+
+        return ApiResponse.onSuccess(findFairyTaleList);
+    }
+
+
     @GetMapping("/{fairytaleId}")
     public ApiResponse<FairyTaleResponseDto.FairyTaleResultDto> getFairyTale(@PathVariable Long fairytaleId){
 
         log.info("getFairyTale API Request time: {}", LocalDateTime.now());
 
-        FairyTaleResponseDto.FairyTaleResultDto findFairyTale = sonnetService.getFairyTale(fairytaleId);
+        FairyTaleResponseDto.FairyTaleResultDto findFairyTale = fairyTaleService.getFairyTale(fairytaleId);
 
         return ApiResponse.onSuccess(findFairyTale);
     }
@@ -59,17 +74,17 @@ public class FairyTaleController {
 
 
     // 이미지 여러개 생성 요청
-    @PostMapping("/sdasync")
-    public ApiResponse<List<FairyTaleResponseDto.StablediffusionResultDto>> createImage(@RequestBody List<FairyTaleRequestDto.StablediffusionRequestDto> requestDto) throws JsonProcessingException {
-
-        log.info("API Request time: {}", LocalDateTime.now());
-
-
-        List<FairyTaleResponseDto.StablediffusionResultDto> result = fairyTaleService.asyncImage(requestDto);
-
-
-        return ApiResponse.onSuccess(result);
-    }
+//    @PostMapping("/sdasync")
+//    public ApiResponse<List<FairyTaleResponseDto.StablediffusionResultDto>> createImage(@RequestBody List<FairyTaleRequestDto.StablediffusionRequestDto> requestDto) throws JsonProcessingException {
+//
+//        log.info("API Request time: {}", LocalDateTime.now());
+//
+//
+//        List<FairyTaleResponseDto.StablediffusionResultDto> result = fairyTaleService.asyncImage(requestDto);
+//
+//
+//        return ApiResponse.onSuccess(result);
+//    }
 
     // 이미지 하나만 생성 요청
     @PostMapping("/sd")
@@ -88,16 +103,27 @@ public class FairyTaleController {
         return ApiResponse.onSuccess(result);
     }
 
-    @PostMapping("/polly")
-    public ApiResponse<List<FairyTaleResponseDto.PollyResultDto>> createMP3(@RequestBody List<FairyTaleRequestDto.PollyRequestDto> requestDto){
+//    @PostMapping("/polly")
+//    public ApiResponse<List<FairyTaleResponseDto.PollyResultDto>> createMP3(@RequestBody List<FairyTaleRequestDto.PollyRequestDto> requestDto){
+//
+//
+//        //String mp3Dir = pollyService.createMP3(requestDto.getText(), fileDir, requestDto.getFileName());
+//
+//        List<FairyTaleResponseDto.PollyResultDto> mp3Dir = fairyTaleService.asyncPolly(requestDto);
+//
+//        //return ApiResponse.onSuccess(new FairyTaleResponseDto.PollyResultDto(mp3Dir));
+//        return ApiResponse.onSuccess(mp3Dir);
+//    }
 
 
-        //String mp3Dir = pollyService.createMP3(requestDto.getText(), fileDir, requestDto.getFileName());
+    @GetMapping("/top")
+    public ApiResponse<List<FairyTaleResponseDto.Top5>> getTop5(){
 
-        List<FairyTaleResponseDto.PollyResultDto> mp3Dir = fairyTaleService.asyncPolly(requestDto);
+        log.info("getTop5 API Request time: {}", LocalDateTime.now());
 
-        //return ApiResponse.onSuccess(new FairyTaleResponseDto.PollyResultDto(mp3Dir));
-        return ApiResponse.onSuccess(mp3Dir);
+        List<FairyTaleResponseDto.Top5> result = fairyTaleService.getTop5();
+
+        return ApiResponse.onSuccess(result);
     }
 
 

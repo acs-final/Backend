@@ -2,21 +2,15 @@ package acs.aws_final_project.domain.fairyTale;
 
 import acs.aws_final_project.domain.body.Body;
 import acs.aws_final_project.domain.fairyTale.dto.FairyTaleRequestDto;
-import acs.aws_final_project.domain.keyword.Keyword;
-
-import java.security.Key;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeMap;
 
 public class FairyTaleConverter {
 
 
-    public static FairyTale toFairyTale(String title){
+    public static Fairytale toFairyTale(String title){
 
 
 
-        return FairyTale.builder()
+        return Fairytale.builder()
                 .title(title)
                 .build();
 
@@ -25,13 +19,13 @@ public class FairyTaleConverter {
 
 
 
-    public static Body toBody(String content, Integer pageNumber, FairyTale fairyTale){
+    public static Body toBody(String content, Integer pageNumber, Fairytale fairyTale){
 
 
         return Body.builder()
                 .content(content)
                 .pageNumber(pageNumber)
-                .fairyTale(fairyTale)
+                .fairytale(fairyTale)
                 .build();
     }
 
