@@ -10,7 +10,6 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Builder
-@Data
 @Table(name = "prompt")
 @AllArgsConstructor
 @NoArgsConstructor

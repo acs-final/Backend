@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 public class BookstoreResponseDto {
 
@@ -30,6 +31,21 @@ public class BookstoreResponseDto {
         private Float score;
         private Long fairytaleId;
         private String imageUrl;
+        private List<BookstoreCommentsDto> comment;
+
+    }
+
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Getter
+    @Builder
+    public static class BookstoreCommentsDto{
+
+        private Long commentId;
+        private String username;
+        private String content;
+        private Float score;
+        private LocalDateTime createdAt;
 
     }
 

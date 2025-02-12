@@ -21,11 +21,11 @@ public class BookstoreController {
     private final BookstoreService bookstoreService;
 
     @PostMapping("/")
-    public ApiResponse<BookstoreResponseDto.BookstoreCreateDto> createBookstore(@RequestBody BookstoreRequestDto.BookstoreCreateDto createDto){
+    public ApiResponse<BookstoreResponseDto.BookstoreCreateDto> createBookstore(@RequestHeader String memberId, @RequestBody BookstoreRequestDto.BookstoreCreateDto createDto){
 
         log.info("createBookstore API Request time: {}", LocalDateTime.now());
 
-        BookstoreResponseDto.BookstoreCreateDto result = bookstoreService.createBookstore(1L, createDto);
+        BookstoreResponseDto.BookstoreCreateDto result = bookstoreService.createBookstore(memberId, createDto);
 
 
         return ApiResponse.onSuccess(result);
@@ -42,21 +42,21 @@ public class BookstoreController {
     }
 
     @PatchMapping("/{bookstoreId}")
-    public ApiResponse<BookstoreResponseDto.BookstoreCreateDto> updateBookstore(@PathVariable Long bookstoreId, @RequestBody BookstoreRequestDto.BookstoreUpdateDto updateDto){
+    public ApiResponse<BookstoreResponseDto.BookstoreCreateDto> updateBookstore(@RequestHeader String memberId, @PathVariable Long bookstoreId, @RequestBody BookstoreRequestDto.BookstoreUpdateDto updateDto){
 
         log.info("getBookstore API Request time: {}", LocalDateTime.now());
 
-        BookstoreResponseDto.BookstoreCreateDto result = bookstoreService.updateBookstore(1L, bookstoreId, updateDto);
+        BookstoreResponseDto.BookstoreCreateDto result = bookstoreService.updateBookstore(memberId, bookstoreId, updateDto);
 
         return ApiResponse.onSuccess(result);
     }
 
     @DeleteMapping("/{bookstoreId}")
-    public ApiResponse<BookstoreResponseDto.BookstoreCreateDto> deleteBookstore(@PathVariable Long bookstoreId){
+    public ApiResponse<BookstoreResponseDto.BookstoreCreateDto> deleteBookstore(@RequestHeader String memberId, @PathVariable Long bookstoreId){
 
         log.info("getBookstore API Request time: {}", LocalDateTime.now());
 
-        Long id = bookstoreService.deleteBookstore(1L, bookstoreId);
+        Long id = bookstoreService.deleteBookstore(memberId, bookstoreId);
 
         BookstoreResponseDto.BookstoreCreateDto result = BookstoreResponseDto.BookstoreCreateDto.builder()
                 .bookstoreId(id)

@@ -53,7 +53,7 @@ public class PollyService {
 //                }
 //                System.out.println("MP3 파일 생성 완료: " + mp3Name);
 //            }
-            String fileName = requestDto.getTitle() + "/" + requestDto.getFileName();
+            String fileName = requestDto.getTitle() + "/" + requestDto.getFileName() + ".mp3";
 
             mp3Name = uploadMP3(audioStream, fileName);
 

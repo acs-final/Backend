@@ -31,7 +31,7 @@ public class CommentService {
     private final BookstoreRepository bookstoreRepository;
 
     @Transactional
-    public CommentResponseDto.CommentCreateDto createComment(CommentRequestDto.CommentCreateDto createDto, Long memberId, Long bookstoreId){
+    public CommentResponseDto.CommentCreateDto createComment(CommentRequestDto.CommentCreateDto createDto, String memberId, Long bookstoreId){
 
         Member findMember = memberRepository.findById(memberId).orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
 
@@ -56,13 +56,18 @@ public class CommentService {
     }
 
     @Transactional
-    public CommentResponseDto.CommentCreateDto updateComment(Long memberId, Long bookstoreId, Long commentId, CommentRequestDto.CommentUpdateDto updateDto){
+    public CommentResponseDto.CommentCreateDto updateComment(String memberId, Long bookstoreId, Long commentId, CommentRequestDto.CommentUpdateDto updateDto){
 
         Member findMember = memberRepository.findById(memberId).orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
+        Bookstore findBookstore = bookstoreRepository.findById(bookstoreId).orElseThrow(() -> new BookstoreHandler(ErrorStatus.BOOKSTORE_NOT_FOUND));
         Comment findComment = commentRepository.findById(commentId).orElseThrow(() -> new CommentHandler(ErrorStatus.COMMENT_NOT_FOUND));
 
         if (findMember != findComment.getMember()){
             throw new MemberHandler(ErrorStatus.FAIRYTALE_BAD_REQUEST);
+        }
+
+        if (findBookstore != findComment.getBookstore()){
+            throw new BookstoreHandler(ErrorStatus.BOOKSTORE_NOT_FOUND);
         }
 
         if (updateDto.getContent() != null){
@@ -81,7 +86,7 @@ public class CommentService {
     }
 
     @Transactional
-    public Long deleteComment(Long memberId, Long bookstoreId, Long commentId){
+    public Long deleteComment(String memberId, Long bookstoreId, Long commentId){
 
         Member findMember = memberRepository.findById(memberId).orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
         Comment findComment = commentRepository.findById(commentId).orElseThrow(() -> new CommentHandler(ErrorStatus.COMMENT_NOT_FOUND));
@@ -111,7 +116,7 @@ public class CommentService {
 
         List<CommentResponseDto.CommentListDto> result = findComment.stream()
                 .sorted(Comparator.comparing(Comment::getCreatedAt).reversed())
-                .map(c -> new CommentResponseDto.CommentListDto(c.getCommentId(), c.getContent(), c.getScore(), c.getMember().getMemberId(), c.getCreatedAt()))
+                .map(c -> new CommentResponseDto.CommentListDto(c.getCommentId(), c.getMember().getName(), c.getContent(), c.getScore(), c.getCreatedAt()))
                 .toList();
 
         return result;
@@ -125,7 +130,7 @@ public class CommentService {
 
         List<CommentResponseDto.CommentListDto> result = findComment.stream()
                 .sorted(Comparator.comparing(Comment::getScore).reversed())
-                .map(c -> new CommentResponseDto.CommentListDto(c.getCommentId(), c.getContent(), c.getScore(), c.getMember().getMemberId(), c.getCreatedAt()))
+                .map(c -> new CommentResponseDto.CommentListDto(c.getCommentId(), c.getMember().getName(), c.getContent(), c.getScore(),  c.getCreatedAt()))
                 .toList();
 
         return result;

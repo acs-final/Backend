@@ -25,9 +25,9 @@ public class CommentResponseDto {
     public static class CommentListDto{
 
         private Long commentId;
+        private String username;
         private String content;
         private Float score;
-        private Long memberId;
         private LocalDateTime createdAt;
     }
 
