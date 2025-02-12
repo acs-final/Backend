@@ -12,6 +12,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.Instant;
+import java.util.Date;
 import java.util.UUID;
 
 @Slf4j
@@ -30,7 +32,11 @@ public class AmazonS3UploadService {
         try {
             // 메타데이터 설정
             ObjectMetadata metadata = new ObjectMetadata();
+            Instant uploadTime = Instant.now();
+
             metadata.setContentType("audio/mpeg");  // MP3 파일로 인식되도록 설정
+            metadata.setLastModified(Date.from(uploadTime));
+
 
             // S3 업로드 요청
             PutObjectRequest putObjectRequest = new PutObjectRequest(bucketName, fileNameResult, audioStream, metadata);
@@ -53,8 +59,10 @@ public class AmazonS3UploadService {
         try {
             ByteArrayInputStream inputStream = new ByteArrayInputStream(imageBytes);
             ObjectMetadata metadata = new ObjectMetadata();
+            Instant uploadTime = Instant.now();
             //metadata.setContentLength(imageBytes.length);
             metadata.setContentType("image/png");
+            metadata.setLastModified(Date.from(uploadTime));
 
             amazonS3Client.putObject(new PutObjectRequest(bucketName, fileNameResult, inputStream, metadata));
 

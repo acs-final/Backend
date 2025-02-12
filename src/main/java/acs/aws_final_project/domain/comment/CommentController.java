@@ -23,31 +23,31 @@ public class CommentController {
     private final CommentService commentService;
 
     @PostMapping("/{bookstoreId}")
-    public ApiResponse<CommentResponseDto.CommentCreateDto> createComment(@PathVariable Long bookstoreId, @RequestBody CommentRequestDto.CommentCreateDto createDto){
+    public ApiResponse<CommentResponseDto.CommentCreateDto> createComment(@RequestHeader String memberId, @PathVariable Long bookstoreId, @RequestBody CommentRequestDto.CommentCreateDto createDto){
 
         log.info("createComment API Request time: {}", LocalDateTime.now());
 
-        CommentResponseDto.CommentCreateDto result = commentService.createComment(createDto, 1L, bookstoreId);
+        CommentResponseDto.CommentCreateDto result = commentService.createComment(createDto, memberId, bookstoreId);
 
         return ApiResponse.onSuccess(result);
     }
 
     @PatchMapping("/{bookstoreId}/{commentId}")
-    public ApiResponse<CommentResponseDto.CommentCreateDto> updateComment(@PathVariable Long bookstoreId, @PathVariable Long commentId , @RequestBody CommentRequestDto.CommentUpdateDto updateDto){
+    public ApiResponse<CommentResponseDto.CommentCreateDto> updateComment(@RequestHeader String memberId, @PathVariable Long bookstoreId, @PathVariable Long commentId , @RequestBody CommentRequestDto.CommentUpdateDto updateDto){
 
         log.info("updateComment API Request time: {}", LocalDateTime.now());
 
-        CommentResponseDto.CommentCreateDto result = commentService.updateComment(1L, bookstoreId, commentId , updateDto);
+        CommentResponseDto.CommentCreateDto result = commentService.updateComment(memberId, bookstoreId, commentId , updateDto);
 
         return ApiResponse.onSuccess(result);
     }
 
     @DeleteMapping("/{bookstoreId}/{commentId}")
-    public ApiResponse<CommentResponseDto.CommentCreateDto> deleteComment(@PathVariable Long bookstoreId, @PathVariable Long commentId){
+    public ApiResponse<CommentResponseDto.CommentCreateDto> deleteComment(@RequestHeader String memberId, @PathVariable Long bookstoreId, @PathVariable Long commentId){
 
         log.info("deleteComment API Request time: {}", LocalDateTime.now());
 
-        Long id = commentService.deleteComment(1L, bookstoreId, commentId);
+        Long id = commentService.deleteComment(memberId, bookstoreId, commentId);
 
         CommentResponseDto.CommentCreateDto result = CommentResponseDto.CommentCreateDto.builder()
                 .commentId(id)

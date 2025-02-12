@@ -20,9 +20,9 @@ import java.util.List;
 public class Member extends BaseEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+//    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="member_id")
-    private Long memberId;
+    private String memberId;
 
     private String name;
 
