@@ -58,5 +58,8 @@ public class Member extends BaseEntity {
     private List<Fairytale> fairytales;
 
 
+    public void setLoginStatus(){
+        this.loginStatus=LoginStatus.ACTIVE;
+    }
 
 }

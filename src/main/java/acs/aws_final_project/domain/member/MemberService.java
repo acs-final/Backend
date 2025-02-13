@@ -37,15 +37,26 @@ public class MemberService {
     @Transactional
     public MemberResponseDto.LoginResponseDto login(String memberId){
 
-        Optional<Member> findMember = memberRepository.findById(memberId);
+//        Optional<Member> findMember = memberRepository.findById(memberId);
 
-        if (findMember.isEmpty()){
+        Member deletedMember = memberRepository.findInactiveMemberById(memberId).orElse(null);
 
-            Member newMember = MemberConverter.toMember(memberId, 0);
+        log.info("deletedMember: {}", deletedMember);
 
-            memberRepository.save(newMember);
-            log.info("첫 로그인 성공: {}", newMember.getMemberId());
+        if (deletedMember != null) {
+            deletedMember.setLoginStatus();
+        } else {
+            Optional<Member> findMember = memberRepository.findById(memberId);
+
+            if (findMember.isEmpty()){
+
+                Member newMember = MemberConverter.toMember(memberId, 0);
+
+                memberRepository.save(newMember);
+                log.info("첫 로그인 성공: {}", newMember.getMemberId());
+            }
         }
+
 
         return new MemberResponseDto.LoginResponseDto(memberId);
 
