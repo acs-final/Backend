@@ -25,6 +25,8 @@ public class Report extends BaseEntity {
 
     private Float score;
 
+    private String imageUrl;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member member;

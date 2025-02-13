@@ -11,6 +11,12 @@ import acs.aws_final_project.domain.fairyTale.service.PollyService;
 import acs.aws_final_project.domain.fairyTale.service.SonnetService;
 import acs.aws_final_project.global.response.ApiResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.joda.time.DateTime;
@@ -35,6 +41,11 @@ public class FairyTaleController {
 
     // 동화책 목록 가져오기. pagenation 추가 해야함.
     @GetMapping("/")
+    @Operation(summary = "전체 동화책 목록 조회 API",description = "회원 구분 없이 전체 동화책 목록 조회.")
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200",description = "OK, 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "FAIRYTALE404", description = "",content = @Content(schema = @Schema(implementation = ApiResponse.class))),
+    })
     public ApiResponse<List<FairyTaleResponseDto.FairyTaleListDto>> getFairyTaleList(){
 
         log.info("getFairyTaleList API Request time: {}", LocalDateTime.now());
@@ -46,6 +57,14 @@ public class FairyTaleController {
 
 
     @GetMapping("/{fairytaleId}")
+    @Operation(summary = "동화책 상세 조회 API",description = "동화책 상세 조회")
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200",description = "OK, 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "FAIRYTALE404", description = "동화책을 찾을 수 없습니다.",content = @Content(schema = @Schema(implementation = ApiResponse.class))),
+    })
+    @Parameters({
+            @Parameter(name = "fairytaleId", description = "동화책 id"),
+    })
     public ApiResponse<FairyTaleResponseDto.FairyTaleResultDto> getFairyTale(@PathVariable Long fairytaleId){
 
         log.info("getFairyTale API Request time: {}", LocalDateTime.now());
@@ -56,6 +75,15 @@ public class FairyTaleController {
     }
 
     @PostMapping("/sonnet")
+    @Operation(summary = "동화책 생성 API",description = "동화책 생성")
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200",description = "OK, 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "MEMBER404", description = "회원을 찾을 수 없습니다.",content = @Content(schema = @Schema(implementation = ApiResponse.class))),
+    })
+    @Parameters({
+            @Parameter(name = "memberId", description = "멤버 id"),
+            @Parameter(name = "requestDto", description = "동화책 장르, 자녀 성별, 주제"),
+    })
     public ApiResponse<FairyTaleResponseDto.FairyTaleResultDto> createFairyTale(@RequestHeader String memberId, @RequestBody FairyTaleRequestDto.FairyTaleCreateDto requestDto){
 
         log.info("createFairyTale API Request time: {}", LocalDateTime.now());
@@ -72,6 +100,42 @@ public class FairyTaleController {
         return ApiResponse.onSuccess(result);
     }
 
+    @GetMapping("/top")
+    @Operation(summary = "동화책 TOP5 조회 API",description = "동화책 목록 중 평점순 5개 조회")
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200",description = "OK, 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "FAIRYTALE404", description = "동화책을 찾을 수 없습니다.",content = @Content(schema = @Schema(implementation = ApiResponse.class))),
+    })
+    public ApiResponse<List<FairyTaleResponseDto.Top5>> getTop5(){
+
+        log.info("getTop5 API Request time: {}", LocalDateTime.now());
+
+        List<FairyTaleResponseDto.Top5> result = fairyTaleService.getTop5();
+
+        return ApiResponse.onSuccess(result);
+    }
+
+    @PostMapping("/{fairytaleId}/score")
+    @Operation(summary = "동화책 평점 주기 API",description = "동화책 평점 주기")
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200",description = "OK, 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "FAIRYTALE404", description = "동화책을 찾을 수 없습니다.",content = @Content(schema = @Schema(implementation = ApiResponse.class))),
+    })
+    @Parameters({
+            @Parameter(name = "fairytaleId", description = "동화책 id"),
+            @Parameter(name = "requestDto", description = "평점"),
+    })
+    public ApiResponse<FairyTaleResponseDto.FairyTaleListDto> grantScore(@PathVariable Long fairytaleId, @RequestBody FairyTaleRequestDto.ScoreRequestDto requestDto){
+
+        log.info("grantScore API Request time: {}", LocalDateTime.now());
+
+        FairyTaleResponseDto.FairyTaleListDto result = fairyTaleService.grantScore(fairytaleId, requestDto.getScore());
+
+        return ApiResponse.onSuccess(result);
+    }
+
+
+
 
     // 이미지 여러개 생성 요청
 //    @PostMapping("/sdasync")
@@ -87,21 +151,21 @@ public class FairyTaleController {
 //    }
 
     // 이미지 하나만 생성 요청
-    @PostMapping("/sd")
-//    public ApiResponse<Object> createImage(@RequestParam("imageFile") MultipartFile imageFile){
-    public ApiResponse<Object> createImageByAsync(@RequestBody FairyTaleRequestDto.StablediffusionRequestDto requestDto){
-
-        log.info("API Request time: {}", LocalDateTime.now());
-
-        Object result = null;
-        try {
-            result = stableDiffusionService.createImage(requestDto.getTitle(), requestDto.getFileName(), requestDto.getPrompt());
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
-
-        return ApiResponse.onSuccess(result);
-    }
+//    @PostMapping("/sd")
+////    public ApiResponse<Object> createImage(@RequestParam("imageFile") MultipartFile imageFile){
+//    public ApiResponse<Object> createImageByAsync(@RequestBody FairyTaleRequestDto.StablediffusionRequestDto requestDto){
+//
+//        log.info("API Request time: {}", LocalDateTime.now());
+//
+//        Object result = null;
+//        try {
+//            result = stableDiffusionService.createImage(requestDto.getTitle(), requestDto.getFileName(), requestDto.getPrompt());
+//        } catch (JsonProcessingException e) {
+//            throw new RuntimeException(e);
+//        }
+//
+//        return ApiResponse.onSuccess(result);
+//    }
 
 //    @PostMapping("/polly")
 //    public ApiResponse<List<FairyTaleResponseDto.PollyResultDto>> createMP3(@RequestBody List<FairyTaleRequestDto.PollyRequestDto> requestDto){
@@ -116,24 +180,6 @@ public class FairyTaleController {
 //    }
 
 
-    @GetMapping("/top")
-    public ApiResponse<List<FairyTaleResponseDto.Top5>> getTop5(){
 
-        log.info("getTop5 API Request time: {}", LocalDateTime.now());
-
-        List<FairyTaleResponseDto.Top5> result = fairyTaleService.getTop5();
-
-        return ApiResponse.onSuccess(result);
-    }
-
-    @PostMapping("/{fairytaleId}/score")
-    public ApiResponse<FairyTaleResponseDto.FairyTaleListDto> grantScore(@PathVariable Long fairytaleId, @RequestBody FairyTaleRequestDto.ScoreRequestDto requestDto){
-
-        log.info("grantScore API Request time: {}", LocalDateTime.now());
-
-        FairyTaleResponseDto.FairyTaleListDto result = fairyTaleService.grantScore(fairytaleId, requestDto.getScore());
-
-        return ApiResponse.onSuccess(result);
-    }
 
 }

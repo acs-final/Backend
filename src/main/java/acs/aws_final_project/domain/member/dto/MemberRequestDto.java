@@ -7,17 +7,17 @@ import lombok.NoArgsConstructor;
 
 public class MemberRequestDto {
 
+
     @AllArgsConstructor
     @NoArgsConstructor
     @Getter
     @Builder
-    public static class LoginRequestDto{
+    public static class UpdateProfileDto{
 
-        private String memberId;
-        private String name;
-
+        private String nickname;
+        private String username;
+        private Integer childAge;
     }
-
 
 
 }
