@@ -44,7 +44,7 @@ public class BookstoreService {
         return BookstoreResponseDto.BookstoreResultDto.builder()
                 .title(findBookstore.getTitle())
                 .body(findBookstore.getBody())
-                .score(findBookstore.getScore())
+                .score(findBookstore.getAvgScore())
                 .fairytaleId(findBookstore.getFairytale().getFairytaleId())
                 .imageUrl(findBookstore.getImageUrl())
                 .comment(commentsDtos)
@@ -63,7 +63,7 @@ public class BookstoreService {
             throw new FairytaleHandler(ErrorStatus.FAIRYTALE_NOT_FOUND);
         }
 
-        Bookstore newBookstore = BookstoreConverter.toBookstore(findMember, createDto.getTitle(), createDto.getBody(), createDto.getScore(), 0, findFairytale, createDto.getImageUrl());
+        Bookstore newBookstore = BookstoreConverter.toBookstore(findMember, createDto.getTitle(), createDto.getBody(), createDto.getScore(), createDto.getScore(), createDto.getScore(), 0, findFairytale, createDto.getImageUrl());
 
         Bookstore saveBookstore = bookstoreRepository.save(newBookstore);
 
@@ -90,7 +90,14 @@ public class BookstoreService {
             findBookstore.setBody(updateDto.getBody());
         }
         if (updateDto.getScore() != null){
-            findBookstore.setScore(updateDto.getScore());
+            int scoreCount = findBookstore.getCommentCount() + 1;
+            float totalScore = findBookstore.getTotalScore() - findBookstore.getMyScore() + updateDto.getScore();
+
+            Float avgScore = totalScore / scoreCount;
+
+            findBookstore.setAvgScore(avgScore);
+            findBookstore.setTotalScore(totalScore);
+
         }
         if (updateDto.getImageUrl() != null){
             findBookstore.setImageUrl(updateDto.getImageUrl());
@@ -132,7 +139,7 @@ public class BookstoreService {
             resultDtos.add(new BookstoreResponseDto.BookstoreListResultDto(
                     bs.getBookstoreId(), bs.getMember().getName(),
                     bs.getTitle(), bs.getFairytale().getGenre(), bs.getCommentCount(),
-                    bs.getScore(), bs.getCreatedAt().toLocalDate(), bs.getFairytale().getFairytaleId()));
+                    bs.getAvgScore(), bs.getCreatedAt().toLocalDate(), bs.getFairytale().getFairytaleId()));
         });
 
 
@@ -149,7 +156,7 @@ public class BookstoreService {
                 .map(bs -> new BookstoreResponseDto.BookstoreListResultDto(
                         bs.getBookstoreId(), bs.getMember().getName(),
                         bs.getTitle(), bs.getFairytale().getGenre(), bs.getCommentCount(),
-                        bs.getScore(), bs.getCreatedAt().toLocalDate(), bs.getFairytale().getFairytaleId()
+                        bs.getAvgScore(), bs.getCreatedAt().toLocalDate(), bs.getFairytale().getFairytaleId()
                 ))
                 .collect(Collectors.toList());
 
@@ -169,7 +176,7 @@ public class BookstoreService {
             resultDtos.add(new BookstoreResponseDto.BookstoreListResultDto(
                     bs.getBookstoreId(), bs.getMember().getName(),
                     bs.getTitle(), bs.getFairytale().getGenre(), bs.getCommentCount(),
-                    bs.getScore(), bs.getCreatedAt().toLocalDate(), bs.getFairytale().getFairytaleId()
+                    bs.getAvgScore(), bs.getCreatedAt().toLocalDate(), bs.getFairytale().getFairytaleId()
             ));
         });
 

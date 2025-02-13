@@ -3,18 +3,21 @@ package acs.aws_final_project.domain.fairyTale;
 import acs.aws_final_project.domain.body.Body;
 import acs.aws_final_project.domain.fairyTale.dto.FairyTaleRequestDto;
 import acs.aws_final_project.domain.member.Member;
+import software.amazon.awssdk.services.polly.endpoints.internal.Value;
 
 public class FairyTaleConverter {
 
 
-    public static Fairytale toFairyTale(Member member, String title, Float score, String genre){
+    public static Fairytale toFairyTale(Member member, String title, Float avgScore, Float totalScore, Integer scoreCount, String genre){
 
 
 
         return Fairytale.builder()
                 .member(member)
                 .title(title)
-                .score(score)
+                .avgScore(avgScore)
+                .totalScore(totalScore)
+                .scoreCount(scoreCount)
                 .genre(genre)
                 .build();
 

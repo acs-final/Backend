@@ -9,6 +9,7 @@ import lombok.*;
 @Entity
 @Builder
 @Getter
+@Setter
 @Table(name = "report")
 @AllArgsConstructor
 @NoArgsConstructor
@@ -25,6 +26,7 @@ public class Report extends BaseEntity {
 
     private Float score;
 
+    @Column(length = 500)
     private String imageUrl;
 
     @ManyToOne(fetch = FetchType.LAZY)

@@ -249,7 +249,9 @@ public class SonnetService {
             log.info("Async image request: {}", imageRequestDtos);
 
             /* 동화 저장 시 평점 입력하는 부분 수정 필요 */
-            Fairytale myFairytale = FairyTaleConverter.toFairyTale(findMember, title, 0F, genre);
+
+            Fairytale myFairytale = FairyTaleConverter.toFairyTale(findMember, title, 0F, 0F, 0, genre);
+
 
             fairyTaleRepository.save(myFairytale);
 
@@ -272,7 +274,7 @@ public class SonnetService {
             return myresult.builder()
                     .fairytaleId(myFairytale.getFairytaleId())
                     .title(title)
-                    .score(myFairytale.getScore())
+                    .score(myFairytale.getAvgScore())
                     .genre(myFairytale.getGenre())
                     .body(resultBody)
                     .imageUrl(imageUrls)

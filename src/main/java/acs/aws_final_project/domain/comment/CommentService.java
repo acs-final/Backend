@@ -37,13 +37,17 @@ public class CommentService {
 
         Bookstore findBookstore = bookstoreRepository.findById(bookstoreId).orElseThrow(() -> new BookstoreHandler(ErrorStatus.BOOKSTORE_NOT_FOUND));
 
-        Integer c = findBookstore.getCommentCount();
+        int c = findBookstore.getCommentCount() + 1;
 
-        if (c == null){
-            c = 0;
-        }
+        findBookstore.setCommentCount(c);
 
-        findBookstore.setCommentCount(++c);
+        float totalScore = findBookstore.getTotalScore() + createDto.getScore();
+        int scoreCount = findBookstore.getCommentCount() + 1;  // 평점 개수는 본인 꺼 포함 + 댓글 개수. 댓글 생성할때마다 1증가
+
+        float avgScore = totalScore / scoreCount;
+
+        findBookstore.setAvgScore(avgScore);
+        findBookstore.setTotalScore(totalScore);
 
         bookstoreRepository.save(findBookstore);
 
@@ -74,6 +78,16 @@ public class CommentService {
             findComment.setContent(updateDto.getContent());
         }
         if (updateDto.getScore() != null){
+            float totalScore = findBookstore.getTotalScore() - findComment.getScore() + updateDto.getScore();
+            int scoreCount = findBookstore.getCommentCount() + 1;  // 평점 개수는 본인 꺼 포함 + 댓글 개수. 댓글 수정이므로 개수 그대로.
+
+            float avgScore = totalScore / scoreCount;
+
+            findBookstore.setAvgScore(avgScore);
+            findBookstore.setTotalScore(totalScore);
+
+            bookstoreRepository.save(findBookstore);
+
             findComment.setScore(updateDto.getScore());
         }
 
@@ -99,6 +113,15 @@ public class CommentService {
         Integer c = findBookstore.getCommentCount();
 
         if (c > 0){
+            float totalScore = findBookstore.getTotalScore() - findComment.getScore();
+            int scoreCount = findBookstore.getCommentCount();  // 평점 개수는 본인 꺼 포함 + 댓글 개수. 댓글 삭제이므로 개수 하나 빼줌.
+
+            float avgScore = totalScore / scoreCount;
+
+            findBookstore.setAvgScore(avgScore);
+            findBookstore.setTotalScore(totalScore);
+
+            bookstoreRepository.save(findBookstore);
             findBookstore.setCommentCount(--c);
         }
 

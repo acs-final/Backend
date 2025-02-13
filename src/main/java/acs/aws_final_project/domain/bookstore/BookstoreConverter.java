@@ -6,13 +6,15 @@ import software.amazon.awssdk.services.polly.endpoints.internal.Value;
 
 public class BookstoreConverter {
 
-    public static Bookstore toBookstore(Member member, String title, String body, Float score, Integer commentCount, Fairytale fairyTale, String imageUrl){
+    public static Bookstore toBookstore(Member member, String title, String body, Float myScore, Float avgScore, Float totalScore, Integer commentCount, Fairytale fairyTale, String imageUrl){
 
         return Bookstore.builder()
                 .member(member)
                 .title(title)
                 .body(body)
-                .score(score)
+                .myScore(myScore)
+                .avgScore(avgScore)
+                .totalScore(totalScore)
                 .commentCount(commentCount)
                 .fairytale(fairyTale)
                 .imageUrl(imageUrl)
