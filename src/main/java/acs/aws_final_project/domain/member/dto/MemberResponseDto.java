@@ -16,7 +16,20 @@ public class MemberResponseDto {
     public static class LoginResponseDto{
 
         private String memberId;
-        private String name;
+
+    }
+
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Getter
+    @Builder
+    public static class MemberDetailDto{
+
+        private String nickname;
+        private String username;
+        private Integer credit;
+        private Integer childAge;
+
 
     }
 
@@ -26,7 +39,6 @@ public class MemberResponseDto {
     @Builder
     public static class MyFairytaleDto{
 
-        private String memberId;
         private Long fairytaleId;
         private String writer;
         private String title;
@@ -35,6 +47,39 @@ public class MemberResponseDto {
         private Float score;
         private LocalDate createdAt;
         private String imageUrl;
+
+    }
+
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Getter
+    @Builder
+    public static class MyBookstoreDto{
+
+        private Long bookstoreId;
+        private String writer;
+        private String title;
+        private String genre;
+        private Integer commentCount;
+        private Float score;
+        private LocalDate createdAt;
+        private Long fairytaleId;
+
+    }
+
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Getter
+    @Builder
+    public static class MyReportDto{
+
+        private Long reportId;
+        private String writer;
+        private String title;
+        private String genre;
+        private Float score;
+        private LocalDate createdAt;
+        private Long fairytaleId;
 
     }
 }

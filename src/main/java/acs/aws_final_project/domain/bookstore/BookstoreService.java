@@ -56,7 +56,8 @@ public class BookstoreService {
 
         Member findMember = memberRepository.findById(memberId).orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
 
-        Fairytale findFairytale = fairyTaleRepository.findByFairytaleId(createDto.getFairytaleId());
+        //Fairytale findFairytale = fairyTaleRepository.findByFairytaleId(createDto.getFairytaleId());
+        Fairytale findFairytale = fairyTaleRepository.findById(createDto.getFairytaleId()).orElseThrow(()-> new FairytaleHandler(ErrorStatus.FAIRYTALE_NOT_FOUND));
 
         if (findFairytale == null){
             throw new FairytaleHandler(ErrorStatus.FAIRYTALE_NOT_FOUND);
