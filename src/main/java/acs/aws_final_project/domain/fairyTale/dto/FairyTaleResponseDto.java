@@ -17,6 +17,7 @@ public class FairyTaleResponseDto {
     public static class FairyTaleListDto {
         private Long fairytaleId;
         private String title;
+        private Float score;
     }
 
     @AllArgsConstructor

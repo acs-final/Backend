@@ -42,7 +42,7 @@ public class FairyTaleService {
     public List<FairyTaleResponseDto.FairyTaleListDto> getFairyTaleList() {
         List<Fairytale> findFairyTaleList = fairyTaleRepository.findAll();
         List<FairyTaleResponseDto.FairyTaleListDto> fairyTaleListDtos = findFairyTaleList.stream()
-                .map(ft -> new FairyTaleResponseDto.FairyTaleListDto(ft.getFairytaleId(), ft.getTitle()))
+                .map(ft -> new FairyTaleResponseDto.FairyTaleListDto(ft.getFairytaleId(), ft.getTitle(), ft.getAvgScore()))
                 .toList();
         return fairyTaleListDtos;
     }
@@ -64,7 +64,7 @@ public class FairyTaleService {
         return FairyTaleResponseDto.FairyTaleResultDto.builder()
                 .fairytaleId(fairytaleId)
                 .title(findFairytale.getTitle())
-                .score(findFairytale.getScore())
+                .score(findFairytale.getAvgScore())
                 .genre(findFairytale.getGenre())
                 .body(BodyConverter.toBodies(findBody))
                 .imageUrl(myImages)
@@ -135,7 +135,7 @@ public class FairyTaleService {
     public List<FairyTaleResponseDto.Top3> getTop3() {
         List<Fairytale> findFairytale = fairyTaleRepository.findAllOfTop3();
         findFairytale = findFairytale.stream()
-                .sorted(Comparator.comparing(Fairytale::getScore).reversed())
+                .sorted(Comparator.comparing(Fairytale::getAvgScore).reversed())
                 .toList();
 
         List<FairyTaleResponseDto.Top3> topFairytale = findFairytale.stream()
@@ -151,11 +151,20 @@ public class FairyTaleService {
 
     @Transactional
     public FairyTaleResponseDto.FairyTaleListDto grantScore(Long fairytaleId, Float score) {
+
         Fairytale findFairytale = fairyTaleRepository.findById(fairytaleId)
                 .orElseThrow(() -> new FairytaleHandler(ErrorStatus.FAIRYTALE_NOT_FOUND));
-        Float totalScore = (findFairytale.getScore() + score) / 2;
-        findFairytale.setScore(totalScore);
-        return new FairyTaleResponseDto.FairyTaleListDto(findFairytale.getFairytaleId(), findFairytale.getTitle());
+
+        int scoreCount = findFairytale.getScoreCount() + 1;
+        float totalScore = findFairytale.getTotalScore() + score;
+
+        Float avgScore = totalScore / scoreCount;
+
+        findFairytale.setAvgScore(avgScore);
+        findFairytale.setTotalScore(totalScore);
+        findFairytale.setScoreCount(scoreCount);
+
+        return new FairyTaleResponseDto.FairyTaleListDto(findFairytale.getFairytaleId(), findFairytale.getTitle(), findFairytale.getAvgScore());
     }
 
     // 삭제 메서드: 예외 발생 여부와 상관없이 항상 성공하도록 처리 (소프트 딜리트)

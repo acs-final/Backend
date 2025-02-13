@@ -27,7 +27,7 @@ public class MemberConverter {
                 .title(fairytale.getTitle())
                 .genre(fairytale.getGenre())
                 .hasReport(hasReport)
-                .score(fairytale.getScore())
+                .score(fairytale.getAvgScore())
                 .imageUrl(image.getImageUrl())
                 .build();
 
@@ -41,7 +41,7 @@ public class MemberConverter {
                 .title(bookstore.getTitle())
                 .genre(fairytale.getGenre())
                 .commentCount(bookstore.getCommentCount())
-                .score(bookstore.getScore())
+                .score(bookstore.getAvgScore())
                 .createdAt(bookstore.getCreatedAt().toLocalDate())
                 .fairytaleId(fairytale.getFairytaleId())
                 .build();

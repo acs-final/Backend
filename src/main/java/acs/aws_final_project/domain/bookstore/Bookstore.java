@@ -28,7 +28,11 @@ public class Bookstore extends BaseEntity {
 
     private String body;
 
-    private Float score;
+    private Float myScore;
+
+    private Float avgScore;
+
+    private Float totalScore;
 
     private Integer commentCount;
 

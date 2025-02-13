@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public class ReportResponseDto {
@@ -28,6 +30,7 @@ public class ReportResponseDto {
         private String memberId;
         private Long fairytaleId;
         private LocalDateTime createdAt;
+        private String imageUrl;
     }
 
     // 목록 DTO: 클라이언트에 독후감 제목과 평점만 전달
@@ -36,7 +39,12 @@ public class ReportResponseDto {
     @Getter
     @Builder
     public static class ReportListDto {
+        private Long reportId;
+        private String writer;
         private String title;
+        private String genre;
         private Float score;
+        private LocalDate createdAt;
+        private Long fairytaleId;
     }
 }
