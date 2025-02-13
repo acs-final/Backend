@@ -132,18 +132,18 @@ public class FairyTaleService {
         return resultDtos;
     }
 
-    public List<FairyTaleResponseDto.Top5> getTop5() {
-        List<Fairytale> findFairytale = fairyTaleRepository.findAllOfTop5();
+    public List<FairyTaleResponseDto.Top3> getTop3() {
+        List<Fairytale> findFairytale = fairyTaleRepository.findAllOfTop3();
         findFairytale = findFairytale.stream()
                 .sorted(Comparator.comparing(Fairytale::getScore).reversed())
                 .toList();
 
-        List<FairyTaleResponseDto.Top5> topFairytale = findFairytale.stream()
+        List<FairyTaleResponseDto.Top3> topFairytale = findFairytale.stream()
                 .map(ft -> {
                     Image findImage = imageRepository.findFirstByFairytale(ft);
-                    return new FairyTaleResponseDto.Top5(ft.getFairytaleId(), ft.getTitle(), findImage.getImageUrl());
+                    return new FairyTaleResponseDto.Top3(ft.getFairytaleId(), ft.getTitle(), findImage.getImageUrl());
                 })
-                .limit(5)
+                .limit(3)
                 .toList();
 
         return topFairytale;

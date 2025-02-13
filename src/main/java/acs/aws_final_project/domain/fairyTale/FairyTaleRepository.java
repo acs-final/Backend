@@ -15,6 +15,6 @@ public interface FairyTaleRepository extends JpaRepository<Fairytale, Long> {
 
     List<Fairytale> findAllByMember(Member member);
 
-    @Query("SELECT f FROM Fairytale f ORDER BY f.score DESC LIMIT 5")
-    List<Fairytale> findAllOfTop5();
+    @Query("SELECT f FROM Fairytale f ORDER BY f.score DESC LIMIT 3")
+    List<Fairytale> findAllOfTop3();
 }

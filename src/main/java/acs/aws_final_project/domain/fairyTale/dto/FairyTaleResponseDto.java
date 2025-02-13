@@ -63,7 +63,7 @@ public class FairyTaleResponseDto {
     @NoArgsConstructor
     @Getter
     @Builder
-    public static class Top5 {
+    public static class Top3 {
         private Long fairytaleId;
         private String title;
         private String imageUrl;

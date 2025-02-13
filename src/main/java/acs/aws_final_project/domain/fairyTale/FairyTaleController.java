@@ -88,9 +88,9 @@ public class FairyTaleController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "FAIRYTALE404", description = "동화책을 찾을 수 없습니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class)))
     })
-    public ApiResponse<List<FairyTaleResponseDto.Top5>> getTop5() {
-        log.info("getTop5 API Request time: {}", LocalDateTime.now());
-        List<FairyTaleResponseDto.Top5> result = fairyTaleService.getTop5();
+    public ApiResponse<List<FairyTaleResponseDto.Top3>> getTop3() {
+        log.info("getTop3 API Request time: {}", LocalDateTime.now());
+        List<FairyTaleResponseDto.Top3> result = fairyTaleService.getTop3();
         return ApiResponse.onSuccess(result);
     }
 
