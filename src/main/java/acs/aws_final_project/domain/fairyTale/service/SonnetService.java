@@ -199,6 +199,7 @@ public class SonnetService {
                 }
             }
 
+            log.info("mergedBody: {}", resultBody);
 
 
             // Prompt 추출
@@ -248,7 +249,7 @@ public class SonnetService {
             log.info("Async image request: {}", imageRequestDtos);
 
             /* 동화 저장 시 평점 입력하는 부분 수정 필요 */
-            Fairytale myFairytale = FairyTaleConverter.toFairyTale(findMember, title, 4.5F, genre);
+            Fairytale myFairytale = FairyTaleConverter.toFairyTale(findMember, title, 0F, genre);
 
             fairyTaleRepository.save(myFairytale);
 
