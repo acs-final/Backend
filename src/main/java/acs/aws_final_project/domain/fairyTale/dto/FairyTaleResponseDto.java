@@ -14,19 +14,16 @@ public class FairyTaleResponseDto {
     @NoArgsConstructor
     @Getter
     @Builder
-    public static class FairyTaleListDto{
-
+    public static class FairyTaleListDto {
         private Long fairytaleId;
         private String title;
-
     }
 
     @AllArgsConstructor
     @NoArgsConstructor
     @Getter
     @Builder
-    public static class FairyTaleResultDto{
-
+    public static class FairyTaleResultDto {
         private Long fairytaleId;
         private String title;
         private Float score;
@@ -35,14 +32,13 @@ public class FairyTaleResponseDto {
         //private List<Pages> body;
         private List<StablediffusionResultDto> imageUrl;
         private List<PollyResultDto> mp3Url;
-
     }
 
     @AllArgsConstructor
     @NoArgsConstructor
     @Getter
     @Builder
-    public static class Pages{
+    public static class Pages {
         private String page;
     }
 
@@ -50,7 +46,7 @@ public class FairyTaleResponseDto {
     @NoArgsConstructor
     @Getter
     @Builder
-    public static class StablediffusionResultDto{
+    public static class StablediffusionResultDto {
         //private Integer pageNumber;
         private String imageUrl;
     }
@@ -59,20 +55,26 @@ public class FairyTaleResponseDto {
     @NoArgsConstructor
     @Getter
     @Builder
-    public static class PollyResultDto{
+    public static class PollyResultDto {
         private String mp3Url;
     }
-
 
     @AllArgsConstructor
     @NoArgsConstructor
     @Getter
     @Builder
-    public static class Top5{
+    public static class Top5 {
         private Long fairytaleId;
         private String title;
         private String imageUrl;
-
     }
 
+    // 삭제 응답용 DTO: 삭제된 동화의 id만 전달
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Getter
+    @Builder
+    public static class FairyTaleDeleteDto {
+        private Long fairytaleId;
+    }
 }

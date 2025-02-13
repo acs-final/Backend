@@ -25,7 +25,7 @@ public class ReportResponseDto {
         private String title;
         private String body;
         private Float score;
-        private Long memberId;
+        private String memberId;
         private Long fairytaleId;
         private LocalDateTime createdAt;
     }

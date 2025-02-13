@@ -15,7 +15,7 @@ public class ReportRequestDto {
         private String title;
         private String body;
         private Float score;
-        private Long memberId; // 독후감 작성자 ID
+        private String memberId; // 독후감 작성자 ID
         private Long fairytaleId;  // 독후감 대상 스토리북 ID
     }
 

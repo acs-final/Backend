@@ -13,5 +13,5 @@ public interface ReportRepository extends JpaRepository<Report, Long> {
     Report findByFairyTale(Fairytale fairytale);
 
     List<Report> findAllByMember(Member member);
-    
+
 }

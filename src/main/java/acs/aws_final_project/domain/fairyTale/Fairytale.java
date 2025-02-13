@@ -11,6 +11,8 @@ import acs.aws_final_project.domain.prompt.Prompt;
 import acs.aws_final_project.global.baseEntity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 import java.util.List;
 
@@ -21,6 +23,8 @@ import java.util.List;
 @Table(name = "fairytale")
 @AllArgsConstructor
 @NoArgsConstructor
+@Where(clause = "fairytaledelete = 'ACTIVE'")
+@SQLDelete(sql =  "UPDATE fairytale  SET fairytaledelete = 'INACTIVE' WHERE fairytale_id = ?")
 public class Fairytale extends BaseEntity {
 
     @Id
@@ -33,6 +37,9 @@ public class Fairytale extends BaseEntity {
     private Float score;
 
     private String genre;
+
+    @Enumerated(EnumType.STRING)
+    private acs.aws_final_project.domain.fairyTale.fairytaledelete fairytaledelete;
 
     @OneToMany(mappedBy = "fairytale", cascade = CascadeType.ALL)
     private List<Body> body;
