@@ -11,6 +11,7 @@ import lombok.*;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Entity
@@ -40,6 +41,8 @@ public class Member extends BaseEntity {
     private Integer childAge;
 
     private String color;
+
+    private LocalDate lastVisit;
 
 //    @Enumerated(EnumType.STRING)
 //    private PersonalColor color;

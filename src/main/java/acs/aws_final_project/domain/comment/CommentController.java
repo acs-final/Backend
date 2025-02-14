@@ -23,7 +23,7 @@ public class CommentController {
     private final CommentService commentService;
 
     @PostMapping("/{bookstoreId}")
-    public ApiResponse<CommentResponseDto.CommentCreateDto> createComment(@RequestHeader String memberId, @PathVariable Long bookstoreId, @RequestBody CommentRequestDto.CommentCreateDto createDto){
+    public ApiResponse<CommentResponseDto.CommentCreateDto> createComment(@RequestHeader("memberId") String memberId, @PathVariable("bookstoreId") Long bookstoreId, @RequestBody CommentRequestDto.CommentCreateDto createDto){
 
         log.info("createComment API Request time: {}", LocalDateTime.now());
 
@@ -33,7 +33,7 @@ public class CommentController {
     }
 
     @PatchMapping("/{bookstoreId}/{commentId}")
-    public ApiResponse<CommentResponseDto.CommentCreateDto> updateComment(@RequestHeader String memberId, @PathVariable Long bookstoreId, @PathVariable Long commentId , @RequestBody CommentRequestDto.CommentUpdateDto updateDto){
+    public ApiResponse<CommentResponseDto.CommentCreateDto> updateComment(@RequestHeader("memberId") String memberId, @PathVariable("bookstoreId") Long bookstoreId, @PathVariable("commentId") Long commentId , @RequestBody CommentRequestDto.CommentUpdateDto updateDto){
 
         log.info("updateComment API Request time: {}", LocalDateTime.now());
 
@@ -43,7 +43,7 @@ public class CommentController {
     }
 
     @DeleteMapping("/{bookstoreId}/{commentId}")
-    public ApiResponse<CommentResponseDto.CommentCreateDto> deleteComment(@RequestHeader String memberId, @PathVariable Long bookstoreId, @PathVariable Long commentId){
+    public ApiResponse<CommentResponseDto.CommentCreateDto> deleteComment(@RequestHeader("memberId") String memberId, @PathVariable("bookstoreId") Long bookstoreId, @PathVariable("commentId") Long commentId){
 
         log.info("deleteComment API Request time: {}", LocalDateTime.now());
 
@@ -57,7 +57,7 @@ public class CommentController {
     }
 
     @GetMapping("/{bookstoreId}/latest")
-    public ApiResponse<List<CommentResponseDto.CommentListDto>> getCommentByDate(@PathVariable Long bookstoreId) {
+    public ApiResponse<List<CommentResponseDto.CommentListDto>> getCommentByDate(@PathVariable("bookstoreId") Long bookstoreId) {
 
         log.info("getCommentByDate API Request time: {}", LocalDateTime.now());
 
@@ -68,7 +68,7 @@ public class CommentController {
     }
 
     @GetMapping("/{bookstoreId}/score")
-    public ApiResponse<List<CommentResponseDto.CommentListDto>> getCommentByScore(@PathVariable Long bookstoreId) {
+    public ApiResponse<List<CommentResponseDto.CommentListDto>> getCommentByScore(@PathVariable("bookstoreId") Long bookstoreId) {
 
         log.info("getCommentByScore API Request time: {}", LocalDateTime.now());
 

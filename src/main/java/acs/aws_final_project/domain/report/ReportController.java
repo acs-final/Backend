@@ -34,7 +34,7 @@ public class ReportController {
             @Parameter(name = "memberId", description = "멤버 id"),
             @Parameter(name = "createDto", description = "독후감 제목, 내용, 평점, 동화책 id")
     })
-    public ApiResponse<ReportResponseDto.ReportCreateDto> createReport(@RequestHeader String memberId, @RequestBody ReportRequestDto.ReportCreateDto createDto) {
+    public ApiResponse<ReportResponseDto.ReportCreateDto> createReport(@RequestHeader("memberId") String memberId, @RequestBody ReportRequestDto.ReportCreateDto createDto) {
 
         log.info("createReport API Request time: {}", LocalDateTime.now());
 
@@ -54,7 +54,7 @@ public class ReportController {
             @Parameter(name = "memberId", description = "멤버 id"),
             @Parameter(name = "reportId", description = "독후감 id")
     })
-    public ApiResponse<ReportResponseDto.ReportDetailDto> getReport(@PathVariable Long reportId) {
+    public ApiResponse<ReportResponseDto.ReportDetailDto> getReport(@PathVariable("reportId") Long reportId) {
         log.info("getReport API Request time: {}", LocalDateTime.now());
 
         ReportResponseDto.ReportDetailDto result = reportService.getReport(reportId);
@@ -73,8 +73,8 @@ public class ReportController {
             @Parameter(name = "memberId", description = "멤버 id"),
             @Parameter(name = "createDto", description = "독후감 제목, 내용, 평점")
     })
-    public ApiResponse<ReportResponseDto.ReportCreateDto> updateReport(@RequestHeader String memberId,
-                                                                       @PathVariable Long reportId,
+    public ApiResponse<ReportResponseDto.ReportCreateDto> updateReport(@RequestHeader("memberId") String memberId,
+                                                                       @PathVariable("reportId") Long reportId,
                                                                        @RequestBody ReportRequestDto.ReportUpdateDto updateDto) {
         log.info("updateReport API Request time: {}", LocalDateTime.now());
 
@@ -93,7 +93,7 @@ public class ReportController {
     @Parameters({
             @Parameter(name = "memberId", description = "멤버 id")
     })
-    public ApiResponse<ReportResponseDto.ReportCreateDto> deleteReport(@RequestHeader String memberId, @PathVariable Long reportId) {
+    public ApiResponse<ReportResponseDto.ReportCreateDto> deleteReport(@RequestHeader("memberId") String memberId, @PathVariable("reportId") Long reportId) {
         log.info("deleteReport API Request time: {}", LocalDateTime.now());
 
         Long id = reportService.deleteReport(memberId, reportId);

@@ -55,7 +55,7 @@ public class FairyTaleController {
     @Parameters({
             @Parameter(name = "fairytaleId", description = "동화책 id")
     })
-    public ApiResponse<FairyTaleResponseDto.FairyTaleResultDto> getFairyTale(@PathVariable Long fairytaleId) {
+    public ApiResponse<FairyTaleResponseDto.FairyTaleResultDto> getFairyTale(@PathVariable("fairytaleId") Long fairytaleId) {
         log.info("getFairyTale API Request time: {}", LocalDateTime.now());
         FairyTaleResponseDto.FairyTaleResultDto findFairyTale = fairyTaleService.getFairyTale(fairytaleId);
         return ApiResponse.onSuccess(findFairyTale);
@@ -72,7 +72,7 @@ public class FairyTaleController {
             @Parameter(name = "requestDto", description = "동화책 장르, 자녀 성별, 주제")
     })
     public ApiResponse<FairyTaleResponseDto.FairyTaleResultDto> createFairyTale(
-            @RequestHeader String memberId,
+            @RequestHeader("memberId") String memberId,
             @RequestBody FairyTaleRequestDto.FairyTaleCreateDto requestDto) {
         log.info("createFairyTale API Request time: {}", LocalDateTime.now());
         String genre = requestDto.getGenre();
@@ -82,17 +82,6 @@ public class FairyTaleController {
         return ApiResponse.onSuccess(result);
     }
 
-    @GetMapping("/top")
-    @Operation(summary = "동화책 TOP5 조회 API", description = "동화책 목록 중 평점순 5개 조회")
-    @ApiResponses({
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공"),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "FAIRYTALE404", description = "동화책을 찾을 수 없습니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class)))
-    })
-    public ApiResponse<List<FairyTaleResponseDto.Top3>> getTop3() {
-        log.info("getTop3 API Request time: {}", LocalDateTime.now());
-        List<FairyTaleResponseDto.Top3> result = fairyTaleService.getTop3();
-        return ApiResponse.onSuccess(result);
-    }
 
     @PostMapping("/{fairytaleId}/score")
     @Operation(summary = "동화책 평점 주기 API", description = "동화책 평점 주기")
@@ -105,7 +94,7 @@ public class FairyTaleController {
             @Parameter(name = "requestDto", description = "평점")
     })
     public ApiResponse<FairyTaleResponseDto.FairyTaleListDto> grantScore(
-            @PathVariable Long fairytaleId,
+            @PathVariable("fairytaleId") Long fairytaleId,
             @RequestBody FairyTaleRequestDto.ScoreRequestDto requestDto) {
         log.info("grantScore API Request time: {}", LocalDateTime.now());
         FairyTaleResponseDto.FairyTaleListDto result = fairyTaleService.grantScore(fairytaleId, requestDto.getScore());
@@ -120,7 +109,7 @@ public class FairyTaleController {
     @Parameters({
             @Parameter(name = "fairytaleId", description = "동화책 id")
     })
-    public ApiResponse<FairyTaleResponseDto.FairyTaleDeleteDto> deleteFairytale(@PathVariable Long fairytaleId) {
+    public ApiResponse<FairyTaleResponseDto.FairyTaleDeleteDto> deleteFairytale(@PathVariable("fairytaleId") Long fairytaleId) {
         log.info("deleteFairyTale API Request time: {}", LocalDateTime.now());
         try {
             fairyTaleService.deleteFairytale(fairytaleId);
@@ -133,4 +122,31 @@ public class FairyTaleController {
                         .build()
         );
     }
+
+
+    @GetMapping("/top")
+    @Operation(summary = "동화책 TOP3 조회 API", description = "동화책 목록 중 평점순 3개 조회")
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "FAIRYTALE404", description = "동화책을 찾을 수 없습니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class)))
+    })
+    public ApiResponse<List<FairyTaleResponseDto.Top3>> getTop3() {
+        log.info("getTop3 API Request time: {}", LocalDateTime.now());
+        List<FairyTaleResponseDto.Top3> result = fairyTaleService.getTop3();
+        return ApiResponse.onSuccess(result);
+    }
+
+
+    @GetMapping("/dashboard")
+    @Operation(summary = "대시보드 조회 API", description = "대시보드 조회")
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "FAIRYTALE404", description = "동화책을 찾을 수 없습니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class)))
+    })
+    public ApiResponse<FairyTaleResponseDto.Dashboard> getDashboard() {
+        log.info("getDashboard API Request time: {}", LocalDateTime.now());
+        FairyTaleResponseDto.Dashboard result = fairyTaleService.getDashboard();
+        return ApiResponse.onSuccess(result);
+    }
+
 }

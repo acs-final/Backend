@@ -64,6 +64,42 @@ public class FairyTaleResponseDto {
     @NoArgsConstructor
     @Getter
     @Builder
+    public static class Dashboard {
+
+        private Long todayVisitor;
+        private Long monthlyVisitor;
+        private Long totalFairytale;
+
+        private List<CountByGenre> countByGenre;
+        private List<Top3InDashboard> top3;
+
+    }
+
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Getter
+    @Builder
+    public static class CountByGenre {
+
+        private String genre;
+        private Long count;
+
+    }
+
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Getter
+    @Builder
+    public static class Top3InDashboard {
+
+        private String title;
+        private Float score;
+    }
+
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Getter
+    @Builder
     public static class Top3 {
         private Long fairytaleId;
         private String title;

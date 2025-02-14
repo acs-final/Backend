@@ -6,6 +6,8 @@ import acs.aws_final_project.domain.fairyTale.Fairytale;
 import acs.aws_final_project.domain.image.Image;
 import acs.aws_final_project.domain.member.dto.MemberResponseDto;
 
+import java.time.LocalDate;
+
 public class MemberConverter {
 
     public static Member toMember(String memberId, Integer credit){
@@ -13,6 +15,7 @@ public class MemberConverter {
         return Member.builder()
                 .memberId(memberId)
                 .credit(credit)
+                .lastVisit(LocalDate.now())
                 .loginStatus(LoginStatus.ACTIVE)
                 .build();
     }

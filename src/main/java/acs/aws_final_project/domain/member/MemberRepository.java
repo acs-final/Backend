@@ -6,6 +6,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import javax.swing.text.html.Option;
+import java.time.LocalDate;
 import java.util.Optional;
 
 @Repository
@@ -21,4 +22,12 @@ public interface MemberRepository extends JpaRepository<Member, String> {
 
     Optional<Member> findByLoginStatus(LoginStatus loginStatus);
 
+    long countByLastVisit(LocalDate localDate);
+
+//    @Query("SELECT COUNT(DISTINCT m.memberId) FROM Member m WHERE m.lastVisit BETWEEN :startDate AND :endDate")
+//    long countByMonth(@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
+
+
+    @Query("SELECT COUNT(DISTINCT m.memberId) FROM Member m WHERE FUNCTION('YEAR', m.lastVisit) = :year AND FUNCTION('MONTH', m.lastVisit) = :month")
+    long countByMonth(@Param("year") int year, @Param("month") int month);
 }

@@ -20,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -49,16 +50,19 @@ public class MemberService {
         if (deletedMember != null) {  // 회원 탈퇴 했던 멤버가 다시 로그인할 때 활성화 시킴.
             deletedMember.setLoginStatus();
         } else {
-            Optional<Member> findMember = memberRepository.findById(memberId);
+            Member findMember = memberRepository.findById(memberId).orElse(null);
 
-            if (findMember.isEmpty()){ // 최초 로그인한 사람만 디비에 저장.
+            if (findMember == null){ // 최초 로그인한 사람만 디비에 저장.
 
                 Member newMember = MemberConverter.toMember(memberId, 0);
 
                 memberRepository.save(newMember);
                 log.info("첫 로그인 성공: {}", newMember.getMemberId());
             } else {
-                myColor = findMember.get().getColor();  // 로그인 기록 있는 경우 색상만 가지고 반환.
+                myColor = findMember.getColor();  // 로그인 기록 있는 경우 색상만 가지고 반환.
+
+                findMember.setLastVisit(LocalDate.now());
+                memberRepository.save(findMember);
             }
 
         }

@@ -24,7 +24,7 @@ public class BooksController {
     private final BooksService booksService;
 
     @GetMapping("/")
-    public ApiResponse<List<BooksResponseDto.RecommendedBook>> getRecommendedBooks(@RequestParam BooksGenre genre){
+    public ApiResponse<List<BooksResponseDto.RecommendedBook>> getRecommendedBooks(@RequestParam("genre") BooksGenre genre){
 
         log.info("getRecommendedBooks API Request time: {}", LocalDateTime.now());
 

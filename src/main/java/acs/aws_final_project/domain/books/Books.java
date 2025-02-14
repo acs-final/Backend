@@ -31,5 +31,6 @@ public class Books extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private BooksGenre genre;
 
+    private String goodsUrl; // 사이트 링크.
 
 }

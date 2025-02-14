@@ -26,7 +26,7 @@ public class BooksService {
 
         List<BooksResponseDto.RecommendedBook> topBooks = findBooks.stream()
                 .map(b ->
-                        new BooksResponseDto.RecommendedBook(b.getTitle(), b.getAuthor(),b.getPrice(), b.getScore(), b.getImageUrl())
+                        new BooksResponseDto.RecommendedBook(b.getTitle(), b.getAuthor(),b.getPrice(), b.getScore(), b.getImageUrl(), b.getGoodsUrl())
                 )
                 .limit(3)
                 .toList();

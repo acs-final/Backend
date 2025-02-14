@@ -21,7 +21,7 @@ public class BookstoreController {
     private final BookstoreService bookstoreService;
 
     @PostMapping("/")
-    public ApiResponse<BookstoreResponseDto.BookstoreCreateDto> createBookstore(@RequestHeader String memberId, @RequestBody BookstoreRequestDto.BookstoreCreateDto createDto){
+    public ApiResponse<BookstoreResponseDto.BookstoreCreateDto> createBookstore(@RequestHeader("memberId") String memberId, @RequestBody BookstoreRequestDto.BookstoreCreateDto createDto){
 
         log.info("createBookstore API Request time: {}", LocalDateTime.now());
 
@@ -42,7 +42,7 @@ public class BookstoreController {
     }
 
     @PatchMapping("/{bookstoreId}")
-    public ApiResponse<BookstoreResponseDto.BookstoreCreateDto> updateBookstore(@RequestHeader String memberId, @PathVariable Long bookstoreId, @RequestBody BookstoreRequestDto.BookstoreUpdateDto updateDto){
+    public ApiResponse<BookstoreResponseDto.BookstoreCreateDto> updateBookstore(@RequestHeader("memberId") String memberId, @PathVariable("bookstoreId") Long bookstoreId, @RequestBody BookstoreRequestDto.BookstoreUpdateDto updateDto){
 
         log.info("getBookstore API Request time: {}", LocalDateTime.now());
 
@@ -52,7 +52,7 @@ public class BookstoreController {
     }
 
     @DeleteMapping("/{bookstoreId}")
-    public ApiResponse<BookstoreResponseDto.BookstoreCreateDto> deleteBookstore(@RequestHeader String memberId, @PathVariable Long bookstoreId){
+    public ApiResponse<BookstoreResponseDto.BookstoreCreateDto> deleteBookstore(@RequestHeader("memberId") String memberId, @PathVariable("bookstoreId") Long bookstoreId){
 
         log.info("getBookstore API Request time: {}", LocalDateTime.now());
 

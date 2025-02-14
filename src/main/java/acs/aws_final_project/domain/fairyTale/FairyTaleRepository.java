@@ -3,6 +3,7 @@ package acs.aws_final_project.domain.fairyTale;
 import acs.aws_final_project.domain.member.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -17,4 +18,9 @@ public interface FairyTaleRepository extends JpaRepository<Fairytale, Long> {
 
     @Query("SELECT f FROM Fairytale f ORDER BY f.avgScore DESC LIMIT 3")
     List<Fairytale> findAllOfTop3();
+
+    long countByGenre(String genre);
+
+
+//    long count();
 }

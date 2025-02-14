@@ -12,6 +12,7 @@ import acs.aws_final_project.domain.fairyTale.dto.FairyTaleRequestDto;
 import acs.aws_final_project.domain.fairyTale.dto.FairyTaleResponseDto;
 import acs.aws_final_project.domain.image.Image;
 import acs.aws_final_project.domain.image.ImageRepository;
+import acs.aws_final_project.domain.member.MemberRepository;
 import acs.aws_final_project.global.response.code.resultCode.ErrorStatus;
 import acs.aws_final_project.global.response.exception.handler.FairytaleHandler;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -20,6 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -38,6 +40,7 @@ public class FairyTaleService {
     private final ImageRepository imageRepository;
     private final AudioRepository audioRepository;
     private final BodyRepository bodyRepository;
+    private final MemberRepository memberRepository;
 
     public List<FairyTaleResponseDto.FairyTaleListDto> getFairyTaleList() {
         List<Fairytale> findFairyTaleList = fairyTaleRepository.findAll();
@@ -132,22 +135,7 @@ public class FairyTaleService {
         return resultDtos;
     }
 
-    public List<FairyTaleResponseDto.Top3> getTop3() {
-        List<Fairytale> findFairytale = fairyTaleRepository.findAllOfTop3();
-        findFairytale = findFairytale.stream()
-                .sorted(Comparator.comparing(Fairytale::getAvgScore).reversed())
-                .toList();
 
-        List<FairyTaleResponseDto.Top3> topFairytale = findFairytale.stream()
-                .map(ft -> {
-                    Image findImage = imageRepository.findFirstByFairytale(ft);
-                    return new FairyTaleResponseDto.Top3(ft.getFairytaleId(), ft.getTitle(), findImage.getImageUrl());
-                })
-                .limit(3)
-                .toList();
-
-        return topFairytale;
-    }
 
     @Transactional
     public FairyTaleResponseDto.FairyTaleListDto grantScore(Long fairytaleId, Float score) {
@@ -179,5 +167,61 @@ public class FairyTaleService {
             log.error("Error while deleting fairytale with id {}: {}", fairytaleId, e.getMessage());
             // 예외를 swallow하여 무조건 성공하도록 함.
         }
+    }
+
+    public List<FairyTaleResponseDto.Top3> getTop3() {
+        List<Fairytale> findFairytale = fairyTaleRepository.findAllOfTop3();
+        findFairytale = findFairytale.stream()
+                .sorted(Comparator.comparing(Fairytale::getAvgScore).reversed())
+                .toList();
+
+        List<FairyTaleResponseDto.Top3> topFairytale = findFairytale.stream()
+                .map(ft -> {
+                    Image findImage = imageRepository.findFirstByFairytale(ft);
+                    return new FairyTaleResponseDto.Top3(ft.getFairytaleId(), ft.getTitle(), findImage.getImageUrl());
+                })
+                .limit(3)
+                .toList();
+
+        return topFairytale;
+    }
+
+    public FairyTaleResponseDto.Dashboard getDashboard(){
+
+        List<Fairytale> findFairytale = fairyTaleRepository.findAllOfTop3();
+        findFairytale = findFairytale.stream()
+                .sorted(Comparator.comparing(Fairytale::getAvgScore).reversed())
+                .toList();
+
+        List<FairyTaleResponseDto.Top3InDashboard> top3InDashboards = findFairytale.stream()
+                .map(ft -> new FairyTaleResponseDto.Top3InDashboard(ft.getTitle(), ft.getAvgScore()))
+                .limit(3)
+                .toList();
+
+        List<String> genres = List.of("한국 전래 동화", "세계 전래 동화", "판타지 동화", "동물 동화", "가족 동화", "의사 직업 동화", "소방관 직업 동화", "경찰 직업 동화");
+
+        List<FairyTaleResponseDto.CountByGenre> countByGenres = genres.stream().map(g -> {
+            long count = fairyTaleRepository.countByGenre(g);
+            return new FairyTaleResponseDto.CountByGenre(g, count);
+        }).collect(Collectors.toList());
+
+
+        List<String> localDate = List.of(LocalDate.now().toString().split("-"));
+        LocalDate startDate = LocalDate.of(Integer.parseInt(localDate.get(0)), Integer.parseInt(localDate.get(1)), 1);
+        LocalDate endDate = startDate.withDayOfMonth(startDate.lengthOfMonth());
+
+
+
+        FairyTaleResponseDto.Dashboard result = FairyTaleResponseDto.Dashboard.builder()
+                .todayVisitor(memberRepository.countByLastVisit(LocalDate.now()))
+                .monthlyVisitor(memberRepository.countByMonth(Integer.parseInt(localDate.get(0)), Integer.parseInt(localDate.get(1))))
+                //.monthlyVisitor(memberRepository.countByMonth(startDate, endDate))
+                .totalFairytale(fairyTaleRepository.count())
+                .countByGenre(countByGenres)
+                .top3(top3InDashboards)
+                .build();
+
+
+        return result;
     }
 }

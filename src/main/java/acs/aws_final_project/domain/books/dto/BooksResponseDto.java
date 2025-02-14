@@ -18,6 +18,7 @@ public class BooksResponseDto {
         private Integer price;
         private Float score;
         private String imageUrl;
+        private String siteUrl;
     }
 
 }
