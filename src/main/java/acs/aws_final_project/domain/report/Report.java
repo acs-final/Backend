@@ -1,4 +1,4 @@
-package acs.aws_final_project.domain.Report;
+package acs.aws_final_project.domain.report;
 
 import acs.aws_final_project.domain.fairyTale.Fairytale;
 import acs.aws_final_project.domain.member.Member;

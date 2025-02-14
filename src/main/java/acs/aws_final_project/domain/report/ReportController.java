@@ -1,7 +1,7 @@
-package acs.aws_final_project.domain.Report;
+package acs.aws_final_project.domain.report;
 
-import acs.aws_final_project.domain.Report.dto.ReportRequestDto;
-import acs.aws_final_project.domain.Report.dto.ReportResponseDto;
+import acs.aws_final_project.domain.report.dto.ReportRequestDto;
+import acs.aws_final_project.domain.report.dto.ReportResponseDto;
 import acs.aws_final_project.global.response.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;

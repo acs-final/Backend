@@ -1,6 +1,6 @@
 package acs.aws_final_project.domain.fairyTale;
 
-import acs.aws_final_project.domain.Report.Report;
+import acs.aws_final_project.domain.report.Report;
 import acs.aws_final_project.domain.audio.Audio;
 import acs.aws_final_project.domain.body.Body;
 import acs.aws_final_project.domain.bookstore.Bookstore;
@@ -11,8 +11,6 @@ import acs.aws_final_project.domain.prompt.Prompt;
 import acs.aws_final_project.global.baseEntity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Where;
 
 import java.util.List;
 

@@ -1,5 +1,6 @@
 package acs.aws_final_project.domain.member.dto;
 
+import acs.aws_final_project.domain.member.PersonalColor;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -17,6 +18,7 @@ public class MemberRequestDto {
         private String nickname;
         private String username;
         private Integer childAge;
+        private String color;
     }
 
 

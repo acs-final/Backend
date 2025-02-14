@@ -1,6 +1,6 @@
 package acs.aws_final_project.domain.member;
 
-import acs.aws_final_project.domain.Report.Report;
+import acs.aws_final_project.domain.report.Report;
 import acs.aws_final_project.domain.bookstore.Bookstore;
 import acs.aws_final_project.domain.comment.Comment;
 import acs.aws_final_project.domain.fairyTale.Fairytale;
@@ -38,6 +38,11 @@ public class Member extends BaseEntity {
     private Integer credit;
 
     private Integer childAge;
+
+    private String color;
+
+//    @Enumerated(EnumType.STRING)
+//    private PersonalColor color;
 
     @Enumerated(EnumType.STRING)
     private LoginStatus loginStatus;

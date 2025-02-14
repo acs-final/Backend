@@ -34,7 +34,7 @@ public class MemberController {
     @Parameters({
             @Parameter(name = "memberId", description = "토큰에서 나온 sub값을 memberId로 사용."),
     })
-    public ApiResponse<MemberResponseDto.LoginResponseDto> login(@RequestHeader String memberId){
+    public ApiResponse<MemberResponseDto.LoginResponseDto> login(@RequestHeader("memberId") String memberId){
 
         log.info("login API Request time: {}", LocalDateTime.now());
 
@@ -56,11 +56,11 @@ public class MemberController {
             @Parameter(name = "memberId", description = "멤버 id"),
             @Parameter(name = "requestDto", description = "닉네임, 유저 이름, 자녀 나이")
     })
-    public  ApiResponse<MemberResponseDto.LoginResponseDto> updateMyProfile(@RequestHeader String memberId, @RequestBody MemberRequestDto.UpdateProfileDto requestDto){
+    public  ApiResponse<MemberResponseDto.MemberResultDto> updateMyProfile(@RequestHeader("memberId") String memberId, @RequestBody MemberRequestDto.UpdateProfileDto requestDto){
 
         log.info("updateMyProfile API Request time: {}", LocalDateTime.now());
 
-        MemberResponseDto.LoginResponseDto result = memberService.updateMyProfile(memberId, requestDto);
+        MemberResponseDto.MemberResultDto result = memberService.updateMyProfile(memberId, requestDto);
 
         return ApiResponse.onSuccess(result);
 
@@ -76,11 +76,11 @@ public class MemberController {
     @Parameters({
             @Parameter(name = "memberId", description = "멤버 id"),
     })
-    public ApiResponse<MemberResponseDto.LoginResponseDto> deleteMember(@RequestHeader String memberId){
+    public ApiResponse<MemberResponseDto.MemberResultDto> deleteMember(@RequestHeader("memberId") String memberId){
 
         log.info("deleteMember API Request time: {}", LocalDateTime.now());
 
-        MemberResponseDto.LoginResponseDto result = memberService.deleteMember(memberId);
+        MemberResponseDto.MemberResultDto result = memberService.deleteMember(memberId);
 
         return ApiResponse.onSuccess(result);
 
@@ -95,7 +95,7 @@ public class MemberController {
     @Parameters({
             @Parameter(name = "memberId", description = "멤버 id"),
     })
-    public ApiResponse<MemberResponseDto.MemberDetailDto> getMemberDetail(@RequestHeader String memberId){
+    public ApiResponse<MemberResponseDto.MemberDetailDto> getMemberDetail(@RequestHeader("memberId") String memberId){
 
         log.info("getMemberDetail API Request time: {}", LocalDateTime.now());
 
@@ -114,7 +114,7 @@ public class MemberController {
     @Parameters({
             @Parameter(name = "memberId", description = "멤버 id"),
     })
-    public ApiResponse<List<MemberResponseDto.MyFairytaleDto>> getMyFairytale(@RequestHeader String memberId){
+    public ApiResponse<List<MemberResponseDto.MyFairytaleDto>> getMyFairytale(@RequestHeader("memberId") String memberId){
 
         log.info("getMyFairytale API Request time: {}", LocalDateTime.now());
 
@@ -134,7 +134,7 @@ public class MemberController {
     @Parameters({
             @Parameter(name = "memberId", description = "멤버 id"),
     })
-    public ApiResponse<List<MemberResponseDto.MyBookstoreDto>> getMyBookstore(@RequestHeader String memberId){
+    public ApiResponse<List<MemberResponseDto.MyBookstoreDto>> getMyBookstore(@RequestHeader("memberId") String memberId){
 
         log.info("getMyBookstore API Request time: {}", LocalDateTime.now());
 
@@ -154,7 +154,7 @@ public class MemberController {
     @Parameters({
             @Parameter(name = "memberId", description = "멤버 id"),
     })
-    public ApiResponse<List<MemberResponseDto.MyReportDto>> getMyReport(@RequestHeader String memberId){
+    public ApiResponse<List<MemberResponseDto.MyReportDto>> getMyReport(@RequestHeader("memberId") String memberId){
 
         log.info("getMyReport API Request time: {}", LocalDateTime.now());
 

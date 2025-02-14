@@ -1,9 +1,8 @@
-package acs.aws_final_project.domain.Report;
+package acs.aws_final_project.domain.report;
 
-import acs.aws_final_project.domain.Report.Report;
 import acs.aws_final_project.domain.member.Member;
-import acs.aws_final_project.domain.Report.dto.ReportRequestDto;
-import acs.aws_final_project.domain.Report.dto.ReportResponseDto;
+import acs.aws_final_project.domain.report.dto.ReportRequestDto;
+import acs.aws_final_project.domain.report.dto.ReportResponseDto;
 import acs.aws_final_project.domain.fairyTale.Fairytale;
 import acs.aws_final_project.domain.member.MemberRepository;
 import acs.aws_final_project.domain.fairyTale.FairyTaleRepository;
@@ -116,8 +115,7 @@ public class ReportService {
 
         Member member = memberRepository.findById(memberId).orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
 
-        Report report = reportRepository.findById(reportId)
-                .orElseThrow(() -> new ReportHandler(ErrorStatus.REPORT_NOT_FOUND));
+        Report report = reportRepository.findById(reportId).orElseThrow(() -> new ReportHandler(ErrorStatus.REPORT_NOT_FOUND));
 
         if (member != report.getMember()){
             throw new MemberHandler(ErrorStatus.MEMBER_BAD_REQUEST);

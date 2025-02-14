@@ -1,7 +1,6 @@
 package acs.aws_final_project.domain.member;
 
-import acs.aws_final_project.domain.Report.Report;
-import acs.aws_final_project.domain.Report.ReportRepository;
+
 import acs.aws_final_project.domain.bookstore.Bookstore;
 import acs.aws_final_project.domain.bookstore.BookstoreRepository;
 import acs.aws_final_project.domain.fairyTale.FairyTaleRepository;
@@ -10,6 +9,9 @@ import acs.aws_final_project.domain.image.Image;
 import acs.aws_final_project.domain.image.ImageRepository;
 import acs.aws_final_project.domain.member.dto.MemberRequestDto;
 import acs.aws_final_project.domain.member.dto.MemberResponseDto;
+
+import acs.aws_final_project.domain.report.Report;
+import acs.aws_final_project.domain.report.ReportRepository;
 import acs.aws_final_project.global.response.code.resultCode.ErrorStatus;
 import acs.aws_final_project.global.response.exception.handler.FairytaleHandler;
 import acs.aws_final_project.global.response.exception.handler.MemberHandler;
@@ -20,7 +22,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -43,27 +44,32 @@ public class MemberService {
 
         log.info("deletedMember: {}", deletedMember);
 
-        if (deletedMember != null) {
+        String myColor = "null";
+
+        if (deletedMember != null) {  // 회원 탈퇴 했던 멤버가 다시 로그인할 때 활성화 시킴.
             deletedMember.setLoginStatus();
         } else {
             Optional<Member> findMember = memberRepository.findById(memberId);
 
-            if (findMember.isEmpty()){
+            if (findMember.isEmpty()){ // 최초 로그인한 사람만 디비에 저장.
 
                 Member newMember = MemberConverter.toMember(memberId, 0);
 
                 memberRepository.save(newMember);
                 log.info("첫 로그인 성공: {}", newMember.getMemberId());
+            } else {
+                myColor = findMember.get().getColor();  // 로그인 기록 있는 경우 색상만 가지고 반환.
             }
+
         }
 
 
-        return new MemberResponseDto.LoginResponseDto(memberId);
+        return new MemberResponseDto.LoginResponseDto(memberId, myColor);
 
     }
 
     @Transactional
-    public MemberResponseDto.LoginResponseDto updateMyProfile(String memberId, MemberRequestDto.UpdateProfileDto updateDto){
+    public MemberResponseDto.MemberResultDto updateMyProfile(String memberId, MemberRequestDto.UpdateProfileDto updateDto){
 
         Member findMember = memberRepository.findById(memberId).orElseThrow(()-> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
 
@@ -76,27 +82,30 @@ public class MemberService {
         if (updateDto.getChildAge() != null){
             findMember.setChildAge(updateDto.getChildAge());
         }
+        if (updateDto.getColor() != null){
+            findMember.setColor(updateDto.getColor());
+        }
 
         memberRepository.save(findMember);
 
-        return new MemberResponseDto.LoginResponseDto(findMember.getMemberId());
+        return new MemberResponseDto.MemberResultDto(findMember.getMemberId());
     }
 
     @Transactional
-    public MemberResponseDto.LoginResponseDto deleteMember(String memberId){
+    public MemberResponseDto.MemberResultDto deleteMember(String memberId){
 
         Member findMember = memberRepository.findById(memberId).orElseThrow(()-> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
 
         memberRepository.delete(findMember);
 
-        return new MemberResponseDto.LoginResponseDto(memberId);
+        return new MemberResponseDto.MemberResultDto(memberId);
     }
 
     public MemberResponseDto.MemberDetailDto getMemberDetail(String memberId){
 
         Member findMember = memberRepository.findById(memberId).orElseThrow(()-> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
 
-        return new  MemberResponseDto.MemberDetailDto(findMember.getNickname(), findMember.getName(), findMember.getCredit(), findMember.getChildAge());
+        return new  MemberResponseDto.MemberDetailDto(findMember.getNickname(), findMember.getName(), findMember.getCredit(), findMember.getChildAge(), findMember.getColor());
     }
 
 

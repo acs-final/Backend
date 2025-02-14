@@ -1,8 +1,7 @@
 package acs.aws_final_project.domain.member;
 
-import acs.aws_final_project.domain.Report.Report;
+import acs.aws_final_project.domain.report.Report;
 import acs.aws_final_project.domain.bookstore.Bookstore;
-import acs.aws_final_project.domain.fairyTale.FairyTaleRepository;
 import acs.aws_final_project.domain.fairyTale.Fairytale;
 import acs.aws_final_project.domain.image.Image;
 import acs.aws_final_project.domain.member.dto.MemberResponseDto;

@@ -1,5 +1,6 @@
 package acs.aws_final_project.domain.member.dto;
 
+import acs.aws_final_project.domain.member.PersonalColor;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -16,6 +17,17 @@ public class MemberResponseDto {
     public static class LoginResponseDto{
 
         private String memberId;
+        private String color;
+
+    }
+
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Getter
+    @Builder
+    public static class MemberResultDto{
+
+        private String memberId;
 
     }
 
@@ -29,6 +41,7 @@ public class MemberResponseDto {
         private String username;
         private Integer credit;
         private Integer childAge;
+        private String color;
 
 
     }

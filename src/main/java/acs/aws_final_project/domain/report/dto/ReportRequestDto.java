@@ -1,4 +1,4 @@
-package acs.aws_final_project.domain.Report.dto;
+package acs.aws_final_project.domain.report.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
