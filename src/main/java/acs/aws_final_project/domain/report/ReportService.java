@@ -1,11 +1,11 @@
 package acs.aws_final_project.domain.report;
 
+import acs.aws_final_project.domain.fairyTale.FairytaleRepository;
 import acs.aws_final_project.domain.member.Member;
 import acs.aws_final_project.domain.report.dto.ReportRequestDto;
 import acs.aws_final_project.domain.report.dto.ReportResponseDto;
 import acs.aws_final_project.domain.fairyTale.Fairytale;
 import acs.aws_final_project.domain.member.MemberRepository;
-import acs.aws_final_project.domain.fairyTale.FairyTaleRepository;
 import acs.aws_final_project.global.response.code.resultCode.ErrorStatus;
 import acs.aws_final_project.global.response.exception.handler.FairytaleHandler;
 import acs.aws_final_project.global.response.exception.handler.MemberHandler;
@@ -25,7 +25,7 @@ public class ReportService {
 
     private final ReportRepository reportRepository;
     private final MemberRepository memberRepository;
-    private final FairyTaleRepository storyBookRepository;
+    private final FairytaleRepository storyBookRepository;
 
     // 단일 독후감 조회 (상세 정보 반환)
     public ReportResponseDto.ReportDetailDto getReport(Long reportId) {

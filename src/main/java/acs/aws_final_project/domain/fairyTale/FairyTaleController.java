@@ -75,10 +75,14 @@ public class FairyTaleController {
             @RequestHeader("memberId") String memberId,
             @RequestBody FairyTaleRequestDto.FairyTaleCreateDto requestDto) {
         log.info("createFairyTale API Request time: {}", LocalDateTime.now());
+
         String genre = requestDto.getGenre();
         String gender = requestDto.getGender();
         String challenge = requestDto.getChallenge();
+
         FairyTaleResponseDto.FairyTaleResultDto result = sonnetService.createFairyTale(memberId, genre, gender, challenge);
+        //FairyTaleResponseDto.FairyTaleResultDto result = sonnetService.createFairyTaleByInvoke(memberId, genre, gender, challenge);
+
         return ApiResponse.onSuccess(result);
     }
 

@@ -3,8 +3,8 @@ package acs.aws_final_project.domain.member;
 
 import acs.aws_final_project.domain.bookstore.Bookstore;
 import acs.aws_final_project.domain.bookstore.BookstoreRepository;
-import acs.aws_final_project.domain.fairyTale.FairyTaleRepository;
 import acs.aws_final_project.domain.fairyTale.Fairytale;
+import acs.aws_final_project.domain.fairyTale.FairytaleRepository;
 import acs.aws_final_project.domain.image.Image;
 import acs.aws_final_project.domain.image.ImageRepository;
 import acs.aws_final_project.domain.member.dto.MemberRequestDto;
@@ -22,7 +22,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
 @Slf4j
 @Service
@@ -31,7 +30,7 @@ import java.util.Optional;
 public class MemberService {
 
     private final MemberRepository memberRepository;
-    private final FairyTaleRepository fairyTaleRepository;
+    private final FairytaleRepository fairyTaleRepository;
     private final BookstoreRepository bookstoreRepository;
     private final ImageRepository imageRepository;
     private final ReportRepository reportRepository;

@@ -5,9 +5,8 @@ import acs.aws_final_project.domain.audio.AudioRepository;
 import acs.aws_final_project.domain.body.Body;
 import acs.aws_final_project.domain.body.BodyConverter;
 import acs.aws_final_project.domain.body.BodyRepository;
-import acs.aws_final_project.domain.books.dto.BooksResponseDto;
-import acs.aws_final_project.domain.fairyTale.FairyTaleRepository;
 import acs.aws_final_project.domain.fairyTale.Fairytale;
+import acs.aws_final_project.domain.fairyTale.FairytaleRepository;
 import acs.aws_final_project.domain.fairyTale.dto.FairyTaleRequestDto;
 import acs.aws_final_project.domain.fairyTale.dto.FairyTaleResponseDto;
 import acs.aws_final_project.domain.image.Image;
@@ -36,7 +35,7 @@ public class FairyTaleService {
 
     private final PollyService pollyService;
     private final StableDiffusionService stableDiffusionService;
-    private final FairyTaleRepository fairyTaleRepository;
+    private final FairytaleRepository fairyTaleRepository;
     private final ImageRepository imageRepository;
     private final AudioRepository audioRepository;
     private final BodyRepository bodyRepository;

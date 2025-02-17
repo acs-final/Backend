@@ -1,18 +1,21 @@
 package acs.aws_final_project.domain.aitest;
 
+import acs.aws_final_project.domain.fairyTale.dto.FairyTaleRequestDto;
+import acs.aws_final_project.domain.fairyTale.dto.FairyTaleResponseDto;
+import acs.aws_final_project.domain.fairyTale.service.SonnetService;
 import acs.aws_final_project.global.response.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.joda.time.LocalDateTime;
+import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/v1/ai")
 public class AiController {
+
+    private final SonnetService sonnetService;
 
 //    private final GptService gptService;
 //    private final BedrockService bedrockService;
@@ -35,12 +38,19 @@ public class AiController {
 //        return ApiResponse.onSuccess(content);
 //    }
 //
-//    @PostMapping("/bedrock")
-//    public ApiResponse<Object> bedrock(@RequestBody String question){
-//
-//        Object content = bedrockService.send(question);
-//
-//
-//        return ApiResponse.onSuccess(content);
-//    }
+    @PostMapping("/bedrock")
+    public ApiResponse<Object> createFairyTaleByInvoke(
+            @RequestHeader("memberId") String memberId,
+            @RequestBody FairyTaleRequestDto.FairyTaleCreateDto requestDto) {
+        log.info("createFairyTaleByInvoke API Request time: {}", LocalDateTime.now());
+
+        String genre = requestDto.getGenre();
+        String gender = requestDto.getGender();
+        String challenge = requestDto.getChallenge();
+
+        Object content = sonnetService.createFairyTaleByInvoke(memberId, genre, gender, challenge);
+
+
+        return ApiResponse.onSuccess(content);
+    }
 }

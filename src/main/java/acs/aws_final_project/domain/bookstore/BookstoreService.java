@@ -6,7 +6,7 @@ import acs.aws_final_project.domain.comment.Comment;
 import acs.aws_final_project.domain.comment.CommentConverter;
 import acs.aws_final_project.domain.comment.CommentRepository;
 import acs.aws_final_project.domain.fairyTale.Fairytale;
-import acs.aws_final_project.domain.fairyTale.FairyTaleRepository;
+import acs.aws_final_project.domain.fairyTale.FairytaleRepository;
 import acs.aws_final_project.domain.member.Member;
 import acs.aws_final_project.domain.member.MemberRepository;
 import acs.aws_final_project.global.response.code.resultCode.ErrorStatus;
@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
 public class BookstoreService {
 
     private final BookstoreRepository bookstoreRepository;
-    private final FairyTaleRepository fairyTaleRepository;
+    private final FairytaleRepository fairyTaleRepository;
     private final CommentRepository commentRepository;
     private final MemberRepository memberRepository;
 
