@@ -1,22 +1,34 @@
 package acs.aws_final_project.global.config.mysql;
 
 import com.zaxxer.hikari.HikariDataSource;
+import jakarta.persistence.EntityManagerFactory;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.jdbc.DataSourceBuilder;
+import org.springframework.boot.orm.jpa.EntityManagerFactoryBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.jdbc.datasource.LazyConnectionDataSourceProxy;
+import org.springframework.orm.jpa.JpaTransactionManager;
+import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
+import org.springframework.transaction.PlatformTransactionManager;
 
 import javax.sql.DataSource;
 import java.util.HashMap;
 
 @Configuration
 @RequiredArgsConstructor
-@EnableJpaRepositories
+@EnableJpaRepositories(basePackages = "acs.aws_final_project.repository",
+        entityManagerFactoryRef = "entityManagerFactory", // entityManagerFactory 빈 이름
+        transactionManagerRef = "transactionManager" // transactionManager 빈 이름
+)
+@EntityScan(basePackages = "acs.aws_final_project.entity")
 public class DataSourceConfig {
 
     // Write replica 정보로 만든 DataSource
@@ -36,10 +48,12 @@ public class DataSourceConfig {
     // 읽기 모드인지 여부로 DataSource를 분기 처리
     @Bean
     @DependsOn({"writeDataSource", "readDataSource"})
-    public DataSource routeDataSource() {
+    public DataSource routeDataSource(
+            @Qualifier("writeDataSource") DataSource writeDataSource,
+            @Qualifier("readDataSource") DataSource readDataSource) {
+
         DataSourceRouter dataSourceRouter = new DataSourceRouter();
-        DataSource writeDataSource = writeDataSource();
-        DataSource readDataSource = readDataSource();
+
 
         HashMap<Object, Object> dataSourceMap = new HashMap<>();
         dataSourceMap.put("write", writeDataSource);
@@ -52,8 +66,27 @@ public class DataSourceConfig {
     @Bean
     @Primary
     @DependsOn({"routeDataSource"})
-    public DataSource dataSource() {
-        return new LazyConnectionDataSourceProxy(routeDataSource());
+    public DataSource dataSource(@Qualifier("routeDataSource") DataSource routeDataSource) {
+        return new LazyConnectionDataSourceProxy(routeDataSource);
     }
+
+
+    @Bean(name = "entityManagerFactory")
+    public LocalContainerEntityManagerFactoryBean entityManagerFactory(
+            EntityManagerFactoryBuilder builder,
+            @Qualifier("writeDataSource") DataSource dataSource) {
+        return builder
+                .dataSource(dataSource)
+                .packages("acs.aws_final_project.entity")
+                .persistenceUnit("myJpaUnit")
+                .build();
+    }
+
+    @Bean(name = "transactionManager")
+    public PlatformTransactionManager transactionManager(
+            @Qualifier("entityManagerFactory") EntityManagerFactory entityManagerFactory) {
+        return new JpaTransactionManager(entityManagerFactory);
+    }
+
 
 }
