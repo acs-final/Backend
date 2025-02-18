@@ -4,8 +4,9 @@ plugins {
 	id 'io.spring.dependency-management' version '1.1.7'
 }
 
-group = 'acs'
-version = '0.0.1-SNAPSHOT'
+repositories {
+	mavenCentral()
+}
 
 java {
 	toolchain {
@@ -19,52 +20,46 @@ configurations {
 	}
 }
 
-compileJava {
-	options.compilerArgs << '-parameters'
+allprojects {
+	group = 'acs'
+	version = '0.0.1-SNAPSHOT'
 }
 
+bootJar.enabled = false
 
-repositories {
-	mavenCentral()
-}
+subprojects {
+	apply plugin: 'java'
+	apply plugin: 'org.springframework.boot'
+	apply plugin: 'io.spring.dependency-management'
 
-dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-	implementation 'org.springframework.boot:spring-boot-starter-web'
-	compileOnly 'org.projectlombok:lombok'
-	runtimeOnly 'com.mysql:mysql-connector-j'
-	annotationProcessor 'org.projectlombok:lombok'
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+	repositories {
+		mavenCentral()
+	}
+
+	sourceCompatibility = '17'
+
+	dependencies {
+
+		implementation platform('org.springframework.cloud:spring-cloud-dependencies:2024.0.0')
+
+		implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 
 
-	//swagger
-	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.7.0'
+		compileOnly 'org.projectlombok:lombok'
 
-	// amazon bedrock
-	implementation platform('software.amazon.awssdk:bom:2.26.3')
-	implementation 'software.amazon.awssdk:bedrockruntime'
 
-	// amazon polly
-	implementation("software.amazon.awssdk:polly:2.20.123")
+		annotationProcessor 'org.projectlombok:lombok'
 
-	// aws s3
-	//implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.6.6.RELEASE'
-	implementation 'io.awspring.cloud:spring-cloud-starter-aws:2.4.4'
+		testImplementation 'org.springframework.boot:spring-boot-starter-test'
+		testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
-	//dall-e
-//	implementation 'org.apache.httpcomponents.client5:httpclient5:5.4'
 
-	//jackson
-	implementation 'com.fasterxml.jackson.core:jackson-databind:2.15.2'
+		//swagger
+		implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.7.0'
 
-	//jsoup
-	implementation 'org.jsoup:jsoup:1.14.3'
+	}
 
-	//implementation 'com.googlecode.json-simple:json-simple:1.1'
-
-}
-
-tasks.named('test') {
-	useJUnitPlatform()
+	tasks.named('test') {
+		useJUnitPlatform()
+	}
 }
