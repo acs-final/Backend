@@ -1,1 +1,8 @@
 rootProject.name = 'aws-final-project'
+include 'member'
+include 'fairytale'
+include 'bookstore'
+include 'common'
+include 'report'
+include 'api-gateway'
+
