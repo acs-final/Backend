@@ -16,8 +16,8 @@ pipeline {
                             cd Backend
                             git reset --hard
                             git clean -fd
-                            git checkout main
-                            git pull origin main
+                            git checkout develop
+                            git pull origin develop
                         """
                     } else {
                         sh "git clone -b develop --single-branch ${BACKEND_REPO} Backend"
@@ -44,16 +44,19 @@ pipeline {
             }
         }
 
-        stage('Build & Push Changed Backend Services') {
+        stage('Copy & Build Changed Backend Services') {
             steps {
                 script {
                     def dirs = env.CHANGED_DIRS.split(' ')
                     for (dir in dirs) {
                         if (fileExists("Backend/${dir}/Dockerfile")) {
+                            echo "Copying Dockerfile from ${dir} to Backend root..."
+                            sh "cp Backend/${dir}/Dockerfile Backend/Dockerfile"
+
                             def backendImage = "${BACKEND_IMAGE_PREFIX}/${dir}:${BUILD_NUMBER}"
                             echo "Building Docker image for Backend Service: ${dir}"
                             sh """
-                                cd Backend/${dir}
+                                cd Backend
                                 docker build -t ${backendImage} .
                                 docker push ${backendImage}
                             """
