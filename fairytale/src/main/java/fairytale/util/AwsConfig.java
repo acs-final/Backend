@@ -29,8 +29,8 @@ public class AwsConfig {
 //    @Value("${aws.config.secretKey}")
 //    private String secretKey;
 
-    private final String accessKey = System.getenv("aws_access_key_id");
-    private final String secretKey = System.getenv("aws_secret_access_key");
+    private final String accessKey = System.getenv("AWS_ACCESS_KEY_ID");
+    private final String secretKey = System.getenv("AWS_SECRET_ACCESS_KEY");
 
     @Bean
     public BedrockRuntimeClient bedrockRuntimeClient() {
