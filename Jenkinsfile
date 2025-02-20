@@ -6,7 +6,7 @@ pipeline {
         BACKEND_REPO = "https://github.com/acs-final/Backend.git"
         BACKEND_IMAGE_PREFIX = "192.168.2.141:443/prototype"
         LOCAL_CONFIG_BASE_PATH = "/home/kevin/Backend"
-        LOCAL_COMPOSE_FILE_PATH = "/home/kevin/docker-compose.yml"  // 루트 디렉터리에 있는 docker-compose.yml 경로
+        LOCAL_COMPOSE_FILE_PATH = "/home/kevin/docker-compose.yaml"  // 루트 디렉터리에 있는 docker-compose.yml 경로
     }
 
     stages {
@@ -51,7 +51,7 @@ pipeline {
                     }
 
                     echo "Copying docker-compose.yml from root to Backend directory..."
-                    sh "cp ${LOCAL_COMPOSE_FILE_PATH} Backend/docker-compose.yml"
+                    sh "cp ${LOCAL_COMPOSE_FILE_PATH} Backend/docker-compose.yaml"
                 }
             }
         }
