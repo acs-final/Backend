@@ -3,6 +3,7 @@ package member;
 
 
 import com.common.entity.*;
+import com.common.global.config.RedisService;
 import com.common.global.response.code.resultCode.ErrorStatus;
 import com.common.global.response.exception.handler.FairytaleHandler;
 import com.common.global.response.exception.handler.MemberHandler;
@@ -30,6 +31,8 @@ public class MemberService {
     private final ImageRepository imageRepository;
     private final ReportRepository reportRepository;
 
+    private final RedisService redisService;
+
     @Transactional
     public MemberResponseDto.LoginResponseDto login(String memberId){
 
@@ -50,17 +53,22 @@ public class MemberService {
 
                 Member newMember = MemberConverter.toMember(memberId, 0);
 
+                redisService.saveData("memberId", newMember.getMemberId());
+
                 memberRepository.save(newMember);
                 log.info("첫 로그인 성공: {}", newMember.getMemberId());
             } else {
                 myColor = findMember.getColor();  // 로그인 기록 있는 경우 색상만 가지고 반환.
 
                 findMember.setLastVisit(LocalDate.now());
+
+                redisService.saveData("memberId", findMember.getMemberId());
                 memberRepository.save(findMember);
             }
 
         }
 
+        redisService.getData("memberId");
 
         return new MemberResponseDto.LoginResponseDto(memberId, myColor);
 

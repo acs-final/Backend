@@ -2,6 +2,7 @@ package fairytale;
 
 import com.common.entity.BooksGenre;
 import com.common.global.response.ApiResponse;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import fairytale.dto.books.BooksResponseDto;
 import fairytale.dto.fairyTale.FairyTaleRequestDto;
 import fairytale.dto.fairyTale.FairyTaleResponseDto;
@@ -84,7 +85,7 @@ public class FairyTaleController {
             @Parameter(name = "memberId", description = "멤버 id"),
             @Parameter(name = "requestDto", description = "동화책 장르, 자녀 성별, 주제")
     })
-    public ApiResponse<FairyTaleResponseDto.FairyTaleResultDto> createFairyTale(
+    public ApiResponse<Object> createFairyTale(
             @RequestHeader("memberId") String memberId,
             @RequestBody FairyTaleRequestDto.FairyTaleCreateDto requestDto) {
         log.info("createFairyTale API Request time: {}", LocalDateTime.now());
@@ -93,8 +94,8 @@ public class FairyTaleController {
         String gender = requestDto.getGender();
         String challenge = requestDto.getChallenge();
 
-        FairyTaleResponseDto.FairyTaleResultDto result = sonnetService.createFairyTale(memberId, genre, gender, challenge);
-        //FairyTaleResponseDto.FairyTaleResultDto result = sonnetService.createFairyTaleByInvoke(memberId, genre, gender, challenge);
+        //FairyTaleResponseDto.FairyTaleResultDto result = sonnetService.createFairyTale(memberId, genre, gender, challenge);
+        Object result = sonnetService.createFairyTaleByInvoke(memberId, genre, gender, challenge);
 
         return ApiResponse.onSuccess(result);
     }
@@ -163,6 +164,13 @@ public class FairyTaleController {
     public ApiResponse<FairyTaleResponseDto.Dashboard> getDashboard() {
         log.info("getDashboard API Request time: {}", LocalDateTime.now());
         FairyTaleResponseDto.Dashboard result = fairyTaleService.getDashboard();
+        return ApiResponse.onSuccess(result);
+    }
+
+    @PostMapping("/sd")
+    public ApiResponse<String> testStableDiffusion(@RequestBody String prompt) throws JsonProcessingException {
+        log.info("getDashboard API Request time: {}", LocalDateTime.now());
+        String result = stableDiffusionService.createImage("D:/novaImage", "image", prompt);
         return ApiResponse.onSuccess(result);
     }
 
