@@ -17,7 +17,7 @@ FROM openjdk:17-jdk-slim
 WORKDIR /app
 
 # 빌드된 JAR 파일 복사
-COPY --from=build /app/member/build/libs/*.jar app.jar
+COPY --from=build /app/member/build/libs/*.jar /app/app.jar
 
 # 컨테이너 포트 지정
 EXPOSE 8080
