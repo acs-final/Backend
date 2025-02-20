@@ -43,15 +43,32 @@ pipeline {
 
                     for (dir in backendDirs) {
                         if (fileExists("Backend/${dir}/Dockerfile")) {
-                            echo "Copying application.yaml for ${dir} from local to Backend root..."
-                            sh "cp ${LOCAL_CONFIG_BASE_PATH}/${dir}/application.yaml Backend/${dir}/src/main/resources/application.yaml"
+                            echo "Processing Backend Service: ${dir}"
+
+                            // application.yaml 복사 전 존재 여부 확인
+                            def configPath = "${LOCAL_CONFIG_BASE_PATH}/${dir}/application.yaml"
+                            def targetPath = "Backend/${dir}/src/main/resources/application.yaml"
+
+                            if (fileExists(configPath)) {
+                                echo "Copying application.yaml for ${dir}..."
+                                sh "cp ${configPath} ${targetPath}"
+                                echo "Copied successfully: ${targetPath}"
+                            } else {
+                                echo "WARNING: ${configPath} not found, skipping..."
+                            }
                         } else {
                             echo "No Dockerfile found in Backend Service ${dir}, skipping..."
                         }
                     }
 
-                    echo "Copying docker-compose.yml from root to Backend directory..."
-                    sh "cp ${LOCAL_COMPOSE_FILE_PATH} Backend/docker-compose.yaml"
+                    // docker-compose.yml 복사 전 존재 여부 확인
+                    if (fileExists(LOCAL_COMPOSE_FILE_PATH)) {
+                        echo "Copying docker-compose.yml from root to Backend directory..."
+                        sh "cp ${LOCAL_COMPOSE_FILE_PATH} Backend/docker-compose.yaml"
+                        echo "Copied successfully: Backend/docker-compose.yaml"
+                    } else {
+                        echo "WARNING: ${LOCAL_COMPOSE_FILE_PATH} not found, skipping..."
+                    }
                 }
             }
         }
