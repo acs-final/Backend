@@ -1,10 +1,11 @@
 pipeline {
     agent any
     environment {
-        BUILD_NUMBER = "v2"  // 빌드 번호
-        HARBOR_CREDENTIALS = credentials('harbor') // Jenkins에 등록한 Harbor Credentials ID
-        BACKEND_REPO = "https://github.com/acs-final/Backend.git"  // 백엔드 Git 저장소 URL
-        BACKEND_IMAGE_PREFIX = "192.168.2.141:443/prototype"  // 백엔드 Docker 이미지 기본 경로
+        BUILD_NUMBER = "v3"
+        HARBOR_CREDENTIALS = credentials('harbor')
+        BACKEND_REPO = "https://github.com/acs-final/Backend.git"
+        BACKEND_IMAGE_PREFIX = "192.168.2.141:443/prototype"
+        LOCAL_CONFIG_BASE_PATH = "/home/kevin/Backend"  // 로컬에서 application.yaml을 가져올 기본 경로
     }
 
     stages {
@@ -34,24 +35,18 @@ pipeline {
             }
         }
 
-        stage('Detect Changed Backend Directories') {
+        stage('Build & Push All Backend Services') {
             steps {
                 script {
-                    def changedDirs = sh(script: "cd Backend && git diff --name-only HEAD~1 | awk -F'/' '{print \$1}' | sort -u", returnStdout: true).trim().split('\n')
-                    env.CHANGED_DIRS = changedDirs.join(' ')
-                    echo "Changed Backend Directories: ${env.CHANGED_DIRS}"
-                }
-            }
-        }
+                    def backendDirs = sh(script: "ls Backend", returnStdout: true).trim().split('\n')
 
-        stage('Copy & Build Changed Backend Services') {
-            steps {
-                script {
-                    def dirs = env.CHANGED_DIRS.split(' ')
-                    for (dir in dirs) {
+                    for (dir in backendDirs) {
                         if (fileExists("Backend/${dir}/Dockerfile")) {
                             echo "Copying Dockerfile from ${dir} to Backend root..."
                             sh "cp Backend/${dir}/Dockerfile Backend/Dockerfile"
+
+                            echo "Copying application.yaml for ${dir} from local to Backend root..."
+                            sh "cp ${LOCAL_CONFIG_BASE_PATH}/${dir}/application.yaml Backend/src/main/resources/application.yaml"
 
                             def backendImage = "${BACKEND_IMAGE_PREFIX}/${dir}:${BUILD_NUMBER}"
                             echo "Building Docker image for Backend Service: ${dir}"

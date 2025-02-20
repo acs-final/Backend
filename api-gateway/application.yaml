@@ -1,0 +1,31 @@
+server:
+  port: 8080  # API Gateway 포트
+
+spring:
+  cloud:
+    gateway:
+      routes:
+        - id: member-service
+          uri: ${BACKEND_URL}:8081
+          predicates:
+          - Path=/v1/members/**
+
+        - id: fairytale-service
+          uri: ${BACKEND_URL}:8082/
+          predicates:
+          - Path=/v1/fairytale/**
+
+        - id: bookstore-service
+          uri: ${BACKEND_URL}:8083
+          predicates:
+          - Path=/v1/bookstore/**
+
+        - id: report-service
+          uri: ${BACKEND_URL}:8084
+          predicates:
+          - Path=/v1/reports/**
+
+
+logging:
+  level:
+    org.springframework.cloud.gateway: DEBUG
