@@ -72,7 +72,7 @@ pipeline {
                     echo "Building all services using Docker Compose..."
                     sh """
                         cd Backend
-                        docker-compose build
+                        /usr/local/bin/docker-compose build
                     """
                 }
             }
