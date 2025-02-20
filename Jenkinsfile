@@ -1,12 +1,12 @@
 pipeline {
     agent any
     environment {
-        BUILD_NUMBER = "v2"
+        BUILD_NUMBER = "v3"
         HARBOR_CREDENTIALS = credentials('harbor')
         BACKEND_REPO = "https://github.com/acs-final/Backend.git"
         BACKEND_IMAGE_PREFIX = "192.168.2.141:443/prototype"
         LOCAL_CONFIG_BASE_PATH = "/home/kevin/Backend"
-        LOCAL_COMPOSE_FILE_PATH = "/home/kevin/docker-compose.yaml"  // 루트 디렉터리에 있는 docker-compose.yml 경로
+        LOCAL_COMPOSE_FILE_PATH = "/home/kevin/docker-compose.yaml"
     }
 
     stages {
@@ -14,6 +14,7 @@ pipeline {
             steps {
                 script {
                     if (fileExists("Backend/.git")) {
+                        echo "Updating existing Backend repository..."
                         sh """
                             cd Backend
                             git reset --hard
@@ -22,6 +23,7 @@ pipeline {
                             git pull origin develop
                         """
                     } else {
+                        echo "Cloning Backend repository..."
                         sh "git clone -b develop --single-branch ${BACKEND_REPO} Backend"
                     }
                 }
@@ -31,6 +33,7 @@ pipeline {
         stage('Login to Harbor') {
             steps {
                 script {
+                    echo "Logging in to Harbor..."
                     sh "docker login -u ${HARBOR_CREDENTIALS_USR} -p ${HARBOR_CREDENTIALS_PSW} 192.168.2.141:443"
                 }
             }
@@ -49,7 +52,7 @@ pipeline {
                             def configPath = "${LOCAL_CONFIG_BASE_PATH}/${dir}/application.yaml"
                             def targetPath = "Backend/${dir}/src/main/resources/application.yaml"
 
-                            if (fileExists(configPath)) {
+                            if (sh(script: "[ -f ${configPath} ] && echo 'exists'", returnStdout: true).trim() == "exists") {
                                 echo "Copying application.yaml for ${dir}..."
                                 sh "cp ${configPath} ${targetPath}"
                                 echo "Copied successfully: ${targetPath}"
@@ -62,7 +65,7 @@ pipeline {
                     }
 
                     // docker-compose.yml 복사 전 존재 여부 확인
-                    if (fileExists(LOCAL_COMPOSE_FILE_PATH)) {
+                    if (sh(script: "[ -f ${LOCAL_COMPOSE_FILE_PATH} ] && echo 'exists'", returnStdout: true).trim() == "exists") {
                         echo "Copying docker-compose.yml from root to Backend directory..."
                         sh "cp ${LOCAL_COMPOSE_FILE_PATH} Backend/docker-compose.yaml"
                         echo "Copied successfully: Backend/docker-compose.yaml"
@@ -76,6 +79,7 @@ pipeline {
         stage('Build All Services using Docker Compose') {
             steps {
                 script {
+                    echo "Building all services using Docker Compose..."
                     sh """
                         cd Backend
                         docker-compose build
