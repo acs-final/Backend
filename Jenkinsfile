@@ -22,36 +22,61 @@ pipeline {
             }
         }
 
-        stage('Copy Configs & Docker Compose') {
+        stage('Detect Changed Services') {
             steps {
                 script {
-                    def backendDirs = sh(script: "ls Backend", returnStdout: true).trim().split('\n')
+                    echo "Detecting changed services..."
+                    def changedFiles = sh(script: "cd Backend && git diff --name-only HEAD~1", returnStdout: true).trim().split('\n')
 
-                    for (dir in backendDirs) {
-                        echo "Processing Backend Service: ${dir}"
-
-                        // 🔥 ✅ 수정된 로컬 경로: /home/kevin/Backend/${dir}/src/main/resources/application.yaml
-                        def configPath = "${LOCAL_CONFIG_BASE_PATH}/${dir}/src/main/resources/application.yaml"
-                        def targetDir = "Backend/${dir}/src/main/resources"
-                        def targetPath = "${targetDir}/application.yaml"
-
-                        if (fileExists(configPath)) {
-                            echo "Copying application.yaml for ${dir}..."
-                            sh "mkdir -p ${targetDir}"
-                            sh "cp ${configPath} ${targetPath}"
-                            echo "Copied successfully: ${targetPath}"
-                        } else {
-                            echo "WARNING: ${configPath} not found, skipping..."
+                    def changedServices = []
+                    for (file in changedFiles) {
+                        def match = file =~ /^(.+?)\//
+                        if (match) {
+                            def serviceName = match[0][1]
+                            if (!changedServices.contains(serviceName)) {
+                                changedServices.add(serviceName)
+                            }
                         }
                     }
 
-                    // docker-compose.yaml 복사
-                    if (fileExists(LOCAL_COMPOSE_FILE_PATH)) {
-                        echo "Copying docker-compose.yaml to Backend directory..."
-                        sh "cp ${LOCAL_COMPOSE_FILE_PATH} Backend/docker-compose.yaml"
-                        echo "Copied successfully: Backend/docker-compose.yaml"
-                    } else {
-                        echo "WARNING: ${LOCAL_COMPOSE_FILE_PATH} not found, skipping..."
+                    if (changedServices.isEmpty()) {
+                        echo "No changes detected. Skipping build."
+                        currentBuild.result = 'SUCCESS'
+                        return
+                    }
+
+                    echo "Changed services: ${changedServices.join(', ')}"
+                    env.CHANGED_SERVICES = changedServices.join(',')
+                }
+            }
+        }
+
+        stage('Copy Configs & Dockerfiles') {
+            steps {
+                script {
+                    def changedServices = env.CHANGED_SERVICES.split(',')
+
+                    for (service in changedServices) {
+                        def configPath = "${LOCAL_CONFIG_BASE_PATH}/${service}/src/main/resources/application.yaml"
+                        def targetDir = "Backend/${service}/src/main/resources"
+                        def targetPath = "${targetDir}/application.yaml"
+
+                        if (fileExists(configPath)) {
+                            echo "Copying application.yaml for ${service}..."
+                            sh "mkdir -p ${targetDir}"
+                            sh "cp ${configPath} ${targetPath}"
+                        } else {
+                            echo "WARNING: ${configPath} not found, skipping..."
+                        }
+
+                        // Dockerfile 복사
+                        def dockerfilePath = "Backend/${service}/Dockerfile"
+                        if (fileExists(dockerfilePath)) {
+                            echo "Copying Dockerfile for ${service} to Backend root..."
+                            sh "cp ${dockerfilePath} Backend/Dockerfile"
+                        } else {
+                            echo "WARNING: ${dockerfilePath} not found, skipping..."
+                        }
                     }
                 }
             }
@@ -66,14 +91,18 @@ pipeline {
             }
         }
 
-        stage('Build All Services using Docker Compose') {
+        stage('Build Changed Services') {
             steps {
                 script {
-                    echo "Building all services using Docker Compose..."
-                    sh """
-                        cd Backend
-                        /usr/local/bin/docker-compose build
-                    """
+                    def changedServices = env.CHANGED_SERVICES.split(',')
+
+                    for (service in changedServices) {
+                        echo "Building ${service}..."
+                        sh """
+                            cd Backend
+                            docker build -t ${BACKEND_IMAGE_PREFIX}/${service}:${BUILD_NUMBER} .
+                        """
+                    }
                 }
             }
         }
@@ -81,13 +110,12 @@ pipeline {
         stage('Push Built Images to Harbor') {
             steps {
                 script {
-                    def backendDirs = sh(script: "ls Backend", returnStdout: true).trim().split('\n')
+                    def changedServices = env.CHANGED_SERVICES.split(',')
 
-                    for (dir in backendDirs) {
-                        def backendImage = "${BACKEND_IMAGE_PREFIX}/${dir}:${BUILD_NUMBER}"
+                    for (service in changedServices) {
+                        def backendImage = "${BACKEND_IMAGE_PREFIX}/${service}:${BUILD_NUMBER}"
                         echo "Pushing Docker image: ${backendImage}"
                         sh "docker push ${backendImage}"
-                        echo "Pushed successfully: ${backendImage}"
                     }
                 }
             }
