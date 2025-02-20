@@ -1,5 +1,5 @@
 package com.common.entity;
 
 public enum BooksGenre {
-    FOLKTALE, CREATION, RELIGIOUS
+    creative, Learning, religious, traditional, Life, masterpiece
 }

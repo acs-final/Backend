@@ -11,11 +11,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
 import software.amazon.awssdk.core.SdkBytes;
+import software.amazon.awssdk.core.client.config.ClientOverrideConfiguration;
+import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.bedrockruntime.BedrockRuntimeClient;
 import software.amazon.awssdk.services.bedrockruntime.model.*;
 
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
@@ -33,13 +37,33 @@ public class StableDiffusionService {
     private String STABLEDIFFUSION_MODEL_ID;
 
 
-    private final BedrockRuntimeClient bedrockRuntimeClient;
+    //private final BedrockRuntimeClient bedrockRuntimeClient;
 
     private final AmazonS3UploadService amazonS3UploadService;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     private final String SYSTEM_PROMPT_NOVA = "Create a cartoon-style illustration based on ";
+
+    private final BedrockRuntimeClient bedrockRuntimeClient = bedrockRuntimeClientForStableDiffusion();
+
+
+    public BedrockRuntimeClient bedrockRuntimeClientForStableDiffusion() {
+
+        Region region = Region.US_WEST_2;
+
+        log.info("Stable Diffusion Region: {}", region);
+
+        return BedrockRuntimeClient.builder()
+                .credentialsProvider(DefaultCredentialsProvider.create())
+                .region(region)
+                .overrideConfiguration(ClientOverrideConfiguration.builder()
+                        .apiCallTimeout(Duration.ofSeconds(240))
+                        .apiCallAttemptTimeout(Duration.ofSeconds(240))
+                        .build())
+                .build();
+    }
+
 
     public String createImage(String title, String fileName, String promptText) throws JsonProcessingException {
         String message = SYSTEM_PROMPT_NOVA + "\"" + promptText + "\"";

@@ -56,8 +56,6 @@ public class PollyService {
 
             mp3Name = uploadMP3(audioStream, fileName);
 
-            log.info("mp3Name: {}", mp3Name);
-
             return mp3Name;
 
         } catch (Exception e) {
@@ -77,8 +75,6 @@ public class PollyService {
 
         try {
             mp3Url = amazonS3UploadService.uploadMP3(audioStream, fileName, "polly-mp3");
-
-            log.info("mp3Url: {}", mp3Url);
 
         } catch (Exception e) {
             throw new NovaHandler(ErrorStatus.FILE_UPLOAD_FAILED);
