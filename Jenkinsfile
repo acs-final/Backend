@@ -50,7 +50,7 @@ pipeline {
 
                             // application.yaml 복사 전 존재 여부 확인
                             def configPath = "${LOCAL_CONFIG_BASE_PATH}/${dir}/application.yaml"
-                            def targetPath = "Backend/${dir}/src/main/resources/application.yaml"
+                            def targetPath = "Backend/${dir}/application.yaml"
 
                             if (sh(script: "[ -f ${configPath} ] && echo 'exists'", returnStdout: true).trim() == "exists") {
                                 echo "Copying application.yaml for ${dir}..."
