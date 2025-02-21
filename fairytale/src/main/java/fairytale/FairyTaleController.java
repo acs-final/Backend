@@ -2,7 +2,7 @@ package fairytale;
 
 import com.common.global.response.ApiResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import bookstore.books.BooksResponseDto;
+
 import fairytale.dto.fairyTale.FairyTaleRequestDto;
 import fairytale.dto.fairyTale.FairyTaleResponseDto;
 import fairytale.service.FairyTaleService;
@@ -35,7 +35,6 @@ public class FairyTaleController {
     private final StableDiffusionService stableDiffusionService;
     private final PollyService pollyService;
 
-    private final BooksService booksService;
 
 
 

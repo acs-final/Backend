@@ -30,7 +30,7 @@ public class Books extends BaseEntity {
 
     @Column(length = 500)
     private String imageUrl;
-    
+
     @Column(length = 500)
     private String goodsUrl; // 사이트 링크.
 
