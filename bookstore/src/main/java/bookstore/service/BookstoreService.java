@@ -67,6 +67,14 @@ public class BookstoreService {
             throw new FairytaleHandler(ErrorStatus.FAIRYTALE_NOT_FOUND);
         }
 
+        Bookstore findBookstore = bookstoreRepository.findByFairytale(findFairytale);
+
+        if (findBookstore != null){
+            throw  new BookstoreHandler(ErrorStatus.BOOKSTORE_ALREADY_EXIST);
+        }
+
+
+
         Bookstore newBookstore = BookstoreConverter.toBookstore(findMember, createDto.getTitle(), createDto.getBody(), createDto.getScore(), createDto.getScore(), createDto.getScore(), 0, findFairytale, createDto.getImageUrl());
 
         Bookstore saveBookstore = bookstoreRepository.save(newBookstore);

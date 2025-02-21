@@ -1,6 +1,7 @@
 package com.common.repository;
 
 import com.common.entity.Bookstore;
+import com.common.entity.Fairytale;
 import com.common.entity.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -12,4 +13,5 @@ public interface BookstoreRepository extends JpaRepository<Bookstore, Long> {
 
     List<Bookstore> findAllByMember(Member member);
 
+    Bookstore findByFairytale(Fairytale fairytale);
 }
