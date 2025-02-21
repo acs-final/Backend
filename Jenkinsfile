@@ -1,7 +1,7 @@
 pipeline {
     agent any
     environment {
-        BUILD_NUMBER = "v5"
+        BUILD_NUMBER = "v4"
         HARBOR_CREDENTIALS = credentials('harbor')
         BACKEND_REPO = "https://github.com/acs-final/Backend.git"
         BACKEND_IMAGE_PREFIX = "192.168.2.141:443/prototype"
@@ -26,15 +26,39 @@ pipeline {
             steps {
                 script {
                     echo "Detecting changed services..."
-                    def changedFiles = sh(script: "cd Backend && git diff --name-only HEAD~1", returnStdout: true).trim().split('\n')
+                    // 브랜치의 마지막 성공 빌드와 비교
+                    def lastSuccessfulCommit = sh(script: "git rev-parse refs/remotes/origin/develop@{1}", returnStdout: true).trim()
+                    def changedFiles = sh(script: """
+                        cd Backend
+                        git diff --name-only ${lastSuccessfulCommit}..HEAD
+                        git diff --name-only HEAD  # Uncommitted changes
+                        git ls-files --others --exclude-standard  # New files
+                    """, returnStdout: true).trim().split('\n')
 
                     def changedServices = []
                     for (file in changedFiles) {
-                        def match = file =~ /^(.+?)\//
-                        if (match) {
-                            def serviceName = match[0][1]
+                        // 루트 레벨 변경사항 체크
+                        if (!file.contains('/')) {
+                            changedServices.add('root')
+                            continue
+                        }
+                        
+                        // 서비스 디렉토리 체크
+                        def servicePath = file.split('/')
+                        if (servicePath.length >= 1) {
+                            def serviceName = servicePath[0]
                             if (!changedServices.contains(serviceName)) {
                                 changedServices.add(serviceName)
+                            }
+                        }
+                        
+                        // 공통 모듈 체크
+                        if (file.contains('common/') || file.contains('shared/')) {
+                            // 공통 모듈이 변경된 경우 모든 서비스를 다시 빌드
+                            sh "cd Backend && ls -d */ | sed 's#/##'".split('\n').each { service ->
+                                if (!changedServices.contains(service)) {
+                                    changedServices.add(service)
+                                }
                             }
                         }
                     }
@@ -121,5 +145,10 @@ pipeline {
             }
         }
     }
-}
 
+    post {
+        always {
+            cleanWs()
+        }
+    }
+}
