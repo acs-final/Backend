@@ -1,7 +1,11 @@
 package bookstore;
 
+import bookstore.dto.books.BooksResponseDto;
 import bookstore.dto.bookstore.BookstoreRequestDto;
 import bookstore.dto.bookstore.BookstoreResponseDto;
+
+import bookstore.service.BooksService;
+import bookstore.service.BookstoreService;
 
 import com.common.global.response.ApiResponse;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +23,19 @@ import java.util.List;
 public class BookstoreController {
 
     private final BookstoreService bookstoreService;
+
+    private final BooksService booksService;
+
+
+    @GetMapping("/recommanded/")
+    public ApiResponse<List<BooksResponseDto.RecommendedBook>> getRecommendedBooks(@RequestParam("genre") String keyword){
+
+        log.info("getRecommendedBooks API Request time: {}", LocalDateTime.now());
+
+        List<BooksResponseDto.RecommendedBook> result = booksService.getRecommendedBooks(keyword);
+
+        return ApiResponse.onSuccess(result);
+    }
 
     @PostMapping("/")
     public ApiResponse<BookstoreResponseDto.BookstoreCreateDto> createBookstore(@RequestHeader("memberId") String memberId, @RequestBody BookstoreRequestDto.BookstoreCreateDto createDto){

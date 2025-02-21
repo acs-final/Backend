@@ -1,6 +1,7 @@
-package bookstore;
+package bookstore.service;
 
 
+import bookstore.CommentConverter;
 import bookstore.dto.comment.CommentRequestDto;
 import bookstore.dto.comment.CommentResponseDto;
 

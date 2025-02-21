@@ -26,11 +26,12 @@ public class Books extends BaseEntity {
 
     private Float score;
 
+    private String keyword;
+
+    @Column(length = 500)
     private String imageUrl;
-
-    @Enumerated(EnumType.STRING)
-    private BooksGenre genre;
-
+    
+    @Column(length = 500)
     private String goodsUrl; // 사이트 링크.
 
 }

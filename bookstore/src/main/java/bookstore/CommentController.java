@@ -5,6 +5,7 @@ package bookstore;
 import bookstore.dto.comment.CommentRequestDto;
 import bookstore.dto.comment.CommentResponseDto;
 
+import bookstore.service.CommentService;
 import com.common.global.response.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

@@ -44,6 +44,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.ReentrantLock;
 
 @Slf4j
 @Service
@@ -55,7 +56,7 @@ public class SonnetService {
     @Value("${aws.bedrock.sonnet.model}")
     private String SONNET_MODEL_ID;
 
-    //private final BedrockRuntimeClient bedrockRuntimeClient;
+    private final BedrockRuntimeClient bedrockRuntimeClientForClaude;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -95,7 +96,7 @@ public class SonnetService {
 
 
     AtomicInteger counter = new AtomicInteger(0);
-    List<Region> regions = List.of(Region.US_EAST_1, Region.AP_NORTHEAST_2, Region.US_WEST_2);
+    List<Region> regions = List.of(Region.US_EAST_1, Region.AP_NORTHEAST_2, Region.US_WEST_2, Region.AP_NORTHEAST_1, Region.AP_SOUTHEAST_1, Region.EU_CENTRAL_1);
 
     public Region getNextRegion() {
         return regions.get(counter.getAndIncrement() % regions.size());
@@ -117,7 +118,7 @@ public class SonnetService {
                 .build();
     }
 
-    private BedrockRuntimeClient  bedrockRuntimeClientForClaude = bedrockRuntimeClientForClaude();
+    //private BedrockRuntimeClient  bedrockRuntimeClientForClaude = bedrockRuntimeClientForClaude();
 
 
     @Transactional
@@ -125,7 +126,7 @@ public class SonnetService {
 
         Member findMember = memberRepository.findById(memberId).orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
 
-         bedrockRuntimeClientForClaude = bedrockRuntimeClientForClaude();
+        //bedrockRuntimeClientForClaude = bedrockRuntimeClientForClaude();
 
         String message = String.format(
                 "genre = %s\n" +
@@ -376,7 +377,7 @@ public class SonnetService {
     public FairyTaleResponseDto.FairyTaleResultDto createFairyTaleByInvoke(String memberId, String genre, String gender, String challenge) {
         Member findMember = memberRepository.findById(memberId).orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
 
-        bedrockRuntimeClientForClaude = bedrockRuntimeClientForClaude();
+        //bedrockRuntimeClientForClaude = bedrockRuntimeClientForClaude();
 
         String text = String.format(
                 "Create a fairy tale for %s kid using these elements: Genre: %s and Challenge: %s. Write in an enchanting, classic fairy tale style and a satisfying ending. Include vivid descriptions and a moral lesson.\n" +

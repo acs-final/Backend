@@ -26,61 +26,55 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Configuration
 public class AwsConfig {
 
-//    @Value("${aws.config.accessKey}")
-//    private String accessKey;
-//
-//    @Value("${aws.config.secretKey}")
-//    private String secretKey;
-
     private final String accessKey = System.getenv("AWS_ACCESS_KEY_ID");
     private final String secretKey = System.getenv("AWS_SECRET_ACCESS_KEY");
 
-//    AtomicInteger counter = new AtomicInteger(0);
-//    List<Region> regions = List.of(Region.US_EAST_1, Region.US_WEST_2, Region.EU_WEST_1);
-//
-//    public Region getNextRegion() {
-//        return regions.get(counter.getAndIncrement() % regions.size());
-//    }
-//
-//    @Bean
-//    public BedrockRuntimeClient bedrockRuntimeClientForClaude() {
-//
-////        AwsCredentialsProvider credentialsProvider = StaticCredentialsProvider.create(
-////                AwsBasicCredentials.create(accessKey, secretKey)
-////        );
-//        Region region = getNextRegion();
-//
-//        log.info("Region: {}", region);
-//
-//        return BedrockRuntimeClient.builder()
-//                .credentialsProvider(DefaultCredentialsProvider.create())
-//                .region(region)
-//                .overrideConfiguration(ClientOverrideConfiguration.builder()
-//                        .apiCallTimeout(Duration.ofSeconds(240))
-//                        .apiCallAttemptTimeout(Duration.ofSeconds(240))
-//                        .build())
-//                .build();
-//    }
-//
-//    @Bean
-//    public BedrockRuntimeClient bedrockRuntimeClientForStableDiffusion() {
-//
-////        AwsCredentialsProvider credentialsProvider = StaticCredentialsProvider.create(
-////                AwsBasicCredentials.create(accessKey, secretKey)
-////        );
-//        Region region = Region.US_WEST_2;
-//
-//        log.info("Region: {}", region);
-//
-//        return BedrockRuntimeClient.builder()
-//                .credentialsProvider(DefaultCredentialsProvider.create())
-//                .region(region)
-//                .overrideConfiguration(ClientOverrideConfiguration.builder()
-//                        .apiCallTimeout(Duration.ofSeconds(240))
-//                        .apiCallAttemptTimeout(Duration.ofSeconds(240))
-//                        .build())
-//                .build();
-//    }
+    AtomicInteger counter = new AtomicInteger(0);
+    List<Region> regions = List.of(Region.US_EAST_1, Region.US_WEST_2, Region.EU_WEST_1);
+
+    public Region getNextRegion() {
+        return regions.get(counter.getAndIncrement() % regions.size());
+    }
+
+    @Bean
+    public BedrockRuntimeClient bedrockRuntimeClientForClaude() {
+
+//        AwsCredentialsProvider credentialsProvider = StaticCredentialsProvider.create(
+//                AwsBasicCredentials.create(accessKey, secretKey)
+//        );
+        //Region region = getNextRegion();
+
+        //log.info("Region: {}", region);
+
+        return BedrockRuntimeClient.builder()
+                .credentialsProvider(DefaultCredentialsProvider.create())
+                .region(Region.EU_CENTRAL_1)
+                .overrideConfiguration(ClientOverrideConfiguration.builder()
+                        .apiCallTimeout(Duration.ofSeconds(240))
+                        .apiCallAttemptTimeout(Duration.ofSeconds(240))
+                        .build())
+                .build();
+    }
+
+    @Bean
+    public BedrockRuntimeClient bedrockRuntimeClientForStableDiffusion() {
+
+//        AwsCredentialsProvider credentialsProvider = StaticCredentialsProvider.create(
+//                AwsBasicCredentials.create(accessKey, secretKey)
+//        );
+        Region region = Region.US_WEST_2;
+
+        log.info("Region: {}", region);
+
+        return BedrockRuntimeClient.builder()
+                .credentialsProvider(DefaultCredentialsProvider.create())
+                .region(region)
+                .overrideConfiguration(ClientOverrideConfiguration.builder()
+                        .apiCallTimeout(Duration.ofSeconds(240))
+                        .apiCallAttemptTimeout(Duration.ofSeconds(240))
+                        .build())
+                .build();
+    }
 
     @Bean(name = "s3Client")
     public AmazonS3Client amazonS3Client() {

@@ -1,9 +1,8 @@
 package fairytale;
 
-import com.common.entity.BooksGenre;
 import com.common.global.response.ApiResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import fairytale.dto.books.BooksResponseDto;
+import bookstore.books.BooksResponseDto;
 import fairytale.dto.fairyTale.FairyTaleRequestDto;
 import fairytale.dto.fairyTale.FairyTaleResponseDto;
 import fairytale.service.FairyTaleService;
@@ -38,15 +37,7 @@ public class FairyTaleController {
 
     private final BooksService booksService;
 
-    @GetMapping("/recommanded/")
-    public ApiResponse<List<BooksResponseDto.RecommendedBook>> getRecommendedBooks(@RequestParam("genre") BooksGenre genre){
 
-        log.info("getRecommendedBooks API Request time: {}", LocalDateTime.now());
-
-        List<BooksResponseDto.RecommendedBook> result = booksService.getRecommendedBooks(genre);
-
-        return ApiResponse.onSuccess(result);
-    }
 
     @GetMapping("/")
     @Operation(summary = "전체 동화책 목록 조회 API", description = "회원 구분 없이 전체 동화책 목록 조회.")

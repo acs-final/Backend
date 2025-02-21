@@ -1,4 +1,4 @@
-package fairytale.dto.books;
+package bookstore.dto.books;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

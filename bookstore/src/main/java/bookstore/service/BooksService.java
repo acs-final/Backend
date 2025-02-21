@@ -1,10 +1,10 @@
-package fairytale;
+package bookstore.service;
 
 
 import com.common.entity.Books;
-import com.common.entity.BooksGenre;
+
 import com.common.repository.BooksRepository;
-import fairytale.dto.books.BooksResponseDto;
+import bookstore.dto.books.BooksResponseDto;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,9 +22,9 @@ public class BooksService {
 
     private final BooksRepository booksRepository;
 
-    public List<BooksResponseDto.RecommendedBook> getRecommendedBooks(BooksGenre genre){
+    public List<BooksResponseDto.RecommendedBook> getRecommendedBooks(String keyword){
 
-        List<Books> findBooks = booksRepository.findAllByGenre(genre);
+        List<Books> findBooks = booksRepository.findAllByKeyword(keyword);
 
         findBooks = findBooks.stream().sorted(Comparator.comparing(Books::getScore).reversed()).toList();
 
