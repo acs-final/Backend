@@ -21,12 +21,12 @@ public enum ErrorStatus implements BaseErrorCode {
     FAIRYTALE_NOT_FOUND(HttpStatus.NOT_FOUND, "FAIRYTALE400", "동화를 찾을 수 없습니다."),
 
     BOOKSTORE_NOT_FOUND(HttpStatus.NOT_FOUND, "BOOKSTORE400", "해당 게시글을 찾을 수 없습니다."),
-    BOOKSTORE_ALREADY_EXIST(HttpStatus.ALREADY_REPORTED , "BOOKSTORE403", "이미 생성된 게시글이 존재합니다."),
+    BOOKSTORE_ALREADY_EXIST(HttpStatus.BAD_REQUEST , "BOOKSTORE403", "이미 생성된 게시글이 존재합니다."),
 
     COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "COMMENT400", "해당 댓글을 찾을 수 없습니다."),
 
     REPORT_NOT_FOUND(HttpStatus.NOT_FOUND, "REPORT400", "해당 독후감을 찾을 수 없습니다."),
-    REPORT_ALREADY_EXIST(HttpStatus.ALREADY_REPORTED , "REPORT403", "이미 생성된 독후감이 존재합니다.");
+    REPORT_ALREADY_EXIST(HttpStatus.BAD_REQUEST , "REPORT403", "이미 생성된 독후감이 존재합니다.");
 
 
     private final HttpStatus httpStatus;

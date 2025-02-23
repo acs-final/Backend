@@ -26,7 +26,11 @@ public class BooksService {
 
         List<Books> findBooks = booksRepository.findAllByKeyword(keyword);
 
-        findBooks = findBooks.stream().sorted(Comparator.comparing(Books::getScore).reversed()).toList();
+        findBooks = findBooks.stream().peek(b -> {
+            if (b.getScore() == null){
+                b.setScore((float) 0);
+            }
+        }).sorted(Comparator.comparing(Books::getScore).reversed()).toList();
 
         List<BooksResponseDto.RecommendedBook> topBooks = findBooks.stream()
                 .map(b ->
