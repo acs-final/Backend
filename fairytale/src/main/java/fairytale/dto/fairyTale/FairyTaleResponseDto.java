@@ -14,6 +14,15 @@ public class FairyTaleResponseDto {
     @NoArgsConstructor
     @Getter
     @Builder
+    public static class FairyTaleCreateDto {
+        private Long fairytaleId;
+
+    }
+
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Getter
+    @Builder
     public static class FairyTaleListDto {
         private Long fairytaleId;
         private String title;

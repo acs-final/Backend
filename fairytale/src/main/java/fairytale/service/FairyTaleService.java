@@ -73,6 +73,7 @@ public class FairyTaleService {
                 .build();
     }
 
+    @Transactional
     public List<FairyTaleResponseDto.PollyResultDto> asyncPolly(List<FairyTaleRequestDto.PollyRequestDto> requestDtos, Fairytale fairytale) {
         List<FairyTaleRequestDto.PollyRequestDto> requestIds = requestDtos;
         log.info("requestIds: {}", requestDtos);
@@ -102,6 +103,7 @@ public class FairyTaleService {
         return collect;
     }
 
+    @Transactional
     public List<FairyTaleResponseDto.StablediffusionResultDto> asyncImage(List<FairyTaleRequestDto.StablediffusionRequestDto> requestDtos, Fairytale fairytale) throws JsonProcessingException {
         List<FairyTaleRequestDto.StablediffusionRequestDto> requestIds = requestDtos;
 
@@ -196,12 +198,30 @@ public class FairyTaleService {
                 .limit(3)
                 .toList();
 
-        List<String> genres = List.of("한국 전래 동화", "세계 전래 동화", "판타지 동화", "동물 동화", "가족 동화", "의사 직업 동화", "소방관 직업 동화", "경찰 직업 동화");
+        List<String> genres = List.of("한국 전래 동화", "세계 전래 동화", "판타지 동화", "동물 동화", "가족 동화", "의사 직업 동화", "소방관 직업 동화", "경찰 직업 동화", "요리사 직업 동화", "선생님 직업 동화", "과학자 직업 동화", "우주인 직업 동화", "운동선수 직업 동화", "수의사 직업 동화", "예술가 직업 동화");
 
-        List<FairyTaleResponseDto.CountByGenre> countByGenres = genres.stream().map(g -> {
-            long count = fairyTaleRepository.countByGenre(g);
-            return new FairyTaleResponseDto.CountByGenre(g, count);
-        }).collect(Collectors.toList());
+        long jobFtCounts = 0;
+
+        List<FairyTaleResponseDto.CountByGenre> countByGenres = new ArrayList<>();
+
+        for (int i=0; i<genres.size(); i++){
+            if (i<5){
+                long count = fairyTaleRepository.countByGenre(genres.get(i));
+                countByGenres.add(new FairyTaleResponseDto.CountByGenre(genres.get(i), count));
+            } else {
+                jobFtCounts = jobFtCounts + fairyTaleRepository.countByGenre(genres.get(i));
+            }
+
+            if (i==genres.size()-1){
+                countByGenres.add(new FairyTaleResponseDto.CountByGenre("직업 동화", jobFtCounts));
+            }
+
+        }
+
+//        List<FairyTaleResponseDto.CountByGenre> countByGenres = genres.stream().map(g -> {
+//            long count = fairyTaleRepository.countByGenre(g);
+//            return new FairyTaleResponseDto.CountByGenre(g, count);
+//        }).collect(Collectors.toList());
 
 
         List<String> localDate = List.of(LocalDate.now().toString().split("-"));

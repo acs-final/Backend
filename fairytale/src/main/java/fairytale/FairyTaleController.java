@@ -20,8 +20,13 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.joda.time.LocalDateTime;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+import software.amazon.awssdk.services.bedrockruntime.model.InvokeModelWithResponseStreamRequest;
+import software.amazon.awssdk.services.bedrockruntime.model.InvokeModelWithResponseStreamResponseHandler;
 
+import java.io.IOException;
 import java.util.List;
 
 @Slf4j
@@ -35,6 +40,25 @@ public class FairyTaleController {
     private final StableDiffusionService stableDiffusionService;
     private final PollyService pollyService;
 
+
+    @PostMapping(value = "/sonnet/streaming" , produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    @Operation(summary = "동화책 생성 API", description = "동화책 생성 스트리밍 응답")
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "MEMBER404", description = "회원을 찾을 수 없습니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class)))
+    })
+    @Parameters({
+            @Parameter(name = "memberId", description = "멤버 id"),
+            @Parameter(name = "requestDto", description = "동화책 장르, 자녀 성별, 주제")
+    })
+    public SseEmitter createFairytaleWithStreaming(@RequestHeader("memberId") String memberId, @RequestBody FairyTaleRequestDto.FairyTaleCreateDto requestDto) {
+
+        log.info("createFairytaleWithStreaming API Request time: {}", LocalDateTime.now());
+
+        SseEmitter emitter = sonnetService.createFtWithStreaming(memberId, requestDto.getGenre(), requestDto.getGender(), requestDto.getChallenge());
+
+        return emitter;
+    }
 
 
 
@@ -65,6 +89,7 @@ public class FairyTaleController {
         return ApiResponse.onSuccess(findFairyTale);
     }
 
+
     @PostMapping("/sonnet")
     @Operation(summary = "동화책 생성 API", description = "동화책 생성")
     @ApiResponses({
@@ -75,7 +100,7 @@ public class FairyTaleController {
             @Parameter(name = "memberId", description = "멤버 id"),
             @Parameter(name = "requestDto", description = "동화책 장르, 자녀 성별, 주제")
     })
-    public ApiResponse<Object> createFairyTale(
+    public ApiResponse<FairyTaleResponseDto.FairyTaleResultDto> createFairyTale(
             @RequestHeader("memberId") String memberId,
             @RequestBody FairyTaleRequestDto.FairyTaleCreateDto requestDto) {
         log.info("createFairyTale API Request time: {}", LocalDateTime.now());
@@ -85,7 +110,7 @@ public class FairyTaleController {
         String challenge = requestDto.getChallenge();
 
         //FairyTaleResponseDto.FairyTaleResultDto result = sonnetService.createFairyTale(memberId, genre, gender, challenge);
-        Object result = sonnetService.createFairyTaleByInvoke(memberId, genre, gender, challenge);
+        FairyTaleResponseDto.FairyTaleResultDto result = sonnetService.createFairyTaleByInvoke(memberId, genre, gender, challenge);
 
         return ApiResponse.onSuccess(result);
     }
