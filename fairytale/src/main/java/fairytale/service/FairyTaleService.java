@@ -23,6 +23,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
@@ -43,7 +44,13 @@ public class FairyTaleService {
     public List<FairyTaleResponseDto.FairyTaleListDto> getFairyTaleList() {
         List<Fairytale> findFairyTaleList = fairyTaleRepository.findAll();
         List<FairyTaleResponseDto.FairyTaleListDto> fairyTaleListDtos = findFairyTaleList.stream()
-                .map(ft -> new FairyTaleResponseDto.FairyTaleListDto(ft.getFairytaleId(), ft.getTitle(), ft.getAvgScore()))
+                .map(ft -> {
+                    Long likeCount = 0L;
+                    if (ft.getLikeCount() != null){
+                        likeCount = ft.getLikeCount();
+                    }
+                    return new FairyTaleResponseDto.FairyTaleListDto(ft.getFairytaleId(), ft.getTitle(), ft.getImages().get(0).getImageUrl(), likeCount);
+                })
                 .toList();
         return fairyTaleListDtos;
     }
@@ -138,7 +145,7 @@ public class FairyTaleService {
 
 
     @Transactional
-    public FairyTaleResponseDto.FairyTaleListDto grantScore(Long fairytaleId, Float score) {
+    public FairyTaleResponseDto.FairyTaleDto grantScore(Long fairytaleId, Float score) {
 
         Fairytale findFairytale = fairyTaleRepository.findById(fairytaleId)
                 .orElseThrow(() -> new FairytaleHandler(ErrorStatus.FAIRYTALE_NOT_FOUND));
@@ -152,7 +159,7 @@ public class FairyTaleService {
         findFairytale.setTotalScore(totalScore);
         findFairytale.setScoreCount(scoreCount);
 
-        return new FairyTaleResponseDto.FairyTaleListDto(findFairytale.getFairytaleId(), findFairytale.getTitle(), findFairytale.getAvgScore());
+        return new FairyTaleResponseDto.FairyTaleDto(findFairytale.getFairytaleId(), findFairytale.getTitle(), findFairytale.getAvgScore());
     }
 
     // 삭제 메서드: 예외 발생 여부와 상관없이 항상 성공하도록 처리 (소프트 딜리트)

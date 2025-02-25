@@ -60,6 +60,17 @@ public class FairyTaleController {
         return emitter;
     }
 
+    @PostMapping(value = "/sonnet/prompt")
+    public ApiResponse<Object> createPromptText(@RequestBody String body) {
+
+        log.info("createPromptText API Request time: {}", LocalDateTime.now());
+
+        //List<FairyTaleResponseDto.FairyTalePromptDto> result = sonnetService.createPromptText(body);
+        Object result = sonnetService.createPromptText(body);
+
+        return ApiResponse.onSuccess(result);
+    }
+
 
 
     @GetMapping("/")
@@ -126,11 +137,11 @@ public class FairyTaleController {
             @Parameter(name = "fairytaleId", description = "동화책 id"),
             @Parameter(name = "requestDto", description = "평점")
     })
-    public ApiResponse<FairyTaleResponseDto.FairyTaleListDto> grantScore(
+    public ApiResponse<FairyTaleResponseDto.FairyTaleDto> grantScore(
             @PathVariable("fairytaleId") Long fairytaleId,
             @RequestBody FairyTaleRequestDto.ScoreRequestDto requestDto) {
         log.info("grantScore API Request time: {}", LocalDateTime.now());
-        FairyTaleResponseDto.FairyTaleListDto result = fairyTaleService.grantScore(fairytaleId, requestDto.getScore());
+        FairyTaleResponseDto.FairyTaleDto result = fairyTaleService.grantScore(fairytaleId, requestDto.getScore());
         return ApiResponse.onSuccess(result);
     }
 
@@ -185,7 +196,7 @@ public class FairyTaleController {
     @PostMapping("/sd")
     public ApiResponse<String> testStableDiffusion(@RequestBody String prompt) throws JsonProcessingException {
         log.info("getDashboard API Request time: {}", LocalDateTime.now());
-        String result = stableDiffusionService.createImage("D:/novaImage", "image", prompt);
+        String result = stableDiffusionService.createImage("compressed", "compressedImage2", prompt);
         return ApiResponse.onSuccess(result);
     }
 

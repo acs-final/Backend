@@ -33,6 +33,8 @@ public class Fairytale extends BaseEntity {
 
     private String genre;
 
+    private Long likeCount;
+
 //    @Enumerated(EnumType.STRING)
 //    private IsDeleted IsDeleted;
 

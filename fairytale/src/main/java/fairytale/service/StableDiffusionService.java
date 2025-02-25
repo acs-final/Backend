@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import fairytale.util.AmazonS3UploadService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.coobird.thumbnailator.Thumbnails;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,6 +19,7 @@ import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.bedrockruntime.BedrockRuntimeClient;
 import software.amazon.awssdk.services.bedrockruntime.model.*;
 
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.Base64;
@@ -74,7 +76,6 @@ public class StableDiffusionService {
         Map<String, Object> payload = new HashMap<>();
         payload.put("mode", "text-to-image");
 
-
         payload.put("prompt", message);
 
         payload.put("aspect_ratio", "1:1");
@@ -84,8 +85,6 @@ public class StableDiffusionService {
         log.info("payload: {}", payload);
 
         String requestBody = objectMapper.writeValueAsString(payload);
-
-
 
         InvokeModelRequest request = InvokeModelRequest.builder()
                 //.modelId("stability.sd3-5-large-v1:0")
@@ -101,7 +100,6 @@ public class StableDiffusionService {
 
 
         log.info("Response: {}", response);
-        //log.info("ResponseBody: {}", responseBody);
 
         // 이미지 파일을 저장할 경로 지정
         //String filePath = "D:/novaImage/image5.png";  // 예시 경로, 저장할 실제 경로로 변경
@@ -109,7 +107,6 @@ public class StableDiffusionService {
 
         // 이미지를 파일로 저장하는 메소드 호출
         //saveImageFromBase64(responseBody, filePath);
-
 
         try {
 
@@ -124,10 +121,18 @@ public class StableDiffusionService {
                 // Base64 디코딩
                 byte[] decodedBytes = Base64.getDecoder().decode(base64Image);
 
+                ByteArrayInputStream inputStream = new ByteArrayInputStream(decodedBytes);
+                ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
-                filePath = uploadImage(decodedBytes, fileDirName);
+                Thumbnails.of(inputStream)
+                        .size(800, 600)  // 크기 조정 (원하는 해상도로 변경 가능)
+                        .outputQuality(0.7)  // 품질 조정 (0.1 ~ 1.0)
+                        .outputFormat("png")
+                        .toOutputStream(outputStream);
 
-                // 이미지 파일로 저장 (예: generated_image.png)
+                filePath = uploadImage(outputStream.toByteArray(), fileDirName);
+
+//                // 이미지 파일로 저장 (예: generated_image.png)
 //                try (FileOutputStream fos = new FileOutputStream(filePath)) {
 //                    fos.write(decodedBytes);
 //                    log.info("Image saved as generated_image.png");

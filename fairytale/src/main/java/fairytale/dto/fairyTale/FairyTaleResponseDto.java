@@ -14,6 +14,26 @@ public class FairyTaleResponseDto {
     @NoArgsConstructor
     @Getter
     @Builder
+    public static class FairyTaleListDto {
+        private Long fairytaleId;
+        private String title;
+        private String imageUrl;
+        private Long likeCount;
+    }
+
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Getter
+    @Builder
+    public static class FairyTalePromptDto {
+        private String prompt;
+
+    }
+
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Getter
+    @Builder
     public static class FairyTaleCreateDto {
         private Long fairytaleId;
 
@@ -23,7 +43,7 @@ public class FairyTaleResponseDto {
     @NoArgsConstructor
     @Getter
     @Builder
-    public static class FairyTaleListDto {
+    public static class FairyTaleDto {
         private Long fairytaleId;
         private String title;
         private Float score;
