@@ -140,7 +140,7 @@ pipeline {
                     def changedServices = env.MODULES_TO_BUILD.split(',')
 
                     for (service in changedServices) {
-                        sh "docker tag backend-${service} ${BACKEND_IMAGE_PREFIX}/${service}:${BUILD_NUMBER}"
+                        sh "docker tag backend-docker-ci_${service} ${BACKEND_IMAGE_PREFIX}/${service}:${BUILD_NUMBER}"
 
                         def backendImage = "${BACKEND_IMAGE_PREFIX}/${service}:${BUILD_NUMBER}"
                         echo "Pushing Docker image: ${backendImage}"
