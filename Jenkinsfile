@@ -24,6 +24,12 @@ pipeline {
                 script {
                     echo "Detecting changed services..."
 
+                    sh "whoami"
+                    sh "ls -la /var/lib/jenkins/workspace/backend-docker-ci/.git"
+
+                    sh "sudo chown -R jenkins:jenkins /var/lib/jenkins/workspace/backend-docker-ci"
+                    sh "sudo chmod -R u+rwx /var/lib/jenkins/workspace/backend-docker-ci"
+
 
                     dir("/var/lib/jenkins/workspace/backend-docker-ci") {
                         // Git 최신 상태 동기화
@@ -35,7 +41,7 @@ pipeline {
                         // 브랜치의 마지막 성공 빌드와 비교
                         //def lastSuccessfulCommit = sh(script: "git rev-parse refs/remotes/origin/develop", returnStdout: true).trim()
                         def changedFiles = sh(script: """
-                            git diff --name-only origin/develop  # Uncommitted changes
+                            git diff --name-only HEAD origin/develop  # Uncommitted changes
                         """, returnStdout: true).trim().split('\n')
 
                         if (changedFiles) {
@@ -46,9 +52,11 @@ pipeline {
 
                         sh "pwd"
                         sh "ls -la"
+
+                        sh "git pull origin develop"
                     }
 
-                    sh "git pull origin develop"
+
 
                     //
 
