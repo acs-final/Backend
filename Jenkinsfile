@@ -32,9 +32,10 @@ pipeline {
                     def lastSuccessfulCommit = sh(script: "git rev-parse refs/remotes/origin/develop", returnStdout: true).trim()
                     def changedFiles = sh(script: """
                         git diff --name-only origin/develop  # Uncommitted changes
-                        sh "echo $(git diff --name-only origin/develop)"
-
                     """, returnStdout: true).trim().split('\n')
+
+                    sh "echo ${git diff --name-only origin/develop}"
+
 
                     echo "changedFiles: ${changedFiles}"
 
@@ -135,6 +136,44 @@ pipeline {
                         sh "./gradlew :${module}:build --no-daemon -x test"
                     }
 
+                }
+            }
+        }
+
+        // 빌드 전 소나큐브 분석 단계
+        stage('SonarQube Analysis') {
+            steps {
+                withSonarQubeEnv('MySonarQube') {
+                    script {
+                        def buildModules = ['api-gateway', 'bookstore', 'fairytale', 'member', 'report']
+                        def changedServices = env.BUILD_MODULES.split(',')
+                        echo "changeServices: ${changedServices}"
+                        def modulesToScan = changedServices.findAll { it in buildModules }
+
+                        if (modulesToScan.isEmpty()) {
+                            echo "No relevant modules changed, skipping SonarQube analysis."
+                            return
+                        }
+
+                        // SonarQube에 분석할 경로 설정 (변경된 모듈만 추가)
+                        def sourcePaths = modulesToScan.collect { "Backend/${it}/src/main/java" }.join(',')
+                        def binaryPaths = modulesToScan.collect { "Backend/${it}/build/classes/java/main" }.join(',')
+
+                        echo "Running SonarQube scan for modules: ${modulesToScan}"
+
+                        def scannerHome = tool 'LocalSonarScanner'
+
+                        sh """
+                        ${scannerHome}/bin/sonar-scanner \
+                          -Dsonar.projectKey=my_project_key \
+                          -Dsonar.projectName=MyProject_backend \
+                          -Dsonar.projectVersion=1.0 \
+                          -Dsonar.sources=${sourcePaths} \
+                          -Dsonar.java.binaries=${binaryPaths} \
+                          -Dsonar.host.url=http://192.168.3.131:9000 \
+
+                        """
+                    }
                 }
             }
         }
