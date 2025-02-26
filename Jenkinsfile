@@ -34,8 +34,6 @@ pipeline {
                         git diff --name-only origin/develop  # Uncommitted changes
                     """, returnStdout: true).trim().split('\n')
 
-                    sh "echo '${git diff --name-only origin/develop}'"
-
 
                     echo "changedFiles: ${changedFiles}"
 
