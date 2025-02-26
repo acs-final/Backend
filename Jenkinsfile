@@ -101,6 +101,8 @@ pipeline {
                         } else {
                             echo "WARNING: ${dockerfilePath} not found, skipping..."
                         }
+                        sh "chmod +x gradlew"
+                        sh "./gradlew :${service}:build --no-daemon -x test"
                     }
                 }
             }
@@ -111,16 +113,21 @@ pipeline {
             steps {
                 withSonarQubeEnv('MySonarQube') {
                     script {
+                        def changedServices = env.CHANGED_SERVICES.split(',')
                         def scannerHome = tool 'LocalSonarScanner'
-                        sh """
-                        ${scannerHome}/bin/sonar-scanner \
-                          -Dsonar.projectKey=my_project_key \
-                          -Dsonar.projectName=MyProject_backend\
-                          -Dsonar.projectVersion=1.0 \
-                          -Dsonar.sources=. \
-                          -Dsonar.host.url=http://192.168.3.131:9000
-                          -Dsonar.exclusions=**/*.class, **/target/**, **/build/**
-                        """
+
+                        for (service in changedServices) {
+                           sh """
+                           ${scannerHome}/bin/sonar-scanner \
+                             -Dsonar.projectKey=my_project_key \
+                             -Dsonar.projectName=MyProject_backend\
+                             -Dsonar.projectVersion=1.0 \
+                             -Dsonar.sources=. \
+                             -Dsonar.java.binaries=${service}/build/classes
+                             -Dsonar.host.url=http://192.168.3.131:9000
+                           """
+                        }
+
                     }
                 }
             }
