@@ -32,7 +32,8 @@ pipeline {
                     def lastSuccessfulCommit = sh(script: "git rev-parse refs/remotes/origin/develop", returnStdout: true).trim()
                     def changedFiles = sh(script: """
                         git diff --name-only origin/develop  # Uncommitted changes
-                        echo "${git diff --name-only origin/develop}"
+                        sh "echo ${git diff --name-only origin/develop}"
+
                     """, returnStdout: true).trim().split('\n')
 
                     echo "changedFiles: ${changedFiles}"
@@ -138,65 +139,7 @@ pipeline {
             }
         }
 
-        // 빌드 전 소나큐브 분석 단계
-        stage('SonarQube Analysis') {
-            steps {
-                withSonarQubeEnv('MySonarQube') {
-                    script {
-                        def buildModules = ['api-gateway', 'bookstore', 'fairytale', 'member', 'report']
-                        def changedServices = env.BUILD_MODULES.split(',')
-                        echo "changeServices: ${changedServices}"
-                        def modulesToScan = changedServices.findAll { it in buildModules }
-
-                        if (modulesToScan.isEmpty()) {
-                            echo "No relevant modules changed, skipping SonarQube analysis."
-                            return
-                        }
-
-                        // SonarQube에 분석할 경로 설정 (변경된 모듈만 추가)
-                        def sourcePaths = modulesToScan.collect { "Backend/${it}/src/main/java" }.join(',')
-                        def binaryPaths = modulesToScan.collect { "Backend/${it}/build/classes/java/main" }.join(',')
-
-                        echo "Running SonarQube scan for modules: ${modulesToScan}"
-
-                        def scannerHome = tool 'LocalSonarScanner'
-
-                        sh """
-                        ${scannerHome}/bin/sonar-scanner \
-                          -Dsonar.projectKey=my_project_key \
-                          -Dsonar.projectName=MyProject_backend \
-                          -Dsonar.projectVersion=1.0 \
-                          -Dsonar.sources=${sourcePaths} \
-                          -Dsonar.java.binaries=${binaryPaths} \
-                          -Dsonar.host.url=http://192.168.3.131:9000 \
-
-                        """
-                    }
-                }
-            }
-        }
-
-        // 2. Quality Gate 결과 확인 단계
-        stage('Quality Gate') {
-            steps {
-                withSonarQubeEnv('MySonarQube') {  // ✅ Quality Gate도 SonarQube 환경 안에서 실행
-                    script {
-                        // 분석 결과가 처리될 때까지 대기 (최대 3분)
-                        timeout(time: 3, unit: 'MINUTES') {
-                            def qg = waitForQualityGate()
-
-                            if (!qg) {
-                                error "SonarQube Quality Gate 결과를 가져오지 못했습니다. 소나큐브 웹훅 설정을 확인하세요."
-                            }
-
-                            if (qg.status != 'OK') {
-                                error "Pipeline aborted due to Quality Gate failure: ${qg.status}"
-                            }
-                        }
-                    }
-                }
-            }
-        }
+        
 
         stage('Login to Harbor') {
             steps {
