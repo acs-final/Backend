@@ -152,7 +152,7 @@ pipeline {
                           -Dsonar.sources=${sourcesPaths} \
                           -Dsonar.java.binaries=${binariesPaths} \
                           -Dsonar.host.url=http://192.168.3.131:9000 \
-                          -Dsonar.exclusions=**/*.class, **/target/**, **/build/**
+                          -Dsonar.exclusions=**/*.class, **/build/**
                         """
                     }
                 }
