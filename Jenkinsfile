@@ -13,11 +13,8 @@ pipeline {
         stage('Checkout Backend') {
             steps {
                 script {
-                    echo "Removing old Backend directory..."
-                    sh "rm -rf Backend"
-
-                    echo "Cloning Backend repository..."
-                    sh "git clone -b develop --single-branch ${BACKEND_REPO} Backend"
+                    // Git 최신 상태 동기화
+                    sh "git fetch origin develop"
                 }
             }
         }
@@ -26,9 +23,6 @@ pipeline {
             steps {
                 script {
                     echo "Detecting changed services..."
-
-                    // Git 최신 상태 동기화
-                    sh "git fetch origin develop"
 
                     // 브랜치의 마지막 성공 빌드와 비교
                     def lastSuccessfulCommit = sh(script: "git rev-parse refs/remotes/origin/develop", returnStdout: true).trim()
@@ -182,19 +176,15 @@ pipeline {
         // 2. Quality Gate 결과 확인 단계
         stage('Quality Gate') {
             steps {
-                withSonarQubeEnv('MySonarQube') {  // ✅ Quality Gate도 SonarQube 환경 안에서 실행
-                    script {
-                        // 분석 결과가 처리될 때까지 대기 (최대 3분)
-                        timeout(time: 3, unit: 'MINUTES') {
-                            def qg = waitForQualityGate()
+                script {
+                    // 분석 결과가 처리될 때까지 대기 (최대 3분)
+                    timeout(time: 3, unit: 'MINUTES') {
+                        def qg = waitForQualit
+                        if (!qg) {
+                            error "SonarQube Quality Gate 결과를 가져오지 못했습니다. 소나큐브 웹훅 설정을 확인하세요."
 
-                            if (!qg) {
-                                error "SonarQube Quality Gate 결과를 가져오지 못했습니다. 소나큐브 웹훅 설정을 확인하세요."
-                            }
-
-                            if (qg.status != 'OK') {
-                                error "Pipeline aborted due to Quality Gate failure: ${qg.status}"
-                            }
+                        if (qg.status != 'OK') {
+                            error "Pipeline aborted due to Quality Gate failure: ${qg.status}"
                         }
                     }
                 }
