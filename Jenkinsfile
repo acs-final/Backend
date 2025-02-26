@@ -36,7 +36,6 @@ pipeline {
                         sh "git config --global --add safe.directory /var/lib/jenkins/workspace/backend-docker-ci"
                         sh "git fetch origin develop"
 
-                        echo "Current workspace: ${pwd}"
 
                         // 브랜치의 마지막 성공 빌드와 비교
                         //def lastSuccessfulCommit = sh(script: "git rev-parse refs/remotes/origin/develop", returnStdout: true).trim()
