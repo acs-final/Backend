@@ -58,8 +58,6 @@ pipeline {
                         echo "Building module: ${module}"
                         sh "chmod +x gradlew"
 
-                        sh "./gradlew --stop"
-                        sh "./gradlew clean"
 
                         sh "./gradlew :${module}:build --no-daemon -x test"
                     }
