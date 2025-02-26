@@ -57,7 +57,7 @@ pipeline {
                     for (module in buildModules) {
                         echo "Building module: ${module}"
                         sh "chmod +x gradlew"
-                        
+
                         sh "./gradlew --stop"
                         sh "./gradlew clean"
 
@@ -128,7 +128,7 @@ pipeline {
             steps {
                 script {
 
-                    sh "docker-compose -f Backend/docker-compose.yaml Backend/"
+                    sh "docker-compose -f docker-compose.yaml build --no-cache"
 
                 }
             }

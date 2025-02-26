@@ -53,7 +53,7 @@ public class MemberService {
 
                 Member newMember = MemberConverter.toMember(memberId, 0);
 
-                redisService.saveData("memberId", newMember.getMemberId());
+                //redisService.saveData("memberId", newMember.getMemberId());
 
                 memberRepository.save(newMember);
                 log.info("첫 로그인 성공: {}", newMember.getMemberId());
@@ -62,13 +62,13 @@ public class MemberService {
 
                 findMember.setLastVisit(LocalDate.now());
 
-                redisService.saveData("memberId", findMember.getMemberId());
+                //redisService.saveData("memberId", findMember.getMemberId());
                 memberRepository.save(findMember);
             }
 
         }
 
-        redisService.getData("memberId");
+        //redisService.getData("memberId");
 
         return new MemberResponseDto.LoginResponseDto(memberId, myColor);
 
