@@ -10,14 +10,12 @@ pipeline {
     }
 
     stages {
-        stage('Checkout Backend') {
+        stage('Checkout') {
             steps {
                 script {
-                    echo "Removing old Backend directory..."
-
-
-                    echo "Cloning Backend repository..."
-
+                    git branch: 'develop',
+                        credentialsId: 'github-token',  // Jenkins에 등록한 GitHub Credentials ID
+                        url: 'https://github.com/acs-final/Backend.git'  // GitHub 저장소 URL
                 }
             }
         }
@@ -31,7 +29,7 @@ pipeline {
                     sh "git fetch origin develop"
 
                     // 브랜치의 마지막 성공 빌드와 비교
-                    def lastSuccessfulCommit = sh(script: "git rev-parse refs/remotes/origin/develop@{1}", returnStdout: true).trim()
+                    def lastSuccessfulCommit = sh(script: "git rev-parse refs/remotes/origin/develop", returnStdout: true).trim()
                     def changedFiles = sh(script: """
                         git diff --name-only HEAD  # Uncommitted changes
                         git ls-files --others --exclude-standard  # New files
@@ -219,7 +217,6 @@ pipeline {
                         sh """
                             cd Backend
                             docker build -t ${BACKEND_IMAGE_PREFIX}/${service}:${BUILD_NUMBER} .
-                            docker build -t ${BACKEND_IMAGE_PREFIX}/${service}:${BUILD_NUMBER} -f Backend/Dockerfile Backend/
                         """
                     }
                 }
