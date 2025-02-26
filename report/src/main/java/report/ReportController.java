@@ -27,27 +27,6 @@ public class ReportController {
 
     private final ReportService reportService;
 
-    @GetMapping("/test")
-    public ApiResponse<String> testSonarqube() {
-        log.info("testSonarqube API Request time: {}", LocalDateTime.now());
-        System.out.println("first ci test1");
-        System.out.println("first ci test2");
-        System.out.println("first ci test3");
-        System.out.println("first ci test4");
-        System.out.println("first ci test5");
-        System.out.println("first ci test6");
-        System.out.println("first ci test7");
-        System.out.println("first ci test8");
-        System.out.println("first ci test9");
-        System.out.println("first ci test10");
-        System.out.println("first ci test11");
-        System.out.println("first ci test12");
-        System.out.println("first ci test13");
-        System.out.println("first ci test14");
-        System.out.println("first ci test15");
-        System.out.println("first ci test16");
-        return ApiResponse.onSuccess("Test Success!");
-    }
 
     // 독후감 생성 API
     @PostMapping("/")

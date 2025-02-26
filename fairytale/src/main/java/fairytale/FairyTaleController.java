@@ -1,5 +1,6 @@
 package fairytale;
 
+import com.common.global.config.RedisService;
 import com.common.global.response.ApiResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
@@ -20,6 +21,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.joda.time.LocalDateTime;
+import org.springdoc.api.AbstractOpenApiResource;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -39,6 +41,28 @@ public class FairyTaleController {
     private final SonnetService sonnetService;
     private final StableDiffusionService stableDiffusionService;
     private final PollyService pollyService;
+
+    private final RedisService redisService;
+
+
+//    @PostMapping("/redis")
+//    public ApiResponse<String> saveRedis(@RequestParam("testKey") String testKey, @RequestBody String value) {
+//
+//        log.info("saveRedis API Request time: {}", LocalDateTime.now());
+//
+//        redisService.saveData(testKey, value);
+//
+//        return ApiResponse.onSuccess("success save");
+//    }
+//
+//    @GetMapping("/redis")
+//    public ApiResponse<Object> getRedis(@RequestParam("testKey") String testKey){
+//
+//        log.info("getRedis API Request time: {}", LocalDateTime.now());
+//
+//
+//        return ApiResponse.onSuccess(redisService.getData(testKey));
+//    }
 
 
     @PostMapping(value = "/sonnet/streaming" , produces = MediaType.TEXT_EVENT_STREAM_VALUE)
