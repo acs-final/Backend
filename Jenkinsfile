@@ -112,14 +112,22 @@ pipeline {
         stage('Build Changed Modules') {
             steps {
                 script {
-                    def buildModules = env.BUILD_MODULES.split(',')
-                    for (module in buildModules) {
-                        echo "Building module: ${module}"
-                        sh """
-                        chmod +x gradlew
-                        ./gradlew :${module}:build --no-daemon -x test
-                        """
+                    def buildModules = ['api-gateway', 'bookstore', 'fairytale', 'member', 'report']
+                    def changedServices = env.CHANGED_SERVICES.split(',')
+
+                    def modulesToBuild = changedServices.findAll { it in buildModules }
+
+                    if (modulesToBuild.isEmpty()) {
+                        echo "No relevant modules changed, skipping build."
+                        return
                     }
+
+                    for (module in modulesToBuild) {
+                        echo "Building module: ${module}"
+                        sh "chmod +x gradlew"
+                        sh "./gradlew :${module}:build --no-daemon -x test"
+                    }
+
                 }
             }
         }
