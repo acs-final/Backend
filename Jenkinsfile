@@ -26,22 +26,22 @@ pipeline {
         stage('Copy Configs & Dockerfiles') {
             steps {
                 script {
-                    sh "mkdir Backend/api-gateway/src/main/resources"
-                    sh "cp /home/kevin/Backend/api-gateway/src/main/resources/application.yaml Backend/api-gateway/src/main/resources/application.yaml"
+                    sh "mkdir api-gateway/src/main/resources"
+                    sh "cp /home/kevin/Backend/api-gateway/src/main/resources/application.yaml api-gateway/src/main/resources/application.yaml"
 
-                    sh "mkdir backend-docker-ci/fairytale/src/main/resources"
-                    sh "cp /home/kevin/Backend/fairytale/src/main/resources/application.yaml Backend/fairytale/src/main/resources/application.yaml"
+                    sh "mkdir fairytale/src/main/resources"
+                    sh "cp /home/kevin/Backend/fairytale/src/main/resources/application.yaml fairytale/src/main/resources/application.yaml"
 
-                    sh "mkdir Backend/bookstore/src/main/resources"
-                    sh "cp /home/kevin/Backend/bookstore/src/main/resources/application.yaml Backend/bookstore/src/main/resources/application.yaml"
+                    sh "mkdir bookstore/src/main/resources"
+                    sh "cp /home/kevin/Backend/bookstore/src/main/resources/application.yaml bookstore/src/main/resources/application.yaml"
 
-                    sh "mkdir Backend/member/src/main/resources"
-                    sh "cp /home/kevin/Backend/member/src/main/resources/application.yaml Backend/member/src/main/resources/application.yaml"
+                    sh "mkdir member/src/main/resources"
+                    sh "cp /home/kevin/Backend/member/src/main/resources/application.yaml member/src/main/resources/application.yaml"
 
-                    sh "mkdir Backend/report/src/main/resources"
-                    sh "cp /home/kevin/Backend/report/src/main/resources/application.yaml Backend/report/src/main/resources/application.yaml"
+                    sh "mkdir report/src/main/resources"
+                    sh "cp /home/kevin/Backend/report/src/main/resources/application.yaml report/src/main/resources/application.yaml"
 
-                    sh "cp /home/kevin/Backend/docker-compose.yaml Backend/docker-compose.yaml"
+                    sh "cp /home/kevin/Backend/docker-compose.yaml docker-compose.yaml"
 
 
                 }
@@ -72,8 +72,8 @@ pipeline {
                         def buildModules = ['api-gateway', 'bookstore', 'fairytale', 'member', 'report']
 
                         // SonarQube에 분석할 경로 설정 (변경된 모듈만 추가)
-                        def sourcePaths = buildModules.collect { "Backend/${it}/src/main/java" }.join(',')
-                        def binaryPaths = buildModules.collect { "Backend/${it}/build/classes/java/main" }.join(',')
+                        def sourcePaths = buildModules.collect { "${it}/src/main/java" }.join(',')
+                        def binaryPaths = buildModules.collect { "${it}/build/classes/java/main" }.join(',')
 
                         echo "Running SonarQube scan for modules: ${buildModules}"
 
