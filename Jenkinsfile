@@ -26,22 +26,22 @@ pipeline {
         stage('Copy Configs & Dockerfiles') {
             steps {
                 script {
-                    sh "mkdir backend-docker-ci/api-gateway/src/main/resources"
-                    sh "cp /home/kevin/Backend/api-gateway/src/main/resources/application.yaml backend-docker-ci/api-gateway/src/main/resources/application.yaml"
+                    sh "mkdir Backend/api-gateway/src/main/resources"
+                    sh "cp /home/kevin/Backend/api-gateway/src/main/resources/application.yaml Backend/api-gateway/src/main/resources/application.yaml"
 
                     sh "mkdir backend-docker-ci/fairytale/src/main/resources"
-                    sh "cp /home/kevin/Backend/fairytale/src/main/resources/application.yaml backend-docker-ci/fairytale/src/main/resources/application.yaml"
+                    sh "cp /home/kevin/Backend/fairytale/src/main/resources/application.yaml Backend/fairytale/src/main/resources/application.yaml"
 
-                    sh "mkdir backend-docker-ci/bookstore/src/main/resources"
-                    sh "cp /home/kevin/Backend/bookstore/src/main/resources/application.yaml backend-docker-ci/bookstore/src/main/resources/application.yaml"
+                    sh "mkdir Backend/bookstore/src/main/resources"
+                    sh "cp /home/kevin/Backend/bookstore/src/main/resources/application.yaml Backend/bookstore/src/main/resources/application.yaml"
 
-                    sh "mkdir backend-docker-ci/member/src/main/resources"
-                    sh "cp /home/kevin/Backend/member/src/main/resources/application.yaml backend-docker-ci/member/src/main/resources/application.yaml"
+                    sh "mkdir Backend/member/src/main/resources"
+                    sh "cp /home/kevin/Backend/member/src/main/resources/application.yaml Backend/member/src/main/resources/application.yaml"
 
-                    sh "mkdir backend-docker-ci/report/src/main/resources"
-                    sh "cp /home/kevin/Backend/report/src/main/resources/application.yaml backend-docker-ci/report/src/main/resources/application.yaml"
+                    sh "mkdir Backend/report/src/main/resources"
+                    sh "cp /home/kevin/Backend/report/src/main/resources/application.yaml Backend/report/src/main/resources/application.yaml"
 
-                    sh "cp /home/kevin/Backend/docker-compose.yaml backend-docker-ci/docker-compose.yaml"
+                    sh "cp /home/kevin/Backend/docker-compose.yaml Backend/docker-compose.yaml"
 
 
                 }
@@ -108,19 +108,9 @@ pipeline {
         stage('Build Changed Services') {
             steps {
                 script {
-                    def changedServices = env.MODULES_TO_BUILD.split(',')
 
-                    echo "changedServices: ${changedServices}"
+                    sh "docker-compose -f Backend/docker-compose.yaml Backend/"
 
-                    sh "docker-compose -f backend-docker-ci/docker-compose.yaml backend-docker-ci/"
-
-                    for (service in changedServices) {
-                        echo "Building ${service}..."
-                        sh """
-                            echo "Current workspace: ${pwd}"
-                            docker build -t ${BACKEND_IMAGE_PREFIX}/${service}:${BUILD_NUMBER} -f Backend/Dockerfile Backend/
-                        """
-                    }
                 }
             }
         }
