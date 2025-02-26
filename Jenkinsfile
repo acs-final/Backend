@@ -38,8 +38,14 @@ pipeline {
                             git diff --name-only origin/develop  # Uncommitted changes
                         """, returnStdout: true).trim().split('\n')
 
-                        echo "changedFiles: ${changedFiles}"
-                        echo "Current workspace: ${pwd}"
+                        if (changedFiles) {
+                            echo "changedFiles: ${changedFiles}"
+                        } else {
+                            echo "changedFiles is null"
+                        }
+
+                        sh "pwd"
+                        sh "ls -la"
                     }
 
                     sh "git pull origin develop"
