@@ -26,11 +26,14 @@ pipeline {
             steps {
                 script {
                     echo "Detecting changed services..."
+
+                    // Git 최신 상태 동기화
+                    sh "git fetch origin develop"
+
                     // 브랜치의 마지막 성공 빌드와 비교
                     def lastSuccessfulCommit = sh(script: "git rev-parse refs/remotes/origin/develop", returnStdout: true).trim()
                     def changedFiles = sh(script: """
                         cd Backend
-                        git diff --name-only ${lastSuccessfulCommit}..HEAD
                         git diff --name-only HEAD  # Uncommitted changes
                         git ls-files --others --exclude-standard  # New files
                     """, returnStdout: true).trim().split('\n')
@@ -49,8 +52,10 @@ pipeline {
                         
                         // 서비스 디렉토리 체크
                         def servicePath = file.split('/')
-                        if (servicePath.length >= 1) {
+                        echo "servicePath: ${servicePath}"
+                        if (servicePath.length >= 2) {
                             def serviceName = servicePath[0]
+                            echo "serviceName: ${serviceName}"
                             if (!changedServices.contains(serviceName)) {
                                 changedServices.add(serviceName)
                             }
