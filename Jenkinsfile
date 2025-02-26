@@ -33,8 +33,6 @@ pipeline {
                     // 브랜치의 마지막 성공 빌드와 비교
                     def lastSuccessfulCommit = sh(script: "git rev-parse refs/remotes/origin/develop", returnStdout: true).trim()
                     def changedFiles = sh(script: """
-                        cd Backend
-
                         git diff --name-only HEAD  # Uncommitted changes
                         git ls-files --others --exclude-standard  # New files
                     """, returnStdout: true).trim().split('\n')
@@ -221,6 +219,7 @@ pipeline {
                         sh """
                             cd Backend
                             docker build -t ${BACKEND_IMAGE_PREFIX}/${service}:${BUILD_NUMBER} .
+                            docker build -t ${BACKEND_IMAGE_PREFIX}/${service}:${BUILD_NUMBER} -f Backend/Dockerfile Backend/
                         """
                     }
                 }
