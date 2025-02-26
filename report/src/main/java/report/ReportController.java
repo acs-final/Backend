@@ -26,6 +26,13 @@ public class ReportController {
 
     private final ReportService reportService;
 
+    @GetMapping("/test")
+    public ApiResponse<String> testSonarqube() {
+        log.info("testSonarqube API Request time: {}", LocalDateTime.now());
+        
+        return ApiResponse.onSuccess("Test Success!");
+    }
+
     // 독후감 생성 API
     @PostMapping("/")
     @Operation(summary = "독후감 생성 API",description = "독후감 생성")
