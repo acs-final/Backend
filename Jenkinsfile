@@ -27,7 +27,7 @@ pipeline {
                 script {
                     echo "Detecting changed services..."
                     // 브랜치의 마지막 성공 빌드와 비교
-                    def lastSuccessfulCommit = sh(script: "git rev-parse refs/remotes/origin/develop@{1}", returnStdout: true).trim()
+                    def lastSuccessfulCommit = sh(script: "git rev-parse refs/remotes/origin/develop", returnStdout: true).trim()
                     def changedFiles = sh(script: """
                         cd Backend
                         git diff --name-only ${lastSuccessfulCommit}..HEAD
