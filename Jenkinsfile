@@ -133,7 +133,7 @@ pipeline {
                         sh "chmod +x gradlew"
                         sh "./gradlew :${module}:build --no-daemon -x test"
                     }
-
+                    env.MODULES_TO_BUILD = modulesToBuild.join(',')
                 }
             }
         }
@@ -190,13 +190,14 @@ pipeline {
         stage('Build Changed Services') {
             steps {
                 script {
-                    def changedServices = env.BUILD_MODULES.split(',')
+                    def changedServices = env.MODULES_TO_BUILD.split(',')
+
+                    echo "changedServices: ${changedServices}"
 
                     for (service in changedServices) {
                         echo "Building ${service}..."
                         sh """
                             echo "Current workspace: ${pwd}"
-                            docker build -t ${BACKEND_IMAGE_PREFIX}/${service}:${BUILD_NUMBER} .
                             docker build -t ${BACKEND_IMAGE_PREFIX}/${service}:${BUILD_NUMBER} -f Backend/Dockerfile Backend/
                         """
                     }
