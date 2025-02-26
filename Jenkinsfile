@@ -28,11 +28,18 @@ pipeline {
                     sh "git config --global --add safe.directory /var/lib/jenkins/workspace/backend-docker-ci"
                     sh "git fetch origin develop"
 
+                    echo "Current workspace: ${pwd}"
+
                     // 브랜치의 마지막 성공 빌드와 비교
-                    def lastSuccessfulCommit = sh(script: "git rev-parse refs/remotes/origin/develop", returnStdout: true).trim()
-                    def changedFiles = sh(script: """
-                        git diff --name-only origin/develop  # Uncommitted changes
-                    """, returnStdout: true).trim().split('\n')
+                    dir('/var/lib/jenkins/workspace/backend-docker-ci') {
+                        def lastSuccessfulCommit = sh(script: "git rev-parse refs/remotes/origin/develop", returnStdout: true).trim()
+                        def changedFiles = sh(script: """
+                            git diff --name-only origin/develop  # Uncommitted changes
+                        """, returnStdout: true).trim().split('\n')
+
+                        echo "Current workspace: ${pwd}"
+                    }
+
 
 
                     echo "changedFiles: ${changedFiles}"
@@ -44,7 +51,6 @@ pipeline {
                         // 루트 레벨 변경사항 체크
                         if (!file.contains('/')) {
                             changedServices.add('root')
-                            continue
                         }
                         
                         // 서비스 디렉토리 체크
@@ -77,6 +83,7 @@ pipeline {
 
                     echo "Changed services: ${changedServices.join(', ')}"
                     env.CHANGED_SERVICES = changedServices.join(',')
+                    echo "Current workspace: ${pwd}"
                 }
             }
         }
