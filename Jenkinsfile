@@ -32,7 +32,7 @@ pipeline {
                     def lastSuccessfulCommit = sh(script: "git rev-parse refs/remotes/origin/develop", returnStdout: true).trim()
                     def changedFiles = sh(script: """
                         git diff --name-only origin/develop  # Uncommitted changes
-                        sh "echo ${git diff --name-only origin/develop}"
+                        sh "echo $(git diff --name-only origin/develop)"
 
                     """, returnStdout: true).trim().split('\n')
 
@@ -139,7 +139,7 @@ pipeline {
             }
         }
 
-        
+
 
         stage('Login to Harbor') {
             steps {
