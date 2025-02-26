@@ -1,6 +1,7 @@
 package report;
 
 import com.common.global.response.ApiResponse;
+import org.springframework.aop.scope.ScopedProxyUtils;
 import report.dto.ReportRequestDto;
 import report.dto.ReportResponseDto;
 
@@ -29,7 +30,7 @@ public class ReportController {
     @GetMapping("/test")
     public ApiResponse<String> testSonarqube() {
         log.info("testSonarqube API Request time: {}", LocalDateTime.now());
-        
+        System.out.println("first ci test1");
         return ApiResponse.onSuccess("Test Success!");
     }
 
