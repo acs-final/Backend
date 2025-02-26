@@ -138,7 +138,7 @@ pipeline {
                 withSonarQubeEnv('MySonarQube') {
                     script {
                         def buildModules = ['api-gateway', 'bookstore', 'fairytale', 'member', 'report']
-                        def changedServices = env.CHANGED_SERVICES.split(',')
+                        def changedServices = env.BUILD_MODULES.split(',')
                         def modulesToScan = changedServices.findAll { it in buildModules }
 
                         if (modulesToScan.isEmpty()) {
@@ -177,17 +177,17 @@ pipeline {
                         // 분석 결과가 처리될 때까지 대기 (최대 3분)
                         timeout(time: 3, unit: 'MINUTES') {
                             def qg = waitForQualityGate()
-        
+
                             if (!qg) {
                                 error "SonarQube Quality Gate 결과를 가져오지 못했습니다. 소나큐브 웹훅 설정을 확인하세요."
                             }
-        
+
                             if (qg.status != 'OK') {
                                 error "Pipeline aborted due to Quality Gate failure: ${qg.status}"
                             }
                         }
                     }
-        }
+                }
             }
         }
 
