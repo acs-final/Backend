@@ -159,8 +159,8 @@ pipeline {
                           -Dsonar.projectKey=my_project_key \
                           -Dsonar.projectName=MyProject_backend \
                           -Dsonar.projectVersion=1.0 \
-                          -Dsonar.sources=${sourcesPaths} \
-                          -Dsonar.java.binaries=${binariesPaths} \
+                          -Dsonar.sources=${sourcePaths} \
+                          -Dsonar.java.binaries=${binaryPaths} \
                           -Dsonar.host.url=http://192.168.3.131:9000 \
 
                         """
