@@ -15,123 +15,26 @@ pipeline {
                 script {
                     echo "Current workspace: ${pwd}"
 
+                    git branch: 'develop',
+                        credentialsId: 'github-token',  // Jenkins에 등록한 GitHub Credentials ID
+                        url: 'https://github.com/acs-final/Backend.git'  // GitHub 저장소 URL
                 }
             }
         }
 
-        stage('Detect Changed Services') {
-            steps {
-                script {
-                    echo "Detecting changed services..."
-
-                    sh "whoami"
-                    sh "ls -la /var/lib/jenkins/workspace/backend-docker-ci/.git"
-
-                    sh "sudo chown -R jenkins:jenkins /var/lib/jenkins/workspace/backend-docker-ci"
-                    sh "sudo chmod -R u+rwx /var/lib/jenkins/workspace/backend-docker-ci"
-
-
-                    dir("/var/lib/jenkins/workspace/backend-docker-ci") {
-                        // Git 최신 상태 동기화
-                        sh "git config --global --add safe.directory /var/lib/jenkins/workspace/backend-docker-ci"
-                        sh "git fetch origin develop"
-
-
-                        // 브랜치의 마지막 성공 빌드와 비교
-                        //def lastSuccessfulCommit = sh(script: "git rev-parse refs/remotes/origin/develop", returnStdout: true).trim()
-                        def changedFiles = sh(script: """
-                            git diff --name-only HEAD origin/develop  # Uncommitted changes
-                        """, returnStdout: true).trim().split('\n')
-
-                        if (changedFiles) {
-                            echo "changedFiles: ${changedFiles}"
-                        } else {
-                            echo "changedFiles is null"
-                        }
-
-                        sh "pwd"
-                        sh "ls -la"
-
-                        sh "git pull origin develop"
-                    }
-
-
-
-                    //
-
-                    def changedServices = []
-                    for (file in changedFiles) {
-                        echo "file in changedFiles: ${file}"
-
-                        // 루트 레벨 변경사항 체크
-                        if (!file.contains('/')) {
-                            changedServices.add('root')
-                        }
-                        
-                        // 서비스 디렉토리 체크
-                        def servicePath = file.split('/')
-                        echo "servicePath: ${servicePath}"
-                        if (servicePath.length >= 2) {
-                            def serviceName = servicePath[0]
-                            echo "serviceName: ${serviceName}"
-                            if (!changedServices.contains(serviceName)) {
-                                changedServices.add(serviceName)
-                            }
-                        }
-                        
-                        // 공통 모듈 체크
-                        if (file.contains('common/') || file.contains('shared/')) {
-                            // 공통 모듈이 변경된 경우 모든 서비스를 다시 빌드
-                            sh "cd Backend && ls -d */ | sed 's#/##'".split('\n').each { service ->
-                                if (!changedServices.contains(service)) {
-                                    changedServices.add(service)
-                                }
-                            }
-                        }
-                    }
-
-                    if (changedServices.isEmpty()) {
-                        echo "No changes detected. Skipping build."
-                        currentBuild.result = 'SUCCESS'
-                        return
-                    }
-
-                    echo "Changed services: ${changedServices.join(', ')}"
-                    env.CHANGED_SERVICES = changedServices.join(',')
-                    echo "Current workspace: ${pwd}"
-                }
-            }
-        }
 
         stage('Copy Configs & Dockerfiles') {
             steps {
                 script {
-                    def changedServices = env.CHANGED_SERVICES.split(',')
+                    sh "cp /home/kevin/Backend/api-gateway/src/main/resources/application.yaml backend-docker-ci/api-gateway/src/main/resources/application.yaml"
+                    sh "cp /home/kevin/Backend/fairytale/src/main/resources/application.yaml backend-docker-ci/fairytale/src/main/resources/application.yaml"
+                    sh "cp /home/kevin/Backend/bookstore/src/main/resources/application.yaml backend-docker-ci/bookstore/src/main/resources/application.yaml"
+                    sh "cp /home/kevin/Backend/member/src/main/resources/application.yaml backend-docker-ci/member/src/main/resources/application.yaml"
+                    sh "cp /home/kevin/Backend/report/src/main/resources/application.yaml backend-docker-ci/report/src/main/resources/application.yaml"
 
-                    for (service in changedServices) {
-                        def configPath = "${LOCAL_CONFIG_BASE_PATH}/${service}/src/main/resources/application.yaml"
-                        def targetDir = "Backend/${service}/src/main/resources"
-                        def targetPath = "${targetDir}/application.yaml"
+                    sh "cp /home/kevin/Backend/docker-compose.yaml backend-docker-ci/docker-compose.yaml"
 
-                        if (fileExists(configPath)) {
-                            echo "Copying application.yaml for ${service}..."
-                            sh "mkdir -p ${targetDir}"
-                            sh "cp ${configPath} ${targetPath}"
-                        } else {
-                            echo "WARNING: ${configPath} not found, skipping..."
-                        }
 
-                        // Dockerfile 복사
-                        def dockerfilePath = "Backend/${service}/Dockerfile"
-                        if (fileExists(dockerfilePath)) {
-                            echo "Copying Dockerfile for ${service} to Backend root..."
-                            sh "cp ${dockerfilePath} Backend/Dockerfile"
-                        } else {
-                            echo "WARNING: ${dockerfilePath} not found, skipping..."
-                        }
-                    }
-                    // 변경된 모듈 목록을 환경 변수로 저장 (다음 단계에서 사용)
-                    env.BUILD_MODULES = changedServices.join(',')
                 }
             }
         }
@@ -141,21 +44,13 @@ pipeline {
             steps {
                 script {
                     def buildModules = ['api-gateway', 'bookstore', 'fairytale', 'member', 'report']
-                    def changedServices = env.CHANGED_SERVICES.split(',')
 
-                    def modulesToBuild = changedServices.findAll { it in buildModules }
-
-                    if (modulesToBuild.isEmpty()) {
-                        echo "No relevant modules changed, skipping build."
-                        return
-                    }
-
-                    for (module in modulesToBuild) {
+                    for (module in buildModules) {
                         echo "Building module: ${module}"
                         sh "chmod +x gradlew"
                         sh "./gradlew :${module}:build --no-daemon -x test"
                     }
-                    env.MODULES_TO_BUILD = modulesToBuild.join(',')
+                    env.MODULES_TO_BUILD = buildModules.join(',')
                 }
             }
         }
@@ -166,20 +61,12 @@ pipeline {
                 withSonarQubeEnv('MySonarQube') {
                     script {
                         def buildModules = ['api-gateway', 'bookstore', 'fairytale', 'member', 'report']
-                        def changedServices = env.BUILD_MODULES.split(',')
-                        echo "changeServices: ${changedServices}"
-                        def modulesToScan = changedServices.findAll { it in buildModules }
-
-                        if (modulesToScan.isEmpty()) {
-                            echo "No relevant modules changed, skipping SonarQube analysis."
-                            return
-                        }
 
                         // SonarQube에 분석할 경로 설정 (변경된 모듈만 추가)
-                        def sourcePaths = modulesToScan.collect { "Backend/${it}/src/main/java" }.join(',')
-                        def binaryPaths = modulesToScan.collect { "Backend/${it}/build/classes/java/main" }.join(',')
+                        def sourcePaths = buildModules.collect { "Backend/${it}/src/main/java" }.join(',')
+                        def binaryPaths = buildModules.collect { "Backend/${it}/build/classes/java/main" }.join(',')
 
-                        echo "Running SonarQube scan for modules: ${modulesToScan}"
+                        echo "Running SonarQube scan for modules: ${buildModules}"
 
                         def scannerHome = tool 'LocalSonarScanner'
 
@@ -216,6 +103,8 @@ pipeline {
 
                     echo "changedServices: ${changedServices}"
 
+                    sh "docker-compose -f backend-docker-ci/docker-compose.yaml backend-docker-ci/"
+
                     for (service in changedServices) {
                         echo "Building ${service}..."
                         sh """
@@ -230,9 +119,11 @@ pipeline {
         stage('Push Built Images to Harbor') {
             steps {
                 script {
-                    def changedServices = env.CHANGED_SERVICES.split(',')
+                    def changedServices = env.MODULES_TO_BUILD.split(',')
 
                     for (service in changedServices) {
+                        sh "docker tag backend-${service} ${BACKEND_IMAGE_PREFIX}/${service}:${BUILD_NUMBER}"
+
                         def backendImage = "${BACKEND_IMAGE_PREFIX}/${service}:${BUILD_NUMBER}"
                         echo "Pushing Docker image: ${backendImage}"
                         sh "docker push ${backendImage}"
