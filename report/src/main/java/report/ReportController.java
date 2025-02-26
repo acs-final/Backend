@@ -33,6 +33,7 @@ public class ReportController {
         System.out.println("first ci test1");
         System.out.println("first ci test2");
         System.out.println("first ci test3");
+        System.out.println("first ci test4");
         return ApiResponse.onSuccess("Test Success!");
     }
 
