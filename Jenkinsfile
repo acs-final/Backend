@@ -119,6 +119,7 @@ pipeline {
                           -Dsonar.projectVersion=1.0 \
                           -Dsonar.sources=. \
                           -Dsonar.host.url=http://192.168.3.131:9000
+                          -Dsonar.exclusions=**/*.class, **/target/**, **/build/**
                         """
                     }
                 }
