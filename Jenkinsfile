@@ -13,7 +13,7 @@ pipeline {
         stage('Checkout') {
             steps {
                 script {
-                    echo "Current workspace: $(pwd)"
+                    echo "Current workspace: ${pwd}"
 
                 }
             }
