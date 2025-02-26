@@ -31,6 +31,7 @@ public class ReportController {
     public ApiResponse<String> testSonarqube() {
         log.info("testSonarqube API Request time: {}", LocalDateTime.now());
         System.out.println("first ci test1");
+        System.out.println("first ci test2");
         return ApiResponse.onSuccess("Test Success!");
     }
 
