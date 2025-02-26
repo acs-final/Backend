@@ -26,10 +26,19 @@ pipeline {
         stage('Copy Configs & Dockerfiles') {
             steps {
                 script {
+                    sh "mkdir backend-docker-ci/api-gateway/src/main/resources"
                     sh "cp /home/kevin/Backend/api-gateway/src/main/resources/application.yaml backend-docker-ci/api-gateway/src/main/resources/application.yaml"
+
+                    sh "mkdir backend-docker-ci/fairytale/src/main/resources"
                     sh "cp /home/kevin/Backend/fairytale/src/main/resources/application.yaml backend-docker-ci/fairytale/src/main/resources/application.yaml"
+
+                    sh "mkdir backend-docker-ci/bookstore/src/main/resources"
                     sh "cp /home/kevin/Backend/bookstore/src/main/resources/application.yaml backend-docker-ci/bookstore/src/main/resources/application.yaml"
+
+                    sh "mkdir backend-docker-ci/member/src/main/resources"
                     sh "cp /home/kevin/Backend/member/src/main/resources/application.yaml backend-docker-ci/member/src/main/resources/application.yaml"
+
+                    sh "mkdir backend-docker-ci/report/src/main/resources"
                     sh "cp /home/kevin/Backend/report/src/main/resources/application.yaml backend-docker-ci/report/src/main/resources/application.yaml"
 
                     sh "cp /home/kevin/Backend/docker-compose.yaml backend-docker-ci/docker-compose.yaml"
