@@ -31,8 +31,8 @@ pipeline {
                     // 브랜치의 마지막 성공 빌드와 비교
                     def lastSuccessfulCommit = sh(script: "git rev-parse refs/remotes/origin/develop", returnStdout: true).trim()
                     def changedFiles = sh(script: """
-                        git diff --name-only HEAD  # Uncommitted changes
-                        git ls-files --others --exclude-standard  # New files
+                        git diff --name-only origin/develop  # Uncommitted changes
+                        echo "${git diff --name-only origin/develop}"
                     """, returnStdout: true).trim().split('\n')
 
                     echo "changedFiles: ${changedFiles}"
