@@ -190,13 +190,14 @@ pipeline {
         stage('Build Changed Services') {
             steps {
                 script {
-                    def changedServices = env.CHANGED_SERVICES.split(',')
+                    def changedServices = env.BUILD_MODULES.split(',')
 
                     for (service in changedServices) {
                         echo "Building ${service}..."
                         sh """
-                            cd Backend
+                            echo "Current workspace: ${pwd}"
                             docker build -t ${BACKEND_IMAGE_PREFIX}/${service}:${BUILD_NUMBER} .
+                            docker build -t ${BACKEND_IMAGE_PREFIX}/${service}:${BUILD_NUMBER} -f Backend/Dockerfile Backend/
                         """
                     }
                 }
