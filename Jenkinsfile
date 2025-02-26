@@ -31,8 +31,8 @@ pipeline {
                     echo "Current workspace: ${pwd}"
 
                     // 브랜치의 마지막 성공 빌드와 비교
-                    dir('/var/lib/jenkins/workspace/backend-docker-ci') {
-                        def lastSuccessfulCommit = sh(script: "git rev-parse refs/remotes/origin/develop", returnStdout: true).trim()
+                    dir("/var/lib/jenkins/workspace/backend-docker-ci") {
+                        //def lastSuccessfulCommit = sh(script: "git rev-parse refs/remotes/origin/develop", returnStdout: true).trim()
                         def changedFiles = sh(script: """
                             git diff --name-only origin/develop  # Uncommitted changes
                         """, returnStdout: true).trim().split('\n')
@@ -40,7 +40,7 @@ pipeline {
                         echo "Current workspace: ${pwd}"
                     }
 
-
+                    sh "git pull origin develop"
 
                     echo "changedFiles: ${changedFiles}"
 
