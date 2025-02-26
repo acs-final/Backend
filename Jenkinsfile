@@ -35,8 +35,12 @@ pipeline {
                         git ls-files --others --exclude-standard  # New files
                     """, returnStdout: true).trim().split('\n')
 
+                    echo "changedFiles: ${changedFiles}"
+
                     def changedServices = []
                     for (file in changedFiles) {
+                        echo "file in changedFiles: ${file}"
+
                         // 루트 레벨 변경사항 체크
                         if (!file.contains('/')) {
                             changedServices.add('root')
@@ -139,6 +143,7 @@ pipeline {
                     script {
                         def buildModules = ['api-gateway', 'bookstore', 'fairytale', 'member', 'report']
                         def changedServices = env.BUILD_MODULES.split(',')
+                        echo "changeServices: ${changedServices}"
                         def modulesToScan = changedServices.findAll { it in buildModules }
 
                         if (modulesToScan.isEmpty()) {
