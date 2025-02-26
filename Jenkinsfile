@@ -101,8 +101,11 @@ pipeline {
                         } else {
                             echo "WARNING: ${dockerfilePath} not found, skipping..."
                         }
-                        sh "chmod +x gradlew"
-                        sh "./gradlew :${service}:build --no-daemon -x test"
+                        if (${service} != "root" && ${service} != "common"){
+                            sh "chmod +x gradlew"
+                            sh "./gradlew :${service}:build --no-daemon -x test"
+                        }
+
                     }
                 }
             }
