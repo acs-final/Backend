@@ -10,19 +10,15 @@ pipeline {
     }
 
     stages {
-        stage('Checkout Backend') {
-            steps {
-                script {
-                    // Git 최신 상태 동기화
-                    sh "git fetch origin develop"
-                }
-            }
-        }
+
 
         stage('Detect Changed Services') {
             steps {
                 script {
                     echo "Detecting changed services..."
+
+                    // Git 최신 상태 동기화
+                    sh "git fetch origin develop"
 
                     // 브랜치의 마지막 성공 빌드와 비교
                     def lastSuccessfulCommit = sh(script: "git rev-parse refs/remotes/origin/develop", returnStdout: true).trim()
@@ -188,6 +184,7 @@ pipeline {
                         }
                     }
                 }
+
             }
         }
 
