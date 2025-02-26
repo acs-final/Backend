@@ -6,10 +6,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 
 import fairytale.dto.fairyTale.FairyTaleRequestDto;
 import fairytale.dto.fairyTale.FairyTaleResponseDto;
-import fairytale.service.FairyTaleService;
-import fairytale.service.StableDiffusionService;
-import fairytale.service.PollyService;
-import fairytale.service.SonnetService;
+import fairytale.service.*;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -41,6 +38,7 @@ public class FairyTaleController {
     private final SonnetService sonnetService;
     private final StableDiffusionService stableDiffusionService;
     private final PollyService pollyService;
+    private final StreamingService streamingService;
 
     private final RedisService redisService;
 
@@ -79,7 +77,7 @@ public class FairyTaleController {
 
         log.info("createFairytaleWithStreaming API Request time: {}", LocalDateTime.now());
 
-        SseEmitter emitter = sonnetService.createFtWithStreaming(memberId, requestDto.getGenre(), requestDto.getGender(), requestDto.getChallenge());
+        SseEmitter emitter = streamingService.createFtWithStreaming(memberId, requestDto.getGenre(), requestDto.getGender(), requestDto.getChallenge());
 
         return emitter;
     }
@@ -90,7 +88,7 @@ public class FairyTaleController {
         log.info("createPromptText API Request time: {}", LocalDateTime.now());
 
         //List<FairyTaleResponseDto.FairyTalePromptDto> result = sonnetService.createPromptText(body);
-        Object result = sonnetService.createPromptText(body);
+        Object result = streamingService.createPromptText(body);
 
         return ApiResponse.onSuccess(result);
     }

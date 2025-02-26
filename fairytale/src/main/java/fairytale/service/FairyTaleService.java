@@ -1,12 +1,10 @@
 package fairytale.service;
 
 
-import com.common.entity.Audio;
-import com.common.entity.Body;
-import com.common.entity.Fairytale;
-import com.common.entity.Image;
+import com.common.entity.*;
 import com.common.global.response.code.resultCode.ErrorStatus;
 import com.common.global.response.exception.handler.FairytaleHandler;
+import com.common.global.response.exception.handler.MemberHandler;
 import com.common.repository.*;
 import fairytale.BodyConverter;
 
@@ -40,6 +38,52 @@ public class FairyTaleService {
     private final AudioRepository audioRepository;
     private final BodyRepository bodyRepository;
     private final MemberRepository memberRepository;
+    private final LikesRepository likesRepository;
+
+
+    @Transactional
+    public FairyTaleResponseDto.FairyTaleLikesDto increaseLike(String memberId, Long fairytaleId){
+        Member findMember = memberRepository.findById(memberId).orElseThrow(()-> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
+
+        Fairytale findFairytale = fairyTaleRepository.findById(fairytaleId).orElseThrow(()-> new FairytaleHandler(ErrorStatus.FAIRYTALE_NOT_FOUND));
+
+        Likes newLikes = Likes.builder()
+                .memberId(memberId)
+                .fairytale(findFairytale)
+                .build();
+
+        likesRepository.save(newLikes);
+
+        Long likeCounts = findFairytale.getLikeCount();
+        findFairytale.setLikeCount(++likeCounts);
+        fairyTaleRepository.save(findFairytale);
+
+        return new  FairyTaleResponseDto.FairyTaleLikesDto(fairytaleId, ++likeCounts);
+
+    }
+
+    @Transactional
+    public FairyTaleResponseDto.FairyTaleLikesDto decreaseLike(String memberId, Long fairytaleId){
+        Member findMember = memberRepository.findById(memberId).orElseThrow(()-> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
+
+        Fairytale findFairytale = fairyTaleRepository.findById(fairytaleId).orElseThrow(()-> new FairytaleHandler(ErrorStatus.FAIRYTALE_NOT_FOUND));
+
+        Likes findLikes = likesRepository.findByFairytaleAndMemberId(findFairytale, memberId);
+
+        if (findLikes != null){
+            likesRepository.delete(findLikes);
+        } else {
+            throw new FairytaleHandler(ErrorStatus.FAIRYTALE_BAD_REQUEST);
+        }
+
+        Long likeCounts = findFairytale.getLikeCount();
+        if (likeCounts > 0){
+            findFairytale.setLikeCount(--likeCounts);
+            fairyTaleRepository.save(findFairytale);
+        }
+
+        return new FairyTaleResponseDto.FairyTaleLikesDto(fairytaleId, likeCounts);
+    }
 
     public List<FairyTaleResponseDto.FairyTaleListDto> getFairyTaleList() {
         List<Fairytale> findFairyTaleList = fairyTaleRepository.findAll();
@@ -49,7 +93,12 @@ public class FairyTaleService {
                     if (ft.getLikeCount() != null){
                         likeCount = ft.getLikeCount();
                     }
-                    return new FairyTaleResponseDto.FairyTaleListDto(ft.getFairytaleId(), ft.getTitle(), ft.getImages().get(0).getImageUrl(), likeCount);
+                    String ftImage = "";
+                    Image firstByFairytale = imageRepository.findFirstByFairytale(ft);
+                    if (firstByFairytale != null){
+                        ftImage = firstByFairytale.getImageUrl();
+                    }
+                    return new FairyTaleResponseDto.FairyTaleListDto(ft.getFairytaleId(), ft.getTitle(), ftImage, likeCount);
                 })
                 .toList();
         return fairyTaleListDtos;
@@ -77,6 +126,7 @@ public class FairyTaleService {
                 .body(BodyConverter.toBodies(findBody))
                 .imageUrl(myImages)
                 .mp3Url(myMp3s)
+                .likeCount(findFairytale.getLikeCount())
                 .build();
     }
 
