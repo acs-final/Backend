@@ -102,6 +102,24 @@ pipeline {
                             echo "WARNING: ${dockerfilePath} not found, skipping..."
                         }
                     }
+                    // 변경된 모듈 목록을 환경 변수로 저장 (다음 단계에서 사용)
+                    env.BUILD_MODULES = changedServices.join(',')
+                }
+            }
+        }
+
+        // 변경된 모듈만 빌드
+        stage('Build Changed Modules') {
+            steps {
+                script {
+                    def buildModules = env.BUILD_MODULES.split(',')
+                    for (module in buildModules) {
+                        echo "Building module: ${module}"
+                        sh """
+                        chmod +x gradlew
+                        ./gradlew :${module}:build --no-daemon -x test
+                        """
+                    }
                 }
             }
         }
@@ -112,14 +130,21 @@ pipeline {
                 withSonarQubeEnv('MySonarQube') {
                     script {
                         def scannerHome = tool 'LocalSonarScanner'
+                        def buildModules = env.BUILD_MODULES.split(',')
+
+                        // SonarQube에 분석할 경로 설정 (변경된 모듈만 추가)
+                        def sourcesPaths = buildModules.collect { "Backend/${it}/src/main/java" }.join(',')
+                        def binariesPaths = buildModules.collect { "Backend/${it}/build/classes/java/main" }.join(',')
+
                         sh """
                         ${scannerHome}/bin/sonar-scanner \
                           -Dsonar.projectKey=my_project_key \
-                          -Dsonar.projectName=MyProject_backend\
+                          -Dsonar.projectName=MyProject_backend \
                           -Dsonar.projectVersion=1.0 \
-                          -Dsonar.sources=. \
-                          -Dsonar.host.url=http://192.168.3.131:9000
-                          -Dsonar.exclusions=**/*.java, **/target/**, **/build/**
+                          -Dsonar.sources=${sourcesPaths} \
+                          -Dsonar.java.binaries=${binariesPaths} \
+                          -Dsonar.host.url=http://192.168.3.131:9000 \
+                          -Dsonar.exclusions=**/*.class, **/target/**, **/build/**
                         """
                     }
                 }
