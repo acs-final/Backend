@@ -13,9 +13,8 @@ pipeline {
         stage('Checkout') {
             steps {
                 script {
-                    git branch: 'develop',
-                        credentialsId: 'github-token',  // Jenkins에 등록한 GitHub Credentials ID
-                        url: 'https://github.com/acs-final/Backend.git'  // GitHub 저장소 URL
+                    sh "echo 'Current workspace: $(pwd)'"
+
                 }
             }
         }
@@ -26,6 +25,7 @@ pipeline {
                     echo "Detecting changed services..."
 
                     // Git 최신 상태 동기화
+                    sh "git config --global --add safe.directory /var/lib/jenkins/workspace/backend-docker-ci"
                     sh "git fetch origin develop"
 
                     // 브랜치의 마지막 성공 빌드와 비교
