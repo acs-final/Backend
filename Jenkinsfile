@@ -137,12 +137,22 @@ pipeline {
             steps {
                 withSonarQubeEnv('MySonarQube') {
                     script {
-                        def scannerHome = tool 'LocalSonarScanner'
-                        def buildModules = env.BUILD_MODULES.split(',')
+                        def buildModules = ['api-gateway', 'bookstore', 'fairytale', 'member', 'report']
+                        def changedServices = env.CHANGED_SERVICES.split(',')
+                        def modulesToScan = changedServices.findAll { it in buildModules }
+
+                        if (modulesToScan.isEmpty()) {
+                            echo "No relevant modules changed, skipping SonarQube analysis."
+                            return
+                        }
 
                         // SonarQube에 분석할 경로 설정 (변경된 모듈만 추가)
-                        def sourcesPaths = buildModules.collect { "Backend/${it}/src/main/java" }.join(',')
-                        def binariesPaths = buildModules.collect { "Backend/${it}/build/classes/java/main" }.join(',')
+                        def sourcePaths = modulesToScan.collect { "Backend/${it}/src/main/java" }.join(',')
+                        def binaryPaths = modulesToScan.collect { "Backend/${it}/build/classes/java/main" }.join(',')
+
+                        echo "Running SonarQube scan for modules: ${modulesToScan}"
+
+                        def scannerHome = tool 'LocalSonarScanner'
 
                         sh """
                         ${scannerHome}/bin/sonar-scanner \
