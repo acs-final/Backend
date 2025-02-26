@@ -56,9 +56,11 @@ pipeline {
 
                     for (module in buildModules) {
                         echo "Building module: ${module}"
+                        sh "chmod +x gradlew"
+                        
                         sh "./gradlew --stop"
                         sh "./gradlew clean"
-                        sh "chmod +x gradlew"
+
                         sh "./gradlew :${module}:build --no-daemon -x test"
                     }
                     env.MODULES_TO_BUILD = buildModules.join(',')
