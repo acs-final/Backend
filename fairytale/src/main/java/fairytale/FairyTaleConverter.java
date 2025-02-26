@@ -10,7 +10,7 @@ import fairytale.dto.fairyTale.FairyTaleRequestDto;
 public class FairyTaleConverter {
 
 
-    public static Fairytale toFairyTale(Member member, String title, Float avgScore, Float totalScore, Integer scoreCount, String genre){
+    public static Fairytale toFairyTale(Member member, String title, Float avgScore, Float totalScore, Integer scoreCount, String genre, Long likeCount){
 
 
 
@@ -21,6 +21,7 @@ public class FairyTaleConverter {
                 .totalScore(totalScore)
                 .scoreCount(scoreCount)
                 .genre(genre)
+                .likeCount(likeCount)
                 .build();
 
     }
