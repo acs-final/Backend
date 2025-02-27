@@ -60,4 +60,6 @@ public class Fairytale extends BaseEntity {
     @OneToMany(mappedBy = "fairytale", cascade = CascadeType.ALL)
     private List<Audio> audio;
 
+    @OneToMany(mappedBy = "fairytale", cascade = CascadeType.ALL)
+    private List<Likes> likes;
 }

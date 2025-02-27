@@ -1,5 +1,6 @@
 package fairytale.dto.fairyTale;
 
+import com.common.entity.Fairytale;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -14,11 +15,36 @@ public class FairyTaleResponseDto {
     @NoArgsConstructor
     @Getter
     @Builder
+    public static class FairyTaleImageAndMp3Dto {
+        private Long fairytaleId;
+        TreeMap<String, String> sortedPrompt;
+        String title;
+        TreeMap<String, String> resultBody;
+        Fairytale myFairytale;
+
+    }
+
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Getter
+    @Builder
     public static class FairyTaleListDto {
         private Long fairytaleId;
         private String title;
         private String imageUrl;
         private Long likeCount;
+    }
+
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Getter
+    @Builder
+    public static class FairyTaleLikeListDto {
+        private Long fairytaleId;
+        private String title;
+        private String imageUrl;
+        private Long likeCount;
+        private Boolean isPressed;
     }
 
     @AllArgsConstructor
@@ -43,6 +69,16 @@ public class FairyTaleResponseDto {
     @NoArgsConstructor
     @Getter
     @Builder
+    public static class FairyTaleLikesDto {
+        private Long fairytaleId;
+        private Long likeCount;
+
+    }
+
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Getter
+    @Builder
     public static class FairyTaleDto {
         private Long fairytaleId;
         private String title;
@@ -58,6 +94,7 @@ public class FairyTaleResponseDto {
         private String title;
         private Float score;
         private String genre;
+        private Long likeCount;
         private TreeMap<String, String> body;
         //private List<Pages> body;
         private List<StablediffusionResultDto> imageUrl;

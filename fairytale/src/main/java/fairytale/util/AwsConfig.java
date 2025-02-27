@@ -48,7 +48,7 @@ public class AwsConfig {
 
         return BedrockRuntimeClient.builder()
                 .credentialsProvider(DefaultCredentialsProvider.create())
-                .region(Region.EU_CENTRAL_1)
+                .region(Region.AP_NORTHEAST_2)
                 .overrideConfiguration(ClientOverrideConfiguration.builder()
                         .apiCallTimeout(Duration.ofSeconds(240))
                         .apiCallAttemptTimeout(Duration.ofSeconds(240))

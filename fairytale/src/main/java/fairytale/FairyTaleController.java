@@ -6,10 +6,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 
 import fairytale.dto.fairyTale.FairyTaleRequestDto;
 import fairytale.dto.fairyTale.FairyTaleResponseDto;
-import fairytale.service.FairyTaleService;
-import fairytale.service.StableDiffusionService;
-import fairytale.service.PollyService;
-import fairytale.service.SonnetService;
+import fairytale.service.*;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -41,6 +38,7 @@ public class FairyTaleController {
     private final SonnetService sonnetService;
     private final StableDiffusionService stableDiffusionService;
     private final PollyService pollyService;
+    private final StreamingService streamingService;
 
     private final RedisService redisService;
 
@@ -64,6 +62,44 @@ public class FairyTaleController {
 //        return ApiResponse.onSuccess(redisService.getData(testKey));
 //    }
 
+    @PostMapping(value = "/likes")
+    @Operation(summary = "좋아요 누르기 API", description = "좋아요 누르기")
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "MEMBER404", description = "회원을 찾을 수 없습니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class)))
+    })
+    @Parameters({
+            @Parameter(name = "memberId", description = "멤버 id"),
+            @Parameter(name = "requestDto", description = "동화책 장르, 자녀 성별, 주제")
+    })
+    public FairyTaleResponseDto.FairyTaleLikesDto increaseLike(@RequestHeader("memberId") String memberId, @RequestBody FairyTaleRequestDto.FairyTaleLikesDto requestDto) {
+
+        log.info("increaseLike API Request time: {}", LocalDateTime.now());
+
+        FairyTaleResponseDto.FairyTaleLikesDto result = fairyTaleService.increaseLike(memberId, requestDto.getFairytaleId());
+
+        return result;
+    }
+
+    @PostMapping(value = "/likes/cancel")
+    @Operation(summary = "좋아요 취소 API", description = "좋아요 취소")
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "MEMBER404", description = "회원을 찾을 수 없습니다.", content = @Content(schema = @Schema(implementation = ApiResponse.class)))
+    })
+    @Parameters({
+            @Parameter(name = "memberId", description = "멤버 id"),
+            @Parameter(name = "requestDto", description = "동화책 장르, 자녀 성별, 주제")
+    })
+    public FairyTaleResponseDto.FairyTaleLikesDto decreaseLike(@RequestHeader("memberId") String memberId, @RequestBody FairyTaleRequestDto.FairyTaleLikesDto requestDto) {
+
+        log.info("decreaseLike API Request time: {}", LocalDateTime.now());
+
+        FairyTaleResponseDto.FairyTaleLikesDto result = fairyTaleService.decreaseLike(memberId, requestDto.getFairytaleId());
+
+        return result;
+    }
+
 
     @PostMapping(value = "/sonnet/streaming" , produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     @Operation(summary = "동화책 생성 API", description = "동화책 생성 스트리밍 응답")
@@ -79,7 +115,7 @@ public class FairyTaleController {
 
         log.info("createFairytaleWithStreaming API Request time: {}", LocalDateTime.now());
 
-        SseEmitter emitter = sonnetService.createFtWithStreaming(memberId, requestDto.getGenre(), requestDto.getGender(), requestDto.getChallenge());
+        SseEmitter emitter = streamingService.createFtWithStreaming(memberId, requestDto.getGenre(), requestDto.getGender(), requestDto.getChallenge());
 
         return emitter;
     }
@@ -90,14 +126,14 @@ public class FairyTaleController {
         log.info("createPromptText API Request time: {}", LocalDateTime.now());
 
         //List<FairyTaleResponseDto.FairyTalePromptDto> result = sonnetService.createPromptText(body);
-        Object result = sonnetService.createPromptText(body);
+        Object result = streamingService.createPromptText(body);
 
         return ApiResponse.onSuccess(result);
     }
 
 
 
-    @GetMapping("/")
+    @GetMapping("/list")
     @Operation(summary = "전체 동화책 목록 조회 API", description = "회원 구분 없이 전체 동화책 목록 조회.")
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공"),
@@ -106,6 +142,18 @@ public class FairyTaleController {
     public ApiResponse<List<FairyTaleResponseDto.FairyTaleListDto>> getFairyTaleList() {
         log.info("getFairyTaleList API Request time: {}", LocalDateTime.now());
         List<FairyTaleResponseDto.FairyTaleListDto> findFairyTaleList = fairyTaleService.getFairyTaleList();
+        return ApiResponse.onSuccess(findFairyTaleList);
+    }
+
+    @GetMapping("/")
+    @Operation(summary = "전체 동화책 목록 조회 API", description = "회원 따라 좋아요 눌렀는지 확인.")
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "FAIRYTALE404", description = "", content = @Content(schema = @Schema(implementation = ApiResponse.class)))
+    })
+    public ApiResponse<List<FairyTaleResponseDto.FairyTaleLikeListDto>> getFairyTaleListWithLikes(@RequestHeader("memberId") String memberId) {
+        log.info("getFairyTaleListWithLikes API Request time: {}", LocalDateTime.now());
+        List<FairyTaleResponseDto.FairyTaleLikeListDto> findFairyTaleList = fairyTaleService.getFairyTaleListWithLikes(memberId);
         return ApiResponse.onSuccess(findFairyTaleList);
     }
 
