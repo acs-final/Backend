@@ -4,6 +4,7 @@ package fairytale.service;
 import com.common.entity.*;
 import com.common.global.response.code.resultCode.ErrorStatus;
 import com.common.global.response.exception.handler.FairytaleHandler;
+import com.common.global.response.exception.handler.LikesHandler;
 import com.common.global.response.exception.handler.MemberHandler;
 import com.common.repository.*;
 import fairytale.BodyConverter;
@@ -47,6 +48,10 @@ public class FairyTaleService {
 
         Fairytale findFairytale = fairyTaleRepository.findById(fairytaleId).orElseThrow(()-> new FairytaleHandler(ErrorStatus.FAIRYTALE_NOT_FOUND));
 
+        if (likesRepository.existsByFairytaleAndMemberId(findFairytale, memberId)){
+            throw new LikesHandler(ErrorStatus.LIKE_IS_PRESSED);
+        }
+
         Likes newLikes = Likes.builder()
                 .memberId(memberId)
                 .fairytale(findFairytale)
@@ -58,7 +63,7 @@ public class FairyTaleService {
         findFairytale.setLikeCount(++likeCounts);
         fairyTaleRepository.save(findFairytale);
 
-        return new  FairyTaleResponseDto.FairyTaleLikesDto(fairytaleId, ++likeCounts);
+        return new  FairyTaleResponseDto.FairyTaleLikesDto(fairytaleId, likeCounts);
 
     }
 
@@ -70,10 +75,11 @@ public class FairyTaleService {
 
         Likes findLikes = likesRepository.findByFairytaleAndMemberId(findFairytale, memberId);
 
+
         if (findLikes != null){
             likesRepository.delete(findLikes);
         } else {
-            throw new FairytaleHandler(ErrorStatus.FAIRYTALE_BAD_REQUEST);
+            throw new FairytaleHandler(ErrorStatus.LIKE_NOT_PRESSED);
         }
 
         Long likeCounts = findFairytale.getLikeCount();
@@ -83,6 +89,31 @@ public class FairyTaleService {
         }
 
         return new FairyTaleResponseDto.FairyTaleLikesDto(fairytaleId, likeCounts);
+    }
+
+    public List<FairyTaleResponseDto.FairyTaleLikeListDto> getFairyTaleListWithLikes(String memberId) {
+        List<Fairytale> findFairyTaleList = fairyTaleRepository.findAll();
+        List<FairyTaleResponseDto.FairyTaleLikeListDto> fairyTaleListDtos = findFairyTaleList.stream()
+                .map(ft -> {
+                    Long likeCount = 0L;
+                    if (ft.getLikeCount() != null) {
+                        likeCount = ft.getLikeCount();
+                    }
+                    String ftImage = "";
+                    Image firstByFairytale = imageRepository.findFirstByFairytale(ft);
+                    if (firstByFairytale != null) {
+                        ftImage = firstByFairytale.getImageUrl();
+                    }
+                    boolean isPressed = false;
+
+                    if (likesRepository.findByFairytaleAndMemberId(ft, memberId) != null){
+                        isPressed = true;
+                    }
+
+                    return new FairyTaleResponseDto.FairyTaleLikeListDto(ft.getFairytaleId(), ft.getTitle(), ftImage, likeCount, isPressed);
+                })
+                .toList();
+        return fairyTaleListDtos;
     }
 
     public List<FairyTaleResponseDto.FairyTaleListDto> getFairyTaleList() {

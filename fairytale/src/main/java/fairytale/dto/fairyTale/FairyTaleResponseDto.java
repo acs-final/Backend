@@ -39,6 +39,18 @@ public class FairyTaleResponseDto {
     @NoArgsConstructor
     @Getter
     @Builder
+    public static class FairyTaleLikeListDto {
+        private Long fairytaleId;
+        private String title;
+        private String imageUrl;
+        private Long likeCount;
+        private Boolean isPressed;
+    }
+
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Getter
+    @Builder
     public static class FairyTalePromptDto {
         private String prompt;
 
