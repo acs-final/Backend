@@ -11,6 +11,16 @@ public class FairyTaleRequestDto {
     @NoArgsConstructor
     @Getter
     @Builder
+    public static class FairyTaleLikesDto{
+
+        private Long fairytaleId;
+
+    }
+
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Getter
+    @Builder
     public static class FairyTaleCreateDto{
 
         private String genre;

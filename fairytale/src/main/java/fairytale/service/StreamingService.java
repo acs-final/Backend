@@ -27,10 +27,7 @@ import software.amazon.awssdk.core.SdkBytes;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.bedrockruntime.BedrockRuntimeAsyncClient;
 import software.amazon.awssdk.services.bedrockruntime.BedrockRuntimeClient;
-import software.amazon.awssdk.services.bedrockruntime.model.InvokeModelRequest;
-import software.amazon.awssdk.services.bedrockruntime.model.InvokeModelResponse;
-import software.amazon.awssdk.services.bedrockruntime.model.InvokeModelWithResponseStreamRequest;
-import software.amazon.awssdk.services.bedrockruntime.model.InvokeModelWithResponseStreamResponseHandler;
+import software.amazon.awssdk.services.bedrockruntime.model.*;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -48,13 +45,15 @@ public class StreamingService {
 
     private final BedrockRuntimeClient bedrockRuntimeClientForClaude;
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
+
 
     private final FairytaleRepository fairyTaleRepository;
     private final BodyRepository bodyRepository;
     private final MemberRepository memberRepository;
 
     private final FairyTaleService fairyTaleService;
+
+    private static Integer SESSION_COUNT = 0;
 
     /*
      * 스트리밍 응답 + 프롬프트 이미지 분리
@@ -80,6 +79,9 @@ public class StreamingService {
 
                 body
         );
+
+        // JSON 파싱을 위한 ObjectMapper 생성
+        ObjectMapper objectMapper = new ObjectMapper();
 
         Map<String, Object> messages = new HashMap<>();
         messages.put("role", "user");
@@ -118,8 +120,7 @@ public class StreamingService {
 
         JsonNode prompt;
         try {
-            // JSON 파싱을 위한 ObjectMapper 생성
-            ObjectMapper objectMapper = new ObjectMapper();
+
 
             String fixedJson = preprocessJsonByInvoke(responseBody);
 
@@ -151,8 +152,12 @@ public class StreamingService {
 
     @Transactional
     public SseEmitter createFtWithStreaming(String memberId, String genre, String gender, String challenge) {
+
+        log.info("SESSION_COUNT: {}", ++SESSION_COUNT);
+
         Member findMember = memberRepository.findById(memberId).orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
 
+        ObjectMapper objectMapper = new ObjectMapper();
 
         SseEmitter emitter = new SseEmitter(60 * 1000L);
 
@@ -205,12 +210,39 @@ public class StreamingService {
 //                gender, genre, challenge
 //        );
 
+
+        /**
+         *  claude sonnet v1 단일 리전
+         */
+
+//        Map<String, Object> messages = new HashMap<>();
+//        messages.put("role", "user");
+//
+//        Map<String, Object> content = new HashMap<>();
+//        content.put("type","text");
+//        content.put("text", text);
+//
+//
+//
+//        messages.put("content", List.of(content));
+//
+//
+//        Map<String, Object> payload = new HashMap<>();
+//        payload.put("max_tokens", 3600);
+//        payload.put("messages", List.of(messages));
+//        payload.put("anthropic_version", "bedrock-2023-05-31");
+
+        /**
+         *  claude sonnet v2 교차 리전
+         */
         Map<String, Object> messages = new HashMap<>();
         messages.put("role", "user");
 
         Map<String, Object> content = new HashMap<>();
         content.put("type","text");
         content.put("text", text);
+
+
 
         messages.put("content", List.of(content));
 
@@ -219,6 +251,11 @@ public class StreamingService {
         payload.put("max_tokens", 3600);
         payload.put("messages", List.of(messages));
         payload.put("anthropic_version", "bedrock-2023-05-31");
+        payload.put("top_k", 250);
+//        payload.put("stop_sequences", "[\"\"]");
+        payload.put("temperature", 1);
+        payload.put("top_p", 0.999);
+
 
         String requestBody = null;
         try {
@@ -226,6 +263,8 @@ public class StreamingService {
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
+
+
 
 
         // Bedrock API 요청 생성
@@ -239,6 +278,7 @@ public class StreamingService {
         StringBuilder completeResponseTextBuffer = new StringBuilder();
 
         // 스트리밍 응답 핸들러
+//        ConverseStreamResponseHandler responseHandler = ConverseStreamResponseHandler.builder()
         InvokeModelWithResponseStreamResponseHandler responseHandler = InvokeModelWithResponseStreamResponseHandler.builder()
                 .subscriber(InvokeModelWithResponseStreamResponseHandler.Visitor.builder().onChunk(chunk -> {
                             // Extract and print the text from the model's native response.
@@ -247,7 +287,7 @@ public class StreamingService {
 
                             String result = chunk.bytes().asUtf8String();
 
-                            ObjectMapper objectMapper = new ObjectMapper();
+
 
                             JsonNode rootNode = null;
                             try {
@@ -291,11 +331,12 @@ public class StreamingService {
 
                         FairyTaleResponseDto.FairyTaleCreateDto createDto = new FairyTaleResponseDto.FairyTaleCreateDto(fairyTaleImageAndMp3Dto.getFairytaleId());
 
-                        emitter.send(SseEmitter.event().name("FairytaleId").data(createDto));
+                        Thread.sleep(1000);
+                        emitter.send(SseEmitter.event().name("FairytaleId: ").data(createDto));
 
                         log.info("Total Streaming text: {}", completeResponseTextBuffer);
 
-                    } catch (IOException e) {
+                    } catch (IOException | InterruptedException e) {
                         log.info("스트리밍 중단 원인: {}", e.getMessage());
                         emitter.completeWithError(e);
                     }
@@ -332,6 +373,8 @@ public class StreamingService {
     public FairyTaleResponseDto.FairyTaleImageAndMp3Dto getStreamingResult(Member findMember, String streamingResult, String genre) throws JsonProcessingException {
         String fixedJson = preprocessJsonByInvoke(streamingResult);
         log.info("Total Streaming text: {}", fixedJson);
+
+        ObjectMapper objectMapper = new ObjectMapper();
 
         JsonNode rootNode = objectMapper.readTree(fixedJson);
 
@@ -452,6 +495,9 @@ public class StreamingService {
         return sonnetResultByInvoke;
     }
 
+
+    /*
+    * 이미지 생성 부분 따로 수행.*/
 
     public void createImageAndMp3(TreeMap<String, String> sortedPrompt, String title, TreeMap<String, String> resultBody, Fairytale myFairytale) throws JsonProcessingException {
 

@@ -26,7 +26,10 @@ public enum ErrorStatus implements BaseErrorCode {
     COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "COMMENT400", "해당 댓글을 찾을 수 없습니다."),
 
     REPORT_NOT_FOUND(HttpStatus.NOT_FOUND, "REPORT400", "해당 독후감을 찾을 수 없습니다."),
-    REPORT_ALREADY_EXIST(HttpStatus.BAD_REQUEST , "REPORT403", "이미 생성된 독후감이 존재합니다.");
+    REPORT_ALREADY_EXIST(HttpStatus.BAD_REQUEST , "REPORT403", "이미 생성된 독후감이 존재합니다."),
+
+    LIKE_IS_PRESSED(HttpStatus.BAD_REQUEST , "LIKE403", "이미 좋아요가 눌러진 상태입니다."),
+    LIKE_NOT_PRESSED(HttpStatus.BAD_REQUEST , "LIKE403", "좋아요가 눌러져 있지 않습니다.");
 
 
     private final HttpStatus httpStatus;

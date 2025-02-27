@@ -8,4 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface LikesRepository extends JpaRepository<Likes, Long> {
 
     Likes findByFairytaleAndMemberId(Fairytale fairytale, String memberId);
+
+    Boolean existsByFairytaleAndMemberId(Fairytale fairytale, String memberId);
+
 }
