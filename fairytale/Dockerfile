@@ -20,6 +20,8 @@ RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
   CMD curl -f http://192.168.2.141:3000/ || exit 1
 
+RUN chmod 644 /app/opentelemetry-javaagent.jar && chown app:app /app/opentelemetry-javaagent.jar
+
 # 5. non-root 사용자(app)로 전환
 USER app
 

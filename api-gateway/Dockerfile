@@ -15,6 +15,8 @@ ADD https://github.com/open-telemetry/opentelemetry-java-instrumentation/release
 # 3.5. curl 설치 (HEALTHCHECK에서 사용)
 RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
 
+RUN chmod 644 /app/opentelemetry-javaagent.jar && chown app:app /app/opentelemetry-javaagent.jar
+
 # 4. HEALTHCHECK 추가
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
   CMD curl -f http://192.168.2.141:3000/ || exit 1
