@@ -24,7 +24,7 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
 USER app
 
 # 컨테이너 포트 지정
-EXPOSE 8083
+EXPOSE 8080
 
 # JAR 파일 실행
 ENTRYPOINT ["java", "-javaagent:/app/opentelemetry-javaagent.jar", "-jar", "app.jar"]

@@ -23,11 +23,8 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
 # 5. non-root 사용자(app)로 전환
 USER app
 
-
 # 3. 컨테이너 포트 노출
 EXPOSE 8080
 
-
 # JAR 파일 실행
 ENTRYPOINT ["java", "-javaagent:/app/opentelemetry-javaagent.jar", "-jar", "app.jar"]
-

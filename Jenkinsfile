@@ -4,7 +4,7 @@ pipeline {
         BUILD_NUMBER = "v4"
         HARBOR_CREDENTIALS = credentials('harbor')
         BACKEND_REPO = "https://github.com/acs-final/Backend.git"
-        BACKEND_IMAGE_PREFIX = "192.168.2.141:443/prototype"
+        BACKEND_IMAGE_PREFIX = "192.168.2.141:443/k8s-project"
         LOCAL_CONFIG_BASE_PATH = "/home/kevin/Backend"
         LOCAL_COMPOSE_FILE_PATH = "/home/kevin/Backend/docker-compose.yaml"
     }

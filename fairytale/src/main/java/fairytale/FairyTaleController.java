@@ -133,7 +133,7 @@ public class FairyTaleController {
 
 
 
-    @GetMapping("/list")
+    @GetMapping("/")
     @Operation(summary = "전체 동화책 목록 조회 API", description = "회원 구분 없이 전체 동화책 목록 조회.")
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공"),
@@ -145,7 +145,7 @@ public class FairyTaleController {
         return ApiResponse.onSuccess(findFairyTaleList);
     }
 
-    @GetMapping("/")
+    @GetMapping("/list")
     @Operation(summary = "전체 동화책 목록 조회 API", description = "회원 따라 좋아요 눌렀는지 확인.")
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공"),
