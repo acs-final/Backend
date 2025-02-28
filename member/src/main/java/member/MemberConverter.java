@@ -18,7 +18,7 @@ public class MemberConverter {
                 .build();
     }
 
-    public static MemberResponseDto.MyFairytaleDto toMyFairytale(Member member, Fairytale fairytale, Boolean hasReport, Image image){
+    public static MemberResponseDto.MyFairytaleDto toMyFairytale(Member member, Fairytale fairytale, Boolean hasReport, String imageUrl){
 
         return MemberResponseDto.MyFairytaleDto.builder()
                 .fairytaleId(fairytale.getFairytaleId())
@@ -28,7 +28,7 @@ public class MemberConverter {
                 .genre(fairytale.getGenre())
                 .hasReport(hasReport)
                 .score(fairytale.getAvgScore())
-                .imageUrl(image.getImageUrl())
+                .imageUrl(imageUrl)
                 .build();
 
     }

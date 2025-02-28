@@ -125,13 +125,17 @@ public class MemberService {
 
 
         List<MemberResponseDto.MyFairytaleDto> result = findFairytale.stream().map(ft -> {
+            String imageUrl = "";
             Image findImage = imageRepository.findFirstByFairytale(ft);
+            if (findImage != null){
+                imageUrl = findImage.getImageUrl();
+            }
             Report findReport = reportRepository.findByFairyTale(ft);
             boolean hasReport = false;
             if (findReport != null) {
                 hasReport = true;
             }
-            return MemberConverter.toMyFairytale(findMember, ft, hasReport, findImage);
+            return MemberConverter.toMyFairytale(findMember, ft, hasReport, imageUrl);
         }).toList();
 
         return result;
