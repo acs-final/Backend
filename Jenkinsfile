@@ -164,7 +164,11 @@ pipeline {
 
                 dir('manifests') {
                     sh """
-                        sed -i 's|image: 192.168.2.141:443/k8s-project/fairytale:.*|image: 192.168.2.141:443/k8s-project/fairytale:${BUILD_NUMBER}|g' back/back-deploy.yaml
+                        sed -i 's|image: 192.168.2.141:443/k8s-project/fairytale:.*|image: 192.168.2.141:443/k8s-project/fairytale:${BUILD_NUMBER}|g' back/fairytale/fairytale-deploy.yaml
+                        sed -i 's|image: 192.168.2.141:443/k8s-project/member:.*|image: 192.168.2.141:443/k8s-project/member:${BUILD_NUMBER}|g' back/member/member-deploy.yaml
+                        sed -i 's|image: 192.168.2.141:443/k8s-project/bookstore:.*|image: 192.168.2.141:443/k8s-project/bookstore:${BUILD_NUMBER}|g' back/bookstore/bookstore-deploy.yaml
+                        sed -i 's|image: 192.168.2.141:443/k8s-project/report:.*|image: 192.168.2.141:443/k8s-project/report:${BUILD_NUMBER}|g' back/report/report-deploy.yaml
+
                         git add front-deploy.yaml
                         git commit -m '[UPDATE] back-deploy ${BUILD_NUMBER} image versioning' || echo 'No changes to commit'
                         git push origin main
