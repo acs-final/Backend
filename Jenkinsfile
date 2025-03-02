@@ -67,7 +67,7 @@ pipeline {
             }
         }
 
-        
+
 
 
 
@@ -112,8 +112,8 @@ pipeline {
                     url: 'https://github.com/acs-final/manifest.git',
                     branch: 'main'
 
-                //sh 'git config user.email "hamo@gmail.com"'
-                //sh 'git config user.name "JONBERMAN"'
+                sh 'git config user.email "hamo2814@gmail.com"'
+                sh 'git config user.name "JONBERMAN"'
                 sh 'git config credential.helper "cache --timeout=3600"'
 
                 sh 'git pull --rebase origin main'
