@@ -103,15 +103,15 @@ pipeline {
                 }
 
                 dir('manifests/back/bookstore') {
-                    sed -i 's|image: 192.168.2.141:443/k8s-project/bookstore:.*|image: 192.168.2.141:443/k8s-project/bookstore:${BUILD_NUMBER}|g' bookstore-deploy.yaml
+                    sh "sed -i 's|image: 192.168.2.141:443/k8s-project/bookstore:.*|image: 192.168.2.141:443/k8s-project/bookstore:${BUILD_NUMBER}|g' bookstore-deploy.yaml"
                 }
 
                 dir('manifests/back/member') {
-                    sed -i 's|image: 192.168.2.141:443/k8s-project/member:.*|image: 192.168.2.141:443/k8s-project/member:${BUILD_NUMBER}|g' member-deploy.yaml
+                    sh "sed -i 's|image: 192.168.2.141:443/k8s-project/member:.*|image: 192.168.2.141:443/k8s-project/member:${BUILD_NUMBER}|g' member-deploy.yaml"
                 }
 
                 dir('manifests/back/report') {
-                    sed -i 's|image: 192.168.2.141:443/k8s-project/report:.*|image: 192.168.2.141:443/k8s-project/report:${BUILD_NUMBER}|g' report-deploy.yaml
+                    sh "sed -i 's|image: 192.168.2.141:443/k8s-project/report:.*|image: 192.168.2.141:443/k8s-project/report:${BUILD_NUMBER}|g' report-deploy.yaml"
                 }
 
                 dir('manifests') {
