@@ -153,26 +153,26 @@ pipeline {
         stage('K8S Manifest Update') {
             steps {
                 git credentialsId: 'JONBERMAN',
-                    url: 'https://github.com/acs-final/manifest.git',
-                    branch: 'main'
+                url: 'https://github.com/acs-final/manifest.git',
+                branch: 'main'
 
-                    //sh 'git config user.email "hamo@gmail.com"'
-                    sh 'git config user.name "JONBERMAN"'
-                    sh 'git config credential.helper "cache --timeout=3600"'
+                //sh 'git config user.email "hamo@gmail.com"'
+                sh 'git config user.name "JONBERMAN"'
+                sh 'git config credential.helper "cache --timeout=3600"'
 
-                    sh 'git pull --rebase origin main'
+                sh 'git pull --rebase origin main'
 
-                    dir('manifests') {
-                        sh """
-                            sed -i 's|image: 192.168.2.141:443/k8s-project/fairytale:.*|image: 192.168.2.141:443/k8s-project/fairytale:${BUILD_NUMBER}|g' back/back-deploy.yaml
-                            git add front-deploy.yaml
-                            git commit -m '[UPDATE] back-deploy ${BUILD_NUMBER} image versioning' || echo 'No changes to commit'
-                            git push origin main
-                        """
-                    }
+                dir('manifests') {
+                    sh """
+                        sed -i 's|image: 192.168.2.141:443/k8s-project/fairytale:.*|image: 192.168.2.141:443/k8s-project/fairytale:${BUILD_NUMBER}|g' back/back-deploy.yaml
+                        git add front-deploy.yaml
+                        git commit -m '[UPDATE] back-deploy ${BUILD_NUMBER} image versioning' || echo 'No changes to commit'
+                        git push origin main
+                    """
                 }
             }
         }
+
     }
 
 }
