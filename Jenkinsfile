@@ -74,27 +74,27 @@ pipeline {
 
                 sh 'git pull --rebase origin main'
 
-                dir('manifests/back/fairytale') {
+                dir('back/fairytale') {
                     echo "Current workspace: ${pwd}"
                     sh "sed -i 's|image: 192.168.2.141:443/k8s-project/fairytale:.*|image: 192.168.2.141:443/k8s-project/fairytale:\${BUILD_NUMBER}|g' fairytale-deploy.yaml"
                 }
 
-                dir('manifests/back/bookstore') {
+                dir('back/bookstore') {
                     echo "Current workspace: ${pwd}"
                     sh "sed -i 's|image: 192.168.2.141:443/k8s-project/bookstore:.*|image: 192.168.2.141:443/k8s-project/bookstore:${BUILD_NUMBER}|g' bookstore-deploy.yaml"
                 }
 
-                dir('manifests/back/member') {
+                dir('back/member') {
                     echo "Current workspace: ${pwd}"
                     sh "sed -i 's|image: 192.168.2.141:443/k8s-project/member:.*|image: 192.168.2.141:443/k8s-project/member:${BUILD_NUMBER}|g' member-deploy.yaml"
                 }
 
-                dir('manifests/back/report') {
+                dir('back/report') {
                     echo "Current workspace: ${pwd}"
                     sh "sed -i 's|image: 192.168.2.141:443/k8s-project/report:.*|image: 192.168.2.141:443/k8s-project/report:${BUILD_NUMBER}|g' report-deploy.yaml"
                 }
 
-                dir('manifests') {
+                dir('') {
                     sh """
                         echo "Current workspace: ${pwd}"
 
