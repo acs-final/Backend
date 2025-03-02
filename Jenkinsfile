@@ -118,7 +118,6 @@ pipeline {
 
                 sh 'git pull --rebase origin main'
 
-                git config --global --add safe.directory /var/lib/jenkins/workspace/backend-docker-ci
 
                 dir('back/fairytale') {
                     echo "Current workspace: ${pwd}"
