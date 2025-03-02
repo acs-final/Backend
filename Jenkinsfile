@@ -1,7 +1,7 @@
 pipeline {
     agent any
     environment {
-        BUILD_NUMBER = "v10"
+        BUILD_NUMBER = "v11"
         HARBOR_CREDENTIALS = credentials('harbor')
         BACKEND_REPO = "https://github.com/acs-final/Backend.git"
         BACKEND_IMAGE_PREFIX = "192.168.2.141:443/k8s-project"
@@ -48,7 +48,6 @@ pipeline {
             }
         }
 
-
         // 변경된 모듈만 빌드
         stage('Build Changed Modules') {
             steps {
@@ -67,7 +66,53 @@ pipeline {
             }
         }
 
+        // 빌드 전 소나큐브 분석 단계
+        stage('SonarQube Analysis') {
+            steps {
+                withSonarQubeEnv('MySonarQube') {
+                    script {
+                        def buildModules = ['api-gateway', 'bookstore', 'fairytale', 'member', 'report']
 
+                        // SonarQube에 분석할 경로 설정 (변경된 모듈만 추가)
+                        def sourcePaths = buildModules.collect { "${it}/src/main/java" }.join(',')
+                        def binaryPaths = buildModules.collect { "${it}/build/classes/java/main" }.join(',')
+
+                        echo "Running SonarQube scan for modules: ${buildModules}"
+
+                        def scannerHome = tool 'LocalSonarScanner'
+
+                        sh """
+                        ${scannerHome}/bin/sonar-scanner \
+                          -Dsonar.projectKey=my_project_key \
+                          -Dsonar.projectName=MyProject_backend \
+                          -Dsonar.projectVersion=1.0 \
+                          -Dsonar.sources=${sourcePaths} \
+                          -Dsonar.java.binaries=${binaryPaths} \
+                          -Dsonar.host.url=http://192.168.3.131:9000 \
+
+                        """
+                    }
+                }
+            }
+        }
+
+        // 2. Quality Gate 결과 확인 단계
+        stage('Quality Gate') {
+            steps {
+                script {
+                    try {
+                        timeout(time: 2, unit: 'MINUTES') {
+                            def qg = waitForQualityGate()
+                            if (qg.status != 'OK') {
+                                echo "Quality Gate failed with status: ${qg.status}"
+                            }
+                        }
+                    } catch (Exception e) {
+                        echo "Quality Gate check failed: ${e.message}"
+                    }
+                }
+            }
+        }
 
 
 
