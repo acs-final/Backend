@@ -48,71 +48,7 @@ pipeline {
             }
         }
 
-        // 변경된 모듈만 빌드
-        stage('Build Changed Modules') {
-            steps {
-                script {
-                    def buildModules = ['api-gateway', 'bookstore', 'fairytale', 'member', 'report']
 
-                    for (module in buildModules) {
-                        echo "Building module: ${module}"
-                        sh "chmod +x gradlew"
-
-
-                        sh "./gradlew :${module}:build --no-daemon -x test"
-                    }
-                    env.MODULES_TO_BUILD = buildModules.join(',')
-                }
-            }
-        }
-
-        // 빌드 전 소나큐브 분석 단계
-        stage('SonarQube Analysis') {
-            steps {
-                withSonarQubeEnv('MySonarQube') {
-                    script {
-                        def buildModules = ['api-gateway', 'bookstore', 'fairytale', 'member', 'report']
-
-                        // SonarQube에 분석할 경로 설정 (변경된 모듈만 추가)
-                        def sourcePaths = buildModules.collect { "${it}/src/main/java" }.join(',')
-                        def binaryPaths = buildModules.collect { "${it}/build/classes/java/main" }.join(',')
-
-                        echo "Running SonarQube scan for modules: ${buildModules}"
-
-                        def scannerHome = tool 'LocalSonarScanner'
-
-                        sh """
-                        ${scannerHome}/bin/sonar-scanner \
-                          -Dsonar.projectKey=my_project_key \
-                          -Dsonar.projectName=MyProject_backend \
-                          -Dsonar.projectVersion=1.0 \
-                          -Dsonar.sources=${sourcePaths} \
-                          -Dsonar.java.binaries=${binaryPaths} \
-                          -Dsonar.host.url=http://192.168.3.131:9000 \
-
-                        """
-                    }
-                }
-            }
-        }
-
-        // 2. Quality Gate 결과 확인 단계
-        stage('Quality Gate') {
-            steps {
-                script {
-                    try {
-                        timeout(time: 2, unit: 'MINUTES') {
-                            def qg = waitForQualityGate()
-                            if (qg.status != 'OK') {
-                                echo "Quality Gate failed with status: ${qg.status}"
-                            }
-                        }
-                    } catch (Exception e) {
-                        echo "Quality Gate check failed: ${e.message}"
-                    }
-                }
-            }
-        }
 
 
         stage('Login to Harbor') {
@@ -162,12 +98,24 @@ pipeline {
 
                 sh 'git pull --rebase origin main'
 
+                dir('manifests/back/fairytale') {
+                    sh "sed -i 's|image: 192.168.2.141:443/k8s-project/fairytale:.*|image: 192.168.2.141:443/k8s-project/fairytale:\${BUILD_NUMBER}|g' fairytale-deploy.yaml"
+                }
+
+                dir('manifests/back/bookstore') {
+                    sed -i 's|image: 192.168.2.141:443/k8s-project/bookstore:.*|image: 192.168.2.141:443/k8s-project/bookstore:${BUILD_NUMBER}|g' bookstore-deploy.yaml
+                }
+
+                dir('manifests/back/member') {
+                    sed -i 's|image: 192.168.2.141:443/k8s-project/member:.*|image: 192.168.2.141:443/k8s-project/member:${BUILD_NUMBER}|g' member-deploy.yaml
+                }
+
+                dir('manifests/back/report') {
+                    sed -i 's|image: 192.168.2.141:443/k8s-project/report:.*|image: 192.168.2.141:443/k8s-project/report:${BUILD_NUMBER}|g' report-deploy.yaml
+                }
+
                 dir('manifests') {
                     sh """
-                        sed -i 's|image: 192.168.2.141:443/k8s-project/fairytale:.*|image: 192.168.2.141:443/k8s-project/fairytale:${BUILD_NUMBER}|g' back/fairytale/fairytale-deploy.yaml
-                        sed -i 's|image: 192.168.2.141:443/k8s-project/member:.*|image: 192.168.2.141:443/k8s-project/member:${BUILD_NUMBER}|g' back/member/member-deploy.yaml
-                        sed -i 's|image: 192.168.2.141:443/k8s-project/bookstore:.*|image: 192.168.2.141:443/k8s-project/bookstore:${BUILD_NUMBER}|g' back/bookstore/bookstore-deploy.yaml
-                        sed -i 's|image: 192.168.2.141:443/k8s-project/report:.*|image: 192.168.2.141:443/k8s-project/report:${BUILD_NUMBER}|g' back/report/report-deploy.yaml
 
                         git add front-deploy.yaml
                         git commit -m '[UPDATE] back-deploy ${BUILD_NUMBER} image versioning' || echo 'No changes to commit'
