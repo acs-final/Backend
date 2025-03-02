@@ -49,6 +49,72 @@ pipeline {
         }
 
 
+ // 변경된 모듈만 빌드
+        stage('Build Changed Modules') {
+            steps {
+                script {
+                    def buildModules = ['api-gateway', 'bookstore', 'fairytale', 'member', 'report']
+
+                    for (module in buildModules) {
+                        echo "Building module: ${module}"
+                        sh "chmod +x gradlew"
+
+
+                        sh "./gradlew :${module}:build --no-daemon -x test"
+                    }
+                    env.MODULES_TO_BUILD = buildModules.join(',')
+                }
+            }
+        }
+
+        // 빌드 전 소나큐브 분석 단계
+        stage('SonarQube Analysis') {
+            steps {
+                withSonarQubeEnv('MySonarQube') {
+                    script {
+                        def buildModules = ['api-gateway', 'bookstore', 'fairytale', 'member', 'report']
+
+                        // SonarQube에 분석할 경로 설정 (변경된 모듈만 추가)
+                        def sourcePaths = buildModules.collect { "${it}/src/main/java" }.join(',')
+                        def binaryPaths = buildModules.collect { "${it}/build/classes/java/main" }.join(',')
+
+                        echo "Running SonarQube scan for modules: ${buildModules}"
+
+                        def scannerHome = tool 'LocalSonarScanner'
+
+                        sh """
+                        ${scannerHome}/bin/sonar-scanner \
+                          -Dsonar.projectKey=my_project_key \
+                          -Dsonar.projectName=MyProject_backend \
+                          -Dsonar.projectVersion=1.0 \
+                          -Dsonar.sources=${sourcePaths} \
+                          -Dsonar.java.binaries=${binaryPaths} \
+                          -Dsonar.host.url=http://192.168.3.131:9000 \
+
+                        """
+                    }
+                }
+            }
+        }
+
+        // 2. Quality Gate 결과 확인 단계
+        stage('Quality Gate') {
+            steps {
+                script {
+                    try {
+                        timeout(time: 2, unit: 'MINUTES') {
+                            def qg = waitForQualityGate()
+                            if (qg.status != 'OK') {
+                                echo "Quality Gate failed with status: ${qg.status}"
+                            }
+                        }
+                    } catch (Exception e) {
+                        echo "Quality Gate check failed: ${e.message}"
+                    }
+                }
+            }
+        }
+
 
 
         stage('Login to Harbor') {
@@ -60,7 +126,31 @@ pipeline {
             }
         }
 
+        stage('Build Changed Services') {
+            steps {
+                script {
 
+                    sh "docker-compose -f docker-compose.yaml build --no-cache"
+
+                }
+            }
+        }
+
+        stage('Push Built Images to Harbor') {
+            steps {
+                script {
+                    def changedServices = env.MODULES_TO_BUILD.split(',')
+
+                    for (service in changedServices) {
+                        sh "docker tag backend-docker-ci_${service} ${BACKEND_IMAGE_PREFIX}/${service}:${BUILD_NUMBER}"
+
+                        def backendImage = "${BACKEND_IMAGE_PREFIX}/${service}:${BUILD_NUMBER}"
+                        echo "Pushing Docker image: ${backendImage}"
+                        sh "docker push ${backendImage}"
+                    }
+                }
+            }
+        }
 
         stage('K8S Manifest Update') {
             steps {
