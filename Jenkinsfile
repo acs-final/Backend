@@ -60,31 +60,7 @@ pipeline {
             }
         }
 
-        stage('Build Changed Services') {
-            steps {
-                script {
 
-                    sh "docker-compose -f docker-compose.yaml build --no-cache"
-
-                }
-            }
-        }
-
-        stage('Push Built Images to Harbor') {
-            steps {
-                script {
-                    def changedServices = env.MODULES_TO_BUILD.split(',')
-
-                    for (service in changedServices) {
-                        sh "docker tag backend-docker-ci_${service} ${BACKEND_IMAGE_PREFIX}/${service}:${BUILD_NUMBER}"
-
-                        def backendImage = "${BACKEND_IMAGE_PREFIX}/${service}:${BUILD_NUMBER}"
-                        echo "Pushing Docker image: ${backendImage}"
-                        sh "docker push ${backendImage}"
-                    }
-                }
-            }
-        }
 
         stage('K8S Manifest Update') {
             steps {
