@@ -98,7 +98,7 @@ pipeline {
                     sh """
                         echo "Current workspace: ${pwd}"
 
-                        git add front-deploy.yaml
+                        git add back/bookstore/bookstore-deploy.yaml back/fairytale/fairytale-deploy.yaml back/member/member-deploy.yaml back/report/report-deploy.yaml
                         git commit -m '[UPDATE] back-deploy ${BUILD_NUMBER} image versioning' || echo 'No changes to commit'
                         git push origin main
                     """
