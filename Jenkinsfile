@@ -1,7 +1,7 @@
 pipeline {
     agent any
     environment {
-        BUILD_NUMBER = "v11"
+        BUILD_NUMBER = "v12"
         HARBOR_CREDENTIALS = credentials('harbor')
         BACKEND_REPO = "https://github.com/acs-final/Backend.git"
         BACKEND_IMAGE_PREFIX = "192.168.2.141:443/k8s-project"
@@ -166,7 +166,7 @@ pipeline {
 
                 dir('back/fairytale') {
                     echo "Current workspace: ${pwd}"
-                    sh "sed -i 's|image: 192.168.2.141:443/k8s-project/fairytale:.*|image: 192.168.2.141:443/k8s-project/fairytale:\${BUILD_NUMBER}|g' fairytale-deploy.yaml"
+                    sh "sed -i 's|image: 192.168.2.141:443/k8s-project/fairytale:.*|image: 192.168.2.141:443/k8s-project/fairytale:${BUILD_NUMBER}|g' fairytale-deploy.yaml"
                 }
 
                 dir('back/bookstore') {
