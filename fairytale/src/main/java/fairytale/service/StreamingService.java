@@ -337,7 +337,7 @@ public class StreamingService {
                                     log.info("result : {}\n", result);
                                 }
 
-                                log.info("현재 실행 중인 스레드 (onChunk 처리 중): {}", Thread.currentThread().getName());
+                                log.info("현재 실행 중인 Thread (onChunk 처리 중): {}", Thread.currentThread().getName());
                             }, taskExecutor());
 
                         })
@@ -346,16 +346,17 @@ public class StreamingService {
                     FairyTaleResponseDto.FairyTaleImageAndMp3Dto fairyTaleImageAndMp3Dto = new FairyTaleResponseDto.FairyTaleImageAndMp3Dto();
                     try {
                         emitter.send(SseEmitter.event().name("complete").data("스트리밍 완료"));
+                        Thread.sleep(1000);
 
                         fairyTaleImageAndMp3Dto = getStreamingResult(findMember, String.valueOf(completeResponseTextBuffer), genre);
 
                         FairyTaleResponseDto.FairyTaleCreateDto createDto = new FairyTaleResponseDto.FairyTaleCreateDto(fairyTaleImageAndMp3Dto.getFairytaleId());
 
-                        Thread.sleep(1000);
                         emitter.send(SseEmitter.event().name("FairytaleId: ").data(createDto));
+                        Thread.sleep(2000);
 
                         log.info("Total Streaming text: {}", completeResponseTextBuffer);
-                        log.info("현재 실행 중인 스레드 (onComplete 호출됨): {}", Thread.currentThread().getName());
+                        log.info("현재 실행 중인 Thread (onComplete 호출됨): {}", Thread.currentThread().getName());
 
                     } catch (IOException | InterruptedException e) {
                         log.info("스트리밍 중단 원인: {}", e.getMessage());
