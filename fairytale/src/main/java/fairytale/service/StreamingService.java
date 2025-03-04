@@ -15,11 +15,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import fairytale.FairyTaleConverter;
 import fairytale.dto.fairyTale.FairyTaleRequestDto;
 import fairytale.dto.fairyTale.FairyTaleResponseDto;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -34,6 +37,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
 
 @Slf4j
 @Service
@@ -48,7 +52,6 @@ public class StreamingService {
     private final BedrockRuntimeClient bedrockRuntimeClientForClaude;
 
 
-
     private final FairytaleRepository fairyTaleRepository;
     private final BodyRepository bodyRepository;
     private final MemberRepository memberRepository;
@@ -56,6 +59,16 @@ public class StreamingService {
     private final FairyTaleService fairyTaleService;
 
     private static Integer SESSION_COUNT = 0;
+
+    public Executor taskExecutor() {
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.setCorePoolSize(10);   // 최소 10개의 스레드 유지
+        executor.setMaxPoolSize(50);    // 최대 50개까지 확장 가능
+        executor.setQueueCapacity(100); // 100개의 작업까지 대기 가능
+        executor.setThreadNamePrefix("AsyncThread-fairytale"); // 스레드 이름 지정
+        executor.initialize();
+        return executor;
+    }
 
     /*
      * 스트리밍 응답 + 프롬프트 이미지 분리
@@ -153,7 +166,7 @@ public class StreamingService {
     }
 
     @Transactional
-    @Async
+    @Async("taskExecutor")
     public CompletableFuture<SseEmitter> createFtWithStreaming(String memberId, String genre, String gender, String challenge) {
 
         log.info("SESSION_COUNT: {}", ++SESSION_COUNT);
@@ -285,45 +298,47 @@ public class StreamingService {
         // 스트리밍 응답 핸들러
 //        ConverseStreamResponseHandler responseHandler = ConverseStreamResponseHandler.builder()
         InvokeModelWithResponseStreamResponseHandler responseHandler = InvokeModelWithResponseStreamResponseHandler.builder()
-                .subscriber(InvokeModelWithResponseStreamResponseHandler.Visitor.builder().onChunk(chunk -> {
-                            // Extract and print the text from the model's native response.
+                .subscriber(InvokeModelWithResponseStreamResponseHandler.Visitor.builder()
+                        .onChunk(chunk -> {
+                            CompletableFuture.runAsync(() -> {
+                                // Extract and print the text from the model's native response.
 //                            var response = new JSONObject(chunk.bytes().asUtf8String());
-                            //var text = new JSONPointer("/text").queryFrom(response);
+                                //var text = new JSONPointer("/text").queryFrom(response);
 
-                            String result = chunk.bytes().asUtf8String();
-
-
-
-                            JsonNode rootNode = null;
-                            try {
-                                rootNode = objectMapper.readTree(result);
+                                String result = chunk.bytes().asUtf8String();
 
 
-                            } catch (JsonProcessingException e) {
-                                throw new RuntimeException(e);
-                            }
-
-                            //String type = rootNode.get("type").toString();
-
-
-                            if (rootNode.has("type") && "content_block_delta".equals(rootNode.get("type").asText())) {
-                                JsonNode delta = rootNode.get("delta");
-                                log.info("delta: {}", delta);
-
-                                String streamingText = delta.get("text").toString().replaceAll("^\"|\"$", "");
-
-                                // Append the text to the response text buffer.
-                                completeResponseTextBuffer.append(streamingText);
-
+                                JsonNode rootNode = null;
                                 try {
-                                    emitter.send(SseEmitter.event().name("message").data(streamingText));
-                                } catch (IOException e) {
-                                    emitter.completeWithError(e);
-                                }
-                                log.info("result : {}\n", result);
-                            }
+                                    rootNode = objectMapper.readTree(result);
 
-                            log.info("현재 실행 중인 스레드 (onChunk 처리 중): {}", Thread.currentThread().getName());
+
+                                } catch (JsonProcessingException e) {
+                                    throw new RuntimeException(e);
+                                }
+
+                                //String type = rootNode.get("type").toString();
+
+
+                                if (rootNode.has("type") && "content_block_delta".equals(rootNode.get("type").asText())) {
+                                    JsonNode delta = rootNode.get("delta");
+                                    log.info("delta: {}", delta);
+
+                                    String streamingText = delta.get("text").toString().replaceAll("^\"|\"$", "");
+
+                                    // Append the text to the response text buffer.
+                                    completeResponseTextBuffer.append(streamingText);
+
+                                    try {
+                                        emitter.send(SseEmitter.event().name("message").data(streamingText));
+                                    } catch (IOException e) {
+                                        emitter.completeWithError(e);
+                                    }
+                                    log.info("result : {}\n", result);
+                                }
+
+                                log.info("현재 실행 중인 스레드 (onChunk 처리 중): {}", Thread.currentThread().getName());
+                            }, taskExecutor());
 
                         })
                         .build())
