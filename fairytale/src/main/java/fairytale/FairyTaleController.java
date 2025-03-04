@@ -27,6 +27,7 @@ import software.amazon.awssdk.services.bedrockruntime.model.InvokeModelWithRespo
 
 import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 @Slf4j
 @RestController
@@ -111,11 +112,12 @@ public class FairyTaleController {
             @Parameter(name = "memberId", description = "멤버 id"),
             @Parameter(name = "requestDto", description = "동화책 장르, 자녀 성별, 주제")
     })
-    public SseEmitter createFairytaleWithStreaming(@RequestHeader("memberId") String memberId, @RequestBody FairyTaleRequestDto.FairyTaleCreateDto requestDto) {
+    public CompletableFuture<SseEmitter> createFairytaleWithStreaming(@RequestHeader("memberId") String memberId, @RequestBody FairyTaleRequestDto.FairyTaleCreateDto requestDto) {
 
         log.info("createFairytaleWithStreaming API Request time: {}", LocalDateTime.now());
 
-        SseEmitter emitter = streamingService.createFtWithStreaming(memberId, requestDto.getGenre(), requestDto.getGender(), requestDto.getChallenge());
+        //SseEmitter emitter = streamingService.createFtWithStreaming(memberId, requestDto.getGenre(), requestDto.getGender(), requestDto.getChallenge());
+        CompletableFuture<SseEmitter> emitter = streamingService.createFtWithStreaming(memberId, requestDto.getGenre(), requestDto.getGender(), requestDto.getChallenge());
 
         return emitter;
     }

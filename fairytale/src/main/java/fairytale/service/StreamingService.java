@@ -19,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -32,6 +33,7 @@ import software.amazon.awssdk.services.bedrockruntime.model.*;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 
 @Slf4j
 @Service
@@ -151,9 +153,12 @@ public class StreamingService {
     }
 
     @Transactional
-    public SseEmitter createFtWithStreaming(String memberId, String genre, String gender, String challenge) {
+    @Async
+    public CompletableFuture<SseEmitter> createFtWithStreaming(String memberId, String genre, String gender, String challenge) {
 
         log.info("SESSION_COUNT: {}", ++SESSION_COUNT);
+
+        log.info("::::::Thread Name : " + Thread.currentThread().getName());
 
         Member findMember = memberRepository.findById(memberId).orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
 
@@ -364,7 +369,8 @@ public class StreamingService {
         asyncClient.invokeModelWithResponseStream(request, responseHandler);
 
 
-        return emitter;
+        return CompletableFuture.completedFuture(emitter);
+        //return emitter;
         //return completeResponseTextBuffer.toString();
     }
 
