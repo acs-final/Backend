@@ -323,7 +323,7 @@ public class StreamingService {
                                 log.info("result : {}\n", result);
                             }
 
-
+                            log.info("현재 실행 중인 스레드 (onChunk 처리 중): {}", Thread.currentThread().getName());
 
                         })
                         .build())
@@ -340,6 +340,7 @@ public class StreamingService {
                         emitter.send(SseEmitter.event().name("FairytaleId: ").data(createDto));
 
                         log.info("Total Streaming text: {}", completeResponseTextBuffer);
+                        log.info("현재 실행 중인 스레드 (onComplete 호출됨): {}", Thread.currentThread().getName());
 
                     } catch (IOException | InterruptedException e) {
                         log.info("스트리밍 중단 원인: {}", e.getMessage());
@@ -350,11 +351,15 @@ public class StreamingService {
 
 
                     /********************* 이미지, mp3 생성 *********************/
-                    try {
-                        createImageAndMp3(fairyTaleImageAndMp3Dto.getSortedPrompt(), fairyTaleImageAndMp3Dto.getTitle(), fairyTaleImageAndMp3Dto.getResultBody(), fairyTaleImageAndMp3Dto.getMyFairytale());
-                    } catch (JsonProcessingException e) {
-                        throw new RuntimeException(e);
-                    }
+                    FairyTaleResponseDto.FairyTaleImageAndMp3Dto finalFairyTaleImageAndMp3Dto = fairyTaleImageAndMp3Dto;
+                    CompletableFuture.runAsync(() -> {
+                        try {
+                            createImageAndMp3(finalFairyTaleImageAndMp3Dto.getSortedPrompt(), finalFairyTaleImageAndMp3Dto.getTitle(), finalFairyTaleImageAndMp3Dto.getResultBody(), finalFairyTaleImageAndMp3Dto.getMyFairytale());
+                        } catch (JsonProcessingException e) {
+                            log.error("Error creating image and mp3: {}", e.getMessage());
+                        }
+                    });
+
 
                 })
                 .onError(emitter::completeWithError)
