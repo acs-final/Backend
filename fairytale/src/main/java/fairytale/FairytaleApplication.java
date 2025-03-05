@@ -13,7 +13,6 @@ import org.springframework.scheduling.annotation.EnableAsync;
 @ComponentScan(basePackages = {"fairytale", "com.common"})
 @EntityScan(basePackages = {"com/common/entity"})
 @EnableAsync
-@EnableJpaRepositories(basePackages = {"com.common.repository"})
 public class FairytaleApplication {
 
     public static void main(String[] args) {

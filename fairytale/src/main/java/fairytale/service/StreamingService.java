@@ -21,15 +21,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
-import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
 import software.amazon.awssdk.core.SdkBytes;
-import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.bedrockruntime.BedrockRuntimeAsyncClient;
 import software.amazon.awssdk.services.bedrockruntime.BedrockRuntimeClient;
 import software.amazon.awssdk.services.bedrockruntime.model.*;
@@ -39,6 +35,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
+import java.util.concurrent.atomic.AtomicReference;
 
 @Slf4j
 @Service
@@ -295,35 +292,36 @@ public class StreamingService {
                         })
                         .build())
                 .onComplete(() -> {
-                    FairyTaleResponseDto.FairyTaleImageAndMp3Dto fairyTaleImageAndMp3Dto = new FairyTaleResponseDto.FairyTaleImageAndMp3Dto();
-                    try {
+                    AtomicReference<FairyTaleResponseDto.FairyTaleImageAndMp3Dto> fairyTaleImageAndMp3Dto = new AtomicReference<>(new FairyTaleResponseDto.FairyTaleImageAndMp3Dto());
 
-                        Thread.sleep(1000);
+                    CompletableFuture.runAsync(() -> {
 
-                        fairyTaleImageAndMp3Dto = getStreamingResult(findMember, String.valueOf(completeResponseTextBuffer), genre);
+                        fairyTaleImageAndMp3Dto.set(getStreamingResult(findMember, String.valueOf(completeResponseTextBuffer), genre));
 
                         //FairyTaleResponseDto.FairyTaleCreateDto createDto = new FairyTaleResponseDto.FairyTaleCreateDto(fairyTaleImageAndMp3Dto.getFairytaleId());
 
-                        String result = "스트리밍 완료 " + fairyTaleImageAndMp3Dto.getFairytaleId();
+                        String result = "스트리밍 완료 " + fairyTaleImageAndMp3Dto.get().getFairytaleId();
                         log.info("스트리밍 완료 + fairytaleId: {}", result);
-                        emitter.send(SseEmitter.event().name("complete").data(result));
-                        //emitter.send(SseEmitter.event().name("FairytaleId").data(createDto));
-                        Thread.sleep(2000);
+                        try {
+                            emitter.send(SseEmitter.event().name("complete").data(result));
+                            //emitter.send(SseEmitter.event().name("FairytaleId").data(createDto));
 
-                        log.info("Streaming Complete FairytaleId: {}", fairyTaleImageAndMp3Dto.getFairytaleId());
+                            Thread.sleep(2000);
+                        } catch (IOException | InterruptedException e) {
+                            log.info("스트리밍 중단 원인 Streaming_fail: {}", e.getMessage());
+                            emitter.completeWithError(e);
+                        }
+                        log.info("Streaming Complete FairytaleId: {}", fairyTaleImageAndMp3Dto.get().getFairytaleId());
 
                         log.info("Total Streaming text: {}", completeResponseTextBuffer);
                         log.info("현재 실행 중인 Thread (onComplete 호출됨): {}", Thread.currentThread().getName());
 
-                    } catch (IOException | InterruptedException e) {
-                        log.info("스트리밍 중단 원인: {}", e.getMessage());
-                        emitter.completeWithError(e);
-                    }
+                    }, taskExecutor());
 
                     emitter.complete();   // 스트리밍 종료.
 
                     /********************* 이미지, mp3 생성 *********************/
-                    FairyTaleResponseDto.FairyTaleImageAndMp3Dto finalFairyTaleImageAndMp3Dto = fairyTaleImageAndMp3Dto;
+                    FairyTaleResponseDto.FairyTaleImageAndMp3Dto finalFairyTaleImageAndMp3Dto = fairyTaleImageAndMp3Dto.get();
                     CompletableFuture.runAsync(() -> {
                         try {
                             createImageAndMp3(finalFairyTaleImageAndMp3Dto.getSortedPrompt(), finalFairyTaleImageAndMp3Dto.getTitle(), finalFairyTaleImageAndMp3Dto.getResultBody(), finalFairyTaleImageAndMp3Dto.getMyFairytale());
