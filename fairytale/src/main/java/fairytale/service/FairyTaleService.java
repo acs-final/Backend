@@ -15,14 +15,12 @@ import fairytale.dto.fairyTale.FairyTaleResponseDto;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
@@ -192,6 +190,48 @@ public class FairyTaleService {
     }
 
     @Transactional
+    public CompletableFuture<List<FairyTaleResponseDto.PollyResultDto>> asyncPolly2(List<FairyTaleRequestDto.PollyRequestDto> requestDtos, Fairytale fairytale) {
+        // 비동기적으로 mp3 생성 API 호출
+        List<CompletableFuture<Pair<String, String>>> mp3Futures = requestDtos.stream()
+                .map(mp3 -> CompletableFuture.supplyAsync(() -> {
+                    try {
+                        String mp3Url = pollyService.createMP3(mp3);
+                        return Pair.of(mp3Url, mp3.getFileName());
+                    } catch (Exception e) {
+                        log.error("mp3 생성 실패: {}, 오류: {}", mp3.getFileName(), e.getMessage());
+                        return null;  // 실패한 경우 null 반환
+                    }
+                }).exceptionally(ex -> {
+                    log.error("비동기 작업 중 예외 발생: {}", ex.getMessage());
+                    return null;
+                }))
+                .toList();
+
+
+        // 모든 mp3 생성 완료 후 결과 수집
+        return CompletableFuture.allOf(mp3Futures.toArray(new CompletableFuture[0]))
+                .thenApply(v -> mp3Futures.stream()
+                        .map(CompletableFuture::join)
+                        .filter(Objects::nonNull)  // 실패한 경우 제거
+                        .map(pair -> {
+                            Audio newAudio = Audio.builder()
+                                    .audioUrl(pair.getFirst())
+                                    .fairytale(fairytale)
+                                    .build();
+                            return newAudio;
+                        })
+                        .toList()
+                )
+                .thenApply(audios -> {
+                    // 병렬로 이미지 저장 (batch insert 가능하도록 변경 가능)
+                    audioRepository.saveAll(audios);
+                    return audios.stream()
+                            .map(mp3 -> new FairyTaleResponseDto.PollyResultDto(mp3.getAudioUrl()))
+                            .toList();
+                });
+    }
+
+    @Transactional
     public List<FairyTaleResponseDto.StablediffusionResultDto> asyncImage(List<FairyTaleRequestDto.StablediffusionRequestDto> requestDtos, Fairytale fairytale) throws JsonProcessingException {
         List<FairyTaleRequestDto.StablediffusionRequestDto> requestIds = requestDtos;
 
@@ -221,6 +261,49 @@ public class FairyTaleService {
             resultDtos.add(new FairyTaleResponseDto.StablediffusionResultDto(i));
         });
         return resultDtos;
+    }
+
+    @Transactional
+    public CompletableFuture<List<FairyTaleResponseDto.StablediffusionResultDto>> asyncImage2(
+            List<FairyTaleRequestDto.StablediffusionRequestDto> requestDtos, Fairytale fairytale) {
+
+        // 비동기적으로 이미지 생성 API 호출
+        List<CompletableFuture<Pair<String, String>>> imageFutures = requestDtos.stream()
+                .map(prompt -> CompletableFuture.supplyAsync(() -> {
+                    try {
+                        String imageUrl = stableDiffusionService.createImage(prompt.getTitle(), prompt.getFileName(), prompt.getPrompt());
+                        return Pair.of(imageUrl, prompt.getFileName());
+                    } catch (Exception e) {
+                        log.error("이미지 생성 실패: {}, 오류: {}", prompt.getFileName(), e.getMessage());
+                        return null;  // 실패한 경우 null 반환
+                    }
+                }).exceptionally(ex -> {
+                    log.error("비동기 작업 중 예외 발생: {}", ex.getMessage());
+                    return null;
+                }))
+                .toList();
+
+        // 모든 이미지 생성 완료 후 결과 수집
+        return CompletableFuture.allOf(imageFutures.toArray(new CompletableFuture[0]))
+                .thenApply(v -> imageFutures.stream()
+                        .map(CompletableFuture::join)
+                        .filter(Objects::nonNull)  // 실패한 경우 제거
+                        .map(pair -> {
+                            Image newImage = Image.builder()
+                                    .imageUrl(pair.getFirst())
+                                    .fairytale(fairytale)
+                                    .build();
+                            return newImage;
+                        })
+                        .toList()
+                )
+                .thenApply(images -> {
+                    // 병렬로 이미지 저장 (batch insert 가능하도록 변경 가능)
+                    imageRepository.saveAll(images);
+                    return images.stream()
+                            .map(img -> new FairyTaleResponseDto.StablediffusionResultDto(img.getImageUrl()))
+                            .toList();
+                });
     }
 
 

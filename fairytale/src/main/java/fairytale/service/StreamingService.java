@@ -206,48 +206,6 @@ public class StreamingService {
 
                 gender, genre, challenge
         );
-//        String text = String.format(
-//                "Create a fairy tale for %s kid using these elements: Genre: %s and Challenge: %s. Write in an enchanting, classic fairy tale style and a satisfying ending. Include vivid descriptions and a moral lesson.\n" +
-//                        "Totally 14 pages of amount.\n" +
-//                        "Divide each page by \"\\n\\n\"" +
-//                        //"Make the result as json format like \n" +
-//                        "The response is always like \n" +
-//                        "{\\n" +
-//                        "제목:\"...\", \\n" +
-//                        "내용: [\\n" +
-//                        "1장: \"...\" \\n" +
-//                        "]" +
-//                        ", which and each page of 내용 should be in one line.\n" +
-////            "The body texts have SSML tags for polly service." +
-//                        "All responses are under 3600 tokens." +
-//                        "All responses in Korean except prompt." +
-//                        "Do not use double quotes in any dialogues or direct quotes of pages." +
-//                        "Do not say any words except response",
-//
-//                gender, genre, challenge
-//        );
-
-
-        /**
-         *  claude sonnet v1 단일 리전
-         */
-
-//        Map<String, Object> messages = new HashMap<>();
-//        messages.put("role", "user");
-//
-//        Map<String, Object> content = new HashMap<>();
-//        content.put("type","text");
-//        content.put("text", text);
-//
-//
-//
-//        messages.put("content", List.of(content));
-//
-//
-//        Map<String, Object> payload = new HashMap<>();
-//        payload.put("max_tokens", 3600);
-//        payload.put("messages", List.of(messages));
-//        payload.put("anthropic_version", "bedrock-2023-05-31");
 
         /**
          *  claude sonnet v2 교차 리전
@@ -295,14 +253,10 @@ public class StreamingService {
         StringBuilder completeResponseTextBuffer = new StringBuilder();
 
         // 스트리밍 응답 핸들러
-//        ConverseStreamResponseHandler responseHandler = ConverseStreamResponseHandler.builder()
         InvokeModelWithResponseStreamResponseHandler responseHandler = InvokeModelWithResponseStreamResponseHandler.builder()
                 .subscriber(InvokeModelWithResponseStreamResponseHandler.Visitor.builder()
                         .onChunk(chunk -> {
                             CompletableFuture.runAsync(() -> {
-                                // Extract and print the text from the model's native response.
-//                            var response = new JSONObject(chunk.bytes().asUtf8String());
-                                //var text = new JSONPointer("/text").queryFrom(response);
 
                                 String result = chunk.bytes().asUtf8String();
 
@@ -315,8 +269,6 @@ public class StreamingService {
                                 } catch (JsonProcessingException e) {
                                     throw new RuntimeException(e);
                                 }
-
-                                //String type = rootNode.get("type").toString();
 
 
                                 if (rootNode.has("type") && "content_block_delta".equals(rootNode.get("type").asText())) {
@@ -336,7 +288,7 @@ public class StreamingService {
                                     log.info("result : {}\n", result);
                                 }
 
-                                log.info("현재 실행 중인 Thread (onChunk 처리 중): {}", Thread.currentThread().getName());
+
                             }, taskExecutor());
 
                         })
@@ -372,6 +324,7 @@ public class StreamingService {
                     CompletableFuture.runAsync(() -> {
                         try {
                             createImageAndMp3(finalFairyTaleImageAndMp3Dto.getSortedPrompt(), finalFairyTaleImageAndMp3Dto.getTitle(), finalFairyTaleImageAndMp3Dto.getResultBody(), finalFairyTaleImageAndMp3Dto.getMyFairytale());
+                            log.info("Thread when creating image and mp3: {}", Thread.currentThread().getName());
                         } catch (JsonProcessingException e) {
                             log.error("Error creating image and mp3: {}", e.getMessage());
                         }
@@ -391,15 +344,14 @@ public class StreamingService {
             try {
                 // Bedrock API 요청 실행
                 bedrockRuntimeAsyncClient.invokeModelWithResponseStream(request, responseHandler);
+                log.info("Bedrock Request Success in {} tries", i);
                 break; // 성공하면 루프 종료
             } catch (ThrottlingException e) {
                 int delay = baseDelay * (int) Math.pow(2, i);
-                System.out.println("ThrottlingException 발생, " + delay + "ms 후 재시도...");
+                System.out.println("ThrottlingException 발생, " + delay + "ms 후 retrying...");
                 Thread.sleep(delay);
             }
         }
-
-
 
 
         return CompletableFuture.completedFuture(emitter);
@@ -442,7 +394,6 @@ public class StreamingService {
 
         // Body를 하나의 문자열로 합치기
         StringBuilder bodyText = new StringBuilder();
-        //sortedBody.forEach((key, value) -> bodyText.append(value).append("\n"));
 
         StringBuilder resultPage = new StringBuilder();
 
@@ -562,17 +513,10 @@ public class StreamingService {
         }
 
 
-
-//            resultBody.forEach((key, value) -> {
-//                int i = 0;
-//                String file = title + i;
-//                mp3RequestDtos.add(FairyTaleConverter.toMp3RequestDto(title,file, value));
-//            });
-
         log.info("Async image request: {}", imageRequestDtos);
 
-        List<FairyTaleResponseDto.StablediffusionResultDto> imageUrls = fairyTaleService.asyncImage(imageRequestDtos, myFairytale);
-        List<FairyTaleResponseDto.PollyResultDto> mp3Urls = fairyTaleService.asyncPolly(mp3RequestDtos, myFairytale);
+        fairyTaleService.asyncImage2(imageRequestDtos, myFairytale);
+        fairyTaleService.asyncPolly2(mp3RequestDtos, myFairytale);
 
     }
 
