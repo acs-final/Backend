@@ -19,6 +19,7 @@ public enum ErrorStatus implements BaseErrorCode {
     FILE_UPLOAD_FAILED(HttpStatus.BAD_REQUEST, "NOVA404", "파일 업로드 실패"),
     FAIRYTALE_BAD_REQUEST(HttpStatus.BAD_REQUEST, "CLAUDE404","동화 생성 오류"),
     FAIRYTALE_NOT_FOUND(HttpStatus.NOT_FOUND, "FAIRYTALE400", "동화를 찾을 수 없습니다."),
+    FAIRYTALE_PARSING_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "FAIRYTALE405", "동화 텍스트 파싱 에러."),
 
     BOOKSTORE_NOT_FOUND(HttpStatus.NOT_FOUND, "BOOKSTORE400", "해당 게시글을 찾을 수 없습니다."),
     BOOKSTORE_ALREADY_EXIST(HttpStatus.BAD_REQUEST , "BOOKSTORE403", "이미 생성된 게시글이 존재합니다."),

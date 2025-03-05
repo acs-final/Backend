@@ -21,6 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
@@ -285,7 +286,7 @@ public class StreamingService {
                                     } catch (IOException e) {
                                         emitter.completeWithError(e);
                                     }
-                                    log.info("result : {}\n", result);
+
                                 }
 
 
@@ -303,7 +304,8 @@ public class StreamingService {
 
                         //FairyTaleResponseDto.FairyTaleCreateDto createDto = new FairyTaleResponseDto.FairyTaleCreateDto(fairyTaleImageAndMp3Dto.getFairytaleId());
 
-                        String result = "스트리밍 완료" + fairyTaleImageAndMp3Dto.getFairytaleId();
+                        String result = "스트리밍 완료 " + fairyTaleImageAndMp3Dto.getFairytaleId();
+                        log.info("스트리밍 완료 + fairytaleId: {}", result);
                         emitter.send(SseEmitter.event().name("complete").data(result));
                         //emitter.send(SseEmitter.event().name("FairytaleId").data(createDto));
                         Thread.sleep(2000);
@@ -319,7 +321,6 @@ public class StreamingService {
                     }
 
                     emitter.complete();   // 스트리밍 종료.
-
 
                     /********************* 이미지, mp3 생성 *********************/
                     FairyTaleResponseDto.FairyTaleImageAndMp3Dto finalFairyTaleImageAndMp3Dto = fairyTaleImageAndMp3Dto;
@@ -363,25 +364,33 @@ public class StreamingService {
 
 
 
-    public FairyTaleResponseDto.FairyTaleImageAndMp3Dto getStreamingResult(Member findMember, String streamingResult, String genre) throws JsonProcessingException {
+    public FairyTaleResponseDto.FairyTaleImageAndMp3Dto getStreamingResult(Member findMember, String streamingResult, String genre) {
         String fixedJson = preprocessJsonByInvoke(streamingResult);
         log.info("Total Streaming text: {}", fixedJson);
 
         ObjectMapper objectMapper = new ObjectMapper();
 
-        JsonNode rootNode = objectMapper.readTree(fixedJson);
+        String title = "";
+        JsonNode bodyNode = null;
+        JsonNode promptNode = null;
+        try {
+            JsonNode rootNode = objectMapper.readTree(fixedJson);
 
-        log.info("RootNode: {}", rootNode);
+            log.info("RootNode: {}", rootNode);
 
 
-        String title = rootNode.get("title").asText();
-        log.info("title: {}", title);
+            title = rootNode.get("title").asText();
+            log.info("title: {}", title);
 
-        JsonNode bodyNode = rootNode.get("body");
-        log.info("body: {}", bodyNode);
+            bodyNode = rootNode.get("body");
+            log.info("body: {}", bodyNode);
 
-        JsonNode promptNode = rootNode.get("prompt");
-        log.info("prompt: {}", promptNode);
+            promptNode = rootNode.get("prompt");
+            log.info("prompt: {}", promptNode);
+        } catch (JsonProcessingException e) {
+            throw new FairytaleHandler(ErrorStatus.FAIRYTALE_PARSING_ERROR);
+        }
+
 
         TreeMap<String, String> sortedBody = new TreeMap<>(Comparator.comparingInt(k -> Integer.parseInt(k.substring(4))));
 
