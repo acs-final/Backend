@@ -296,14 +296,16 @@ public class StreamingService {
                 .onComplete(() -> {
                     FairyTaleResponseDto.FairyTaleImageAndMp3Dto fairyTaleImageAndMp3Dto = new FairyTaleResponseDto.FairyTaleImageAndMp3Dto();
                     try {
-                        emitter.send(SseEmitter.event().name("complete").data("스트리밍 완료"));
+
                         Thread.sleep(1000);
 
                         fairyTaleImageAndMp3Dto = getStreamingResult(findMember, String.valueOf(completeResponseTextBuffer), genre);
 
-                        FairyTaleResponseDto.FairyTaleCreateDto createDto = new FairyTaleResponseDto.FairyTaleCreateDto(fairyTaleImageAndMp3Dto.getFairytaleId());
+                        //FairyTaleResponseDto.FairyTaleCreateDto createDto = new FairyTaleResponseDto.FairyTaleCreateDto(fairyTaleImageAndMp3Dto.getFairytaleId());
 
-                        emitter.send(SseEmitter.event().name("FairytaleId: ").data(createDto));
+                        String result = "스트리밍 완료" + fairyTaleImageAndMp3Dto.getFairytaleId();
+                        emitter.send(SseEmitter.event().name("complete").data(result));
+                        //emitter.send(SseEmitter.event().name("FairytaleId").data(createDto));
                         Thread.sleep(2000);
 
                         log.info("Streaming Complete FairytaleId: {}", fairyTaleImageAndMp3Dto.getFairytaleId());
@@ -407,8 +409,6 @@ public class StreamingService {
             item.fields().forEachRemaining(entry -> sortedPrompt.put(entry.getKey(), entry.getValue().asText()));
         }
         log.info("sortedPrompt: {}", sortedPrompt);
-
-
 
 
         int j = 0;
