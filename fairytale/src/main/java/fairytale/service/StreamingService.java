@@ -166,7 +166,6 @@ public class StreamingService {
     }
 
     @Transactional
-    @Async("taskExecutor")
     public CompletableFuture<SseEmitter> createFtWithStreaming(String memberId, String genre, String gender, String challenge) {
 
         log.info("SESSION_COUNT: {}", ++SESSION_COUNT);
@@ -374,7 +373,7 @@ public class StreamingService {
                         } catch (JsonProcessingException e) {
                             log.error("Error creating image and mp3: {}", e.getMessage());
                         }
-                    });
+                    }, taskExecutor());
 
 
                 })
@@ -492,6 +491,7 @@ public class StreamingService {
         /************************ 디비에 저장 ************************/
         Fairytale myFairytale = FairyTaleConverter.toFairyTale(findMember, title, 0F, 0F, 0, genre, 0L);
 
+        log.info("fairytaleId: {}", myFairytale.getFairytaleId());
 
         fairyTaleRepository.save(myFairytale);
 
