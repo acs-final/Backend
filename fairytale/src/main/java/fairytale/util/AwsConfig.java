@@ -15,6 +15,7 @@ import org.springframework.context.annotation.Configuration;
 import software.amazon.awssdk.auth.credentials.*;
 import software.amazon.awssdk.core.client.config.ClientOverrideConfiguration;
 import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.services.bedrockruntime.BedrockRuntimeAsyncClient;
 import software.amazon.awssdk.services.bedrockruntime.BedrockRuntimeClient;
 import software.amazon.awssdk.services.polly.PollyClient;
 
@@ -37,6 +38,16 @@ public class AwsConfig {
     }
 
     @Bean
+    public BedrockRuntimeAsyncClient bedrockRuntimeAsyncClient(){
+
+
+        return BedrockRuntimeAsyncClient.builder()
+                .credentialsProvider(DefaultCredentialsProvider.create())
+                .region(Region.US_EAST_1)
+                .build();
+    }
+
+    @Bean
     public BedrockRuntimeClient bedrockRuntimeClientForClaude() {
 
 //        AwsCredentialsProvider credentialsProvider = StaticCredentialsProvider.create(
@@ -48,7 +59,7 @@ public class AwsConfig {
 
         return BedrockRuntimeClient.builder()
                 .credentialsProvider(DefaultCredentialsProvider.create())
-                .region(Region.AP_NORTHEAST_2)
+                .region(Region.US_EAST_1)
                 .overrideConfiguration(ClientOverrideConfiguration.builder()
                         .apiCallTimeout(Duration.ofSeconds(240))
                         .apiCallAttemptTimeout(Duration.ofSeconds(240))

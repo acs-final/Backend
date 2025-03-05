@@ -112,7 +112,7 @@ public class FairyTaleController {
             @Parameter(name = "memberId", description = "멤버 id"),
             @Parameter(name = "requestDto", description = "동화책 장르, 자녀 성별, 주제")
     })
-    public CompletableFuture<SseEmitter> createFairytaleWithStreaming(@RequestHeader("memberId") String memberId, @RequestBody FairyTaleRequestDto.FairyTaleCreateDto requestDto) {
+    public CompletableFuture<SseEmitter> createFairytaleWithStreaming(@RequestHeader("memberId") String memberId, @RequestBody FairyTaleRequestDto.FairyTaleCreateDto requestDto) throws InterruptedException {
 
         log.info("createFairytaleWithStreaming API Request time: {}", LocalDateTime.now());
 

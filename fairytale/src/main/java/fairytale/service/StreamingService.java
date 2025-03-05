@@ -50,7 +50,7 @@ public class StreamingService {
     private String SONNET_MODEL_ID;
 
     private final BedrockRuntimeClient bedrockRuntimeClientForClaude;
-
+    private final BedrockRuntimeAsyncClient bedrockRuntimeAsyncClient;
 
     private final FairytaleRepository fairyTaleRepository;
     private final BodyRepository bodyRepository;
@@ -166,7 +166,7 @@ public class StreamingService {
     }
 
     @Transactional
-    public CompletableFuture<SseEmitter> createFtWithStreaming(String memberId, String genre, String gender, String challenge) {
+    public CompletableFuture<SseEmitter> createFtWithStreaming(String memberId, String genre, String gender, String challenge) throws InterruptedException {
 
         log.info("SESSION_COUNT: {}", ++SESSION_COUNT);
 
@@ -354,6 +354,8 @@ public class StreamingService {
                         emitter.send(SseEmitter.event().name("FairytaleId: ").data(createDto));
                         Thread.sleep(2000);
 
+                        log.info("Streaming Complete FairytaleId: {}", fairyTaleImageAndMp3Dto.getFairytaleId());
+
                         log.info("Total Streaming text: {}", completeResponseTextBuffer);
                         log.info("현재 실행 중인 Thread (onComplete 호출됨): {}", Thread.currentThread().getName());
 
@@ -380,13 +382,24 @@ public class StreamingService {
                 .onError(emitter::completeWithError)
                 .build();
 
-        BedrockRuntimeAsyncClient asyncClient = BedrockRuntimeAsyncClient.builder()
-                .credentialsProvider(DefaultCredentialsProvider.create())
-                .region(Region.US_EAST_1)
-                .build();
 
-        // Bedrock API 요청 실행
-        asyncClient.invokeModelWithResponseStream(request, responseHandler);
+
+        int maxRetries = 5;
+        int baseDelay = 100; // 초기 대기 시간 (밀리초)
+
+        for (int i = 0; i < maxRetries; i++) {
+            try {
+                // Bedrock API 요청 실행
+                bedrockRuntimeAsyncClient.invokeModelWithResponseStream(request, responseHandler);
+                break; // 성공하면 루프 종료
+            } catch (ThrottlingException e) {
+                int delay = baseDelay * (int) Math.pow(2, i);
+                System.out.println("ThrottlingException 발생, " + delay + "ms 후 재시도...");
+                Thread.sleep(delay);
+            }
+        }
+
+
 
 
         return CompletableFuture.completedFuture(emitter);
@@ -491,10 +504,9 @@ public class StreamingService {
         /************************ 디비에 저장 ************************/
         Fairytale myFairytale = FairyTaleConverter.toFairyTale(findMember, title, 0F, 0F, 0, genre, 0L);
 
-        log.info("fairytaleId: {}", myFairytale.getFairytaleId());
-
         fairyTaleRepository.save(myFairytale);
 
+        log.info("Saved FairytaleId: {}", myFairytale.getFairytaleId());
 
         //log.info("image urls: {}", imageUrls);
 
