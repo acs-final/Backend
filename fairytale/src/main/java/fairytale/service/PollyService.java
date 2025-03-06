@@ -44,6 +44,7 @@ public class PollyService {
         try (ResponseInputStream<SynthesizeSpeechResponse> response = pollyClient.synthesizeSpeech(request);
              InputStream audioStream = response) {
 
+            /* 로컬 설치 */
 //            try (FileOutputStream outputStream = new FileOutputStream(mp3Name)) {
 //                byte[] buffer = new byte[1024];
 //                int bytesRead;
