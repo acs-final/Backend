@@ -1,0 +1,19 @@
+dependencies {
+
+
+    runtimeOnly 'com.mysql:mysql-connector-j'
+
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+
+    //redis
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+    implementation 'org.springframework.session:spring-session-data-redis'
+}
+
+bootJar{
+    enabled=false
+}
+
+jar{
+    enabled=true
+}

@@ -1,0 +1,25 @@
+dependencies {
+    implementation project(':common')
+
+
+    // amazon bedrock
+    implementation platform('software.amazon.awssdk:bom:2.26.3')
+    implementation 'software.amazon.awssdk:bedrockruntime'
+
+    // amazon polly
+    implementation("software.amazon.awssdk:polly:2.20.123")
+
+    // aws s3
+    implementation 'io.awspring.cloud:spring-cloud-starter-aws:2.4.4'
+
+    //jackson
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.15.2'
+
+    //jsoup
+    implementation 'org.jsoup:jsoup:1.14.3'
+
+    // thumbnailator
+    implementation 'net.coobird:thumbnailator:0.4.14'
+
+}
+

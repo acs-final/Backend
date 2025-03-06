@@ -37,5 +37,9 @@ out/
 .vscode/
 
 ### application.yaml ###
-resources/application.yaml
-src/main/resources/application.yaml
+api-gateway/src/main/resources/application.yaml
+fairytale/src/main/resources/application.yaml
+bookstore/src/main/resources/application.yaml
+member/src/main/resources/application.yaml
+report/src/main/resources/application.yaml
+docker-compose.yaml

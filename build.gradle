@@ -4,8 +4,9 @@ plugins {
 	id 'io.spring.dependency-management' version '1.1.7'
 }
 
-group = 'acs'
-version = '0.0.1-SNAPSHOT'
+repositories {
+	mavenCentral()
+}
 
 java {
 	toolchain {
@@ -19,34 +20,48 @@ configurations {
 	}
 }
 
-repositories {
-	mavenCentral()
+allprojects {
+	group = 'acs'
+	version = '0.0.1-SNAPSHOT'
 }
 
-dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-	implementation 'org.springframework.boot:spring-boot-starter-web'
-	compileOnly 'org.projectlombok:lombok'
-	runtimeOnly 'com.mysql:mysql-connector-j'
-	annotationProcessor 'org.projectlombok:lombok'
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+bootJar.enabled = false
 
-	//swagger
-	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0'
+subprojects {
+	apply plugin: 'java'
+	apply plugin: 'org.springframework.boot'
+	apply plugin: 'io.spring.dependency-management'
 
-	// aws bedrock
-	implementation platform('software.amazon.awssdk:bom:2.26.3')
-	implementation 'software.amazon.awssdk:bedrockruntime'
+	repositories {
+		mavenCentral()
+	}
 
-	//dall-e
-	implementation 'org.apache.httpcomponents.client5:httpclient5:5.4'
+	sourceCompatibility = '17'
 
-	//jackson
-	implementation 'com.fasterxml.jackson.core:jackson-databind:2.15.2'
+	dependencies {
 
-}
+		implementation platform('org.springframework.cloud:spring-cloud-dependencies:2024.0.0')
 
-tasks.named('test') {
-	useJUnitPlatform()
+		implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+
+
+		compileOnly 'org.projectlombok:lombok'
+
+
+		annotationProcessor 'org.projectlombok:lombok'
+
+		testImplementation 'org.springframework.boot:spring-boot-starter-test'
+		testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+
+		//swagger
+		implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.7.0'
+
+
+
+	}
+
+	tasks.named('test') {
+		useJUnitPlatform()
+	}
 }
