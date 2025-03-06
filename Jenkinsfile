@@ -28,19 +28,28 @@ pipeline {
         stage('Copy Configs & Dockerfiles') {
             steps {
                 script {
-                    //sh "mkdir api-gateway/src/main/resources"
+
+                    sh """
+                    if [ ! -d "api-gateway/src/main/resources/" ]; then
+                        mkdir -p "api-gateway/src/main/resources/"
+                        mkdir fairytale/src/main/resources
+                        mkdir bookstore/src/main/resources
+                        mkdir member/src/main/resources
+                        mkdir report/src/main/resources
+                        echo "📁 디렉토리를 생성했습니다: api-gateway/src/main/resources/"
+                    else
+                        echo "✅ 디렉토리가 이미 존재합니다: api-gateway/src/main/resources/"
+                    fi
+                    """
+
                     sh "cp /home/kevin/Backend/api-gateway/src/main/resources/application.yaml api-gateway/src/main/resources/application.yaml"
 
-                    //sh "mkdir fairytale/src/main/resources"
                     sh "cp /home/kevin/Backend/fairytale/src/main/resources/application.yaml fairytale/src/main/resources/application.yaml"
 
-                    //sh "mkdir bookstore/src/main/resources"
                     sh "cp /home/kevin/Backend/bookstore/src/main/resources/application.yaml bookstore/src/main/resources/application.yaml"
 
-                    //sh "mkdir member/src/main/resources"
                     sh "cp /home/kevin/Backend/member/src/main/resources/application.yaml member/src/main/resources/application.yaml"
 
-                    //sh "mkdir report/src/main/resources"
                     sh "cp /home/kevin/Backend/report/src/main/resources/application.yaml report/src/main/resources/application.yaml"
 
                     sh "cp /home/kevin/Backend/docker-compose.yaml docker-compose.yaml"
