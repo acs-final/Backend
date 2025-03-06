@@ -20,18 +20,6 @@ pipeline {
                     git branch: 'main',
                         credentialsId: 'github-token',  // Jenkins에 등록한 GitHub Credentials ID
                         url: 'https://github.com/acs-final/Backend.git'  // GitHub 저장소 URL
-
-                    def payload = readJSON text: env.GITHUB_PAYLOAD ?: '{}'
-                    def ref = payload.ref ?: ''
-                    def branchName = ref.replace('refs/heads/', '')
-
-                    echo "Received push to branch: ${branchName}"
-
-                    if (branchName != "main") {
-                        echo "Skipping build since it's not the main branch."
-                        currentBuild.result = 'SUCCESS'
-                        return
-                    }
                 }
             }
         }
