@@ -11,9 +11,16 @@ pipeline {
 
     stages {
 
-        stage('Check Branch') {
+
+        stage('Checkout') {
             steps {
                 script {
+                    echo "Current workspace: ${pwd}"
+
+                    git branch: 'main',
+                        credentialsId: 'github-token',  // Jenkins에 등록한 GitHub Credentials ID
+                        url: 'https://github.com/acs-final/Backend.git'  // GitHub 저장소 URL
+
                     def payload = readJSON text: env.GITHUB_PAYLOAD ?: '{}'
                     def ref = payload.ref ?: ''
                     def branchName = ref.replace('refs/heads/', '')
@@ -25,18 +32,6 @@ pipeline {
                         currentBuild.result = 'SUCCESS'
                         return
                     }
-                }
-            }
-        }
-
-        stage('Checkout') {
-            steps {
-                script {
-                    echo "Current workspace: ${pwd}"
-
-                    git branch: 'develop',
-                        credentialsId: 'github-token',  // Jenkins에 등록한 GitHub Credentials ID
-                        url: 'https://github.com/acs-final/Backend.git'  // GitHub 저장소 URL
                 }
             }
         }
