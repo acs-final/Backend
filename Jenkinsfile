@@ -20,7 +20,6 @@ pipeline {
                     git branch: 'main',
                         credentialsId: 'github-token',  // Jenkins에 등록한 GitHub Credentials ID
                         url: 'https://github.com/acs-final/Backend.git'  // GitHub 저장소 URL
-
                 }
             }
         }
