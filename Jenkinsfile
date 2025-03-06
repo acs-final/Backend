@@ -1,7 +1,7 @@
 pipeline {
     agent any
     environment {
-        BUILD_NUMBER = "v23"
+        BUILD_NUMBER = "s1"
         HARBOR_CREDENTIALS = credentials('harbor')
         BACKEND_REPO = "https://github.com/acs-final/Backend.git"
         BACKEND_IMAGE_PREFIX = "192.168.2.141:443/k8s-project"
@@ -20,6 +20,15 @@ pipeline {
                     git branch: 'main',
                         credentialsId: 'github-token',  // Jenkins에 등록한 GitHub Credentials ID
                         url: 'https://github.com/acs-final/Backend.git'  // GitHub 저장소 URL
+
+                    def branch = env.GIT_BRANCH ?: env.BRANCH_NAME
+                    if (branch != 'main') {
+                        echo "현재 브랜치는 ${branch}입니다. main 브랜치가 아니므로 파이프라인을 종료합니다."
+                        currentBuild.result = 'ABORTED'
+                        error("main 브랜치가 아닙니다.")
+                    } else {
+                        echo "main 브랜치입니다. 파이프라인을 계속 실행합니다."
+                    }/
                 }
             }
         }
