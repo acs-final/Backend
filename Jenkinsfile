@@ -1,7 +1,7 @@
 pipeline {
     agent any
     environment {
-        BUILD_NUMBER = "s1"
+        BUILD_NUMBER = "v23"
         HARBOR_CREDENTIALS = credentials('harbor')
         BACKEND_REPO = "https://github.com/acs-final/Backend.git"
         BACKEND_IMAGE_PREFIX = "192.168.2.141:443/k8s-project"
@@ -10,6 +10,25 @@ pipeline {
     }
 
     stages {
+
+        stage('Check Branch') {
+            steps {
+                script {
+                    def payload = readJSON text: env.GITHUB_PAYLOAD ?: '{}'
+                    def ref = payload.ref ?: ''
+                    def branchName = ref.replace('refs/heads/', '')
+
+                    echo "Received push to branch: ${branchName}"
+
+                    if (branchName != "main") {
+                        echo "Skipping build since it's not the main branch."
+                        currentBuild.result = 'SUCCESS'
+                        return
+                    }
+                }
+            }
+        }
+
         stage('Checkout') {
             steps {
                 script {
