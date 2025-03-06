@@ -28,7 +28,7 @@ pipeline {
                         error("main 브랜치가 아닙니다.")
                     } else {
                         echo "main 브랜치입니다. 파이프라인을 계속 실행합니다."
-                    }/
+                    }
                 }
             }
         }
